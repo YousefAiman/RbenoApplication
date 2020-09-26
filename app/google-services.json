@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1063793737094",
+    "firebase_url": "https://rbenoapplication.firebaseio.com",
+    "project_id": "rbenoapplication",
+    "storage_bucket": "rbenoapplication.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063793737094:android:ccd1f46cd3caa553",
+        "android_client_info": {
+          "package_name": "com.example.yousef.rbenoapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1063793737094-lc51p9ne73nr0c00844avdd4uo2frsil.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yousef.rbenoapplication",
+            "certificate_hash": "84f135d7efd7d7a8c2e2168a71505364ea5e6013"
+          }
+        },
+        {
+          "client_id": "1063793737094-k270mkh3dk1a1s7dbpe7a4bps698rg5t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yousef.rbenoapplication",
+            "certificate_hash": "fb4987fad0835d0b4f21057c1b74d9300c9061af"
+          }
+        },
+        {
+          "client_id": "1063793737094-0pr1ptk4l9212dt6rgcojegdgrtrmi8u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDemmShmJn-Zle2egDGjXvT445ETw29m8U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1063793737094-9vrua1rerrja1sbnlkm00ti1lil5d9v9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

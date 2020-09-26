@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/favouriteNavigationItem"
+        android:title="المفضلة"
+        android:icon="@drawable/heart_icon"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/messagesNavigationItem"
+        android:title="الرسائل"
+        android:icon="@drawable/messages_grey_icon"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/add_promo_tv"
+        android:title="اضافة اعلان"
+        android:checked="true"
+        app:showAsAction="ifRoom"
+        android:checkable="false" />
+
+    <item
+        android:id="@+id/notificationNavigationItem"
+        android:icon="@drawable/notification_grey_icon"
+        android:title="الاشعارات"
+        app:showAsAction="ifRoom"
+        app:actionLayout="@layout/menu_counter" />
+
+    <item
+        android:id="@+id/homeNavigationItem"
+        android:title="الرئيسية"
+        android:icon="@drawable/home_grey_icon"
+        android:checked="true"
+        app:showAsAction="ifRoom" />
+
+</menu>

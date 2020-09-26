@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context=".SettingsFragment"
+    android:background="#fff">
+
+    <include layout="@layout/settings_toolbar"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/settings_toolbar_shadow"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/settingsProfileLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="تعديل الملف"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/edit_account_icon" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:background="@color/settings_grey" />
+    <LinearLayout
+        android:id="@+id/settingsPasswordLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="تغيير كلمة المرور"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/change_password_icon" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:background="@color/settings_grey" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="سياسة الخصوصية"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/info_icon" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:background="@color/settings_grey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="الاتصال بنا"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/call_us_icon" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:background="@color/settings_grey" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="عن التطبيق"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/about_app_icon" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.3dp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:background="@color/settings_grey" />
+
+    <LinearLayout
+        android:id="@+id/settingsSignoutLl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:paddingStart="@dimen/_22sdp"
+        android:paddingEnd="@dimen/_22sdp"
+        android:paddingTop="@dimen/_14sdp"
+        android:paddingBottom="@dimen/_14sdp">
+
+        <ImageView
+            android:layout_width="@dimen/_9sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:srcCompat="@drawable/setting_arrow_icon" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="تسجيل الخروج"
+            android:textColor="@color/textGreyColor"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:textSize="@dimen/_15sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_23sdp"
+            android:layout_height="@dimen/_21sdp"
+            app:srcCompat="@drawable/signout_icon" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="@dimen/_160sdp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:background="@color/settings_grey" />
+
+</LinearLayout>

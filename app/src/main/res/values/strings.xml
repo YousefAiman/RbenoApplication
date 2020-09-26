@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" translatable="false">Rbeno</string>
+
+    <string name="facebook_app_id">324698381812712</string>
+    <string name="fb_login_protocol_scheme">fb324698381812712</string>
+    <string name="signin">تسجيل الدخول</string>
+    <string name="createaccount">انشاء حساب</string>
+    <string name="createAccountTitle">إنشاء حساب بالبريد الاكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="confirmPassword">تأكيد كلمة المرور</string>
+    <string name="haveAnAccount">لديك حساب مسبق؟ سجل من هنا</string>
+    <string name="signinTitle">تسجيل الدخول بالبريد الالكتروني</string>
+    <string name="forgotPassword">نسيت كلمة المرور؟</string>
+    <string name="dontHaveAnAccount">"ليس لديك حساب؟ انشاء الأن"</string>
+    <string name="noConnection1">أنت غير متصل بالانترنت</string>
+    <string name="noConnection2">الرجاء التأكد من توافر الانترنت في جهازك</string>
+    <string name="noConnection3">ثم أعد المحاولة مرة اخري</string>
+    <string name="tryAgain">حاول مرة أخري</string>
+    <string name="welcome">مرحبا بك في</string>
+    <string name="skip">تخطي</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+</resources>

@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="#fff"
+    tools:context=".PromotionInfoFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/promotiontoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        app:contentInsetEnd="40dp"
+        app:title="">
+
+<!--            <de.hdodenhof.circleimageview.CircleImageView-->
+<!--                android:id="@+id/userImageIndicator"-->
+<!--                android:layout_width="40dp"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:src="@color/transparentGrey"-->
+<!--                 />-->
+
+        <ImageView
+            android:id="@+id/promoBackIv"
+            android:layout_width="@dimen/_32sdp"
+            android:scaleType="center"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/settings_back_arrow"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/promotion_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/a_google"
+                android:gravity="center"
+                android:maxLines="2"
+                android:padding="5dp"
+                android:textColor="#BE1522"
+                android:textSize="@dimen/_17sdp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="15sp"
+                app:autoSizeTextType="uniform"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/promotion_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/a_google"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_15sdp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/gradient_grey_down"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_marginTop="-3dp"
+        android:layout_height="wrap_content"
+        android:scrollbarSize="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:paddingTop="@dimen/_5sdp"
+    android:layout_height="wrap_content">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/promotionsPager"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_200sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="@dimen/_5sdp"
+        android:paddingEnd="@dimen/_5sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/pagerPromoNextIv"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_centerVertical="true"
+        app:srcCompat="@drawable/ic_arrow_next"
+        android:scaleType="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/promotionsPager"
+        app:layout_constraintBottom_toBottomOf="@+id/promotionsPager"
+        app:layout_constraintEnd_toEndOf="@+id/promotionsPager"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:background="@drawable/promo_arrow_back"/>
+
+    <ImageView
+        android:id="@+id/pagerPromoPreviousIv"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_arrow_next"
+        android:scaleType="center"
+        app:layout_constraintTop_toTopOf="@id/promotionsPager"
+        app:layout_constraintBottom_toBottomOf="@+id/promotionsPager"
+        app:layout_constraintStart_toStartOf="@+id/promotionsPager"
+        android:rotation="180"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:background="@drawable/promo_arrow_back"/>
+
+    <TextView
+        android:id="@+id/promotionDescTitleTv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/promotion_desc_round_back"
+        android:fontFamily="@font/a_google"
+        android:paddingStart="@dimen/_9sdp"
+        android:paddingTop="@dimen/_2sdp"
+        android:paddingEnd="@dimen/_9sdp"
+        android:paddingBottom="@dimen/_2sdp"
+        android:text="تفاصيل الاعلان"
+        android:textColor=" #BD1421"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/promoVideoCardView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_170sdp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/_22sdp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/promoVideoPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:resize_mode="fill"
+            app:controller_layout_id="@layout/exo_player_custom_view"
+            tools:targetApi="28"
+            />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/promoInfoTv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/_12sdp"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promotionDescTitleTv2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/promotiondotsSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/promotionsPager"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="35dp"
+        android:layout_marginStart="35dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/promotionIdTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center"
+            android:fontFamily="@font/a_google"
+            android:gravity="end"
+            android:lines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="#515C6F"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline30"
+            app:layout_constraintTop_toTopOf="@+id/promotionViewsTv" />
+
+        <TextView
+            android:id="@+id/promotionPublishtimeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/a_google"
+            android:gravity="center_vertical"
+            android:lines="1"
+            android:layout_marginEnd="5dp"
+            android:textColor="#515C6F"
+            android:textSize="@dimen/_10sdp"
+            app:layout_constraintEnd_toStartOf="@+id/imageView16"
+            app:layout_constraintTop_toTopOf="@+id/promotionViewsTv" />
+
+        <ImageView
+            android:id="@+id/imageView16"
+            android:layout_width="@dimen/_11sdp"
+            android:layout_height="@dimen/_11sdp"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintEnd_toStartOf="@+id/guideline43"
+            app:layout_constraintTop_toTopOf="@+id/imageView15"
+            app:srcCompat="@drawable/clock_icon" />
+
+        <TextView
+            android:id="@+id/promotionViewsTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:lines="1"
+            android:layout_marginEnd="5dp"
+            android:textColor="#515C6F"
+            android:textSize="@dimen/_10sdp"
+             app:layout_constraintEnd_toStartOf="@+id/imageView15"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/imageView15"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_12sdp"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/promotionViewsTv"
+            app:srcCompat="@drawable/eye_icon" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.16" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline43"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.73" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/fav_image"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@drawable/promo_icon_round"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:srcCompat="@drawable/heart_white"
+                    android:scaleType="centerInside"/>
+
+                <ImageView
+                    android:id="@+id/share_img"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/promo_icon_round_red"
+                    android:layout_marginEnd="12dp"
+                    android:scaleType="centerInside"
+                    app:layout_constraintEnd_toStartOf="@+id/message_img"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/plane_white_icon" />
+
+                <ImageView
+                    android:id="@+id/call_img"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/promo_icon_round_red"
+                    android:layout_marginEnd="12dp"
+                    android:scaleType="centerInside"
+                    app:layout_constraintEnd_toStartOf="@+id/fav_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/telephone_white_icon" />
+
+                <ImageView
+                    android:id="@+id/message_img"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:background="@drawable/promo_icon_round_red"
+                    android:scaleType="centerInside"
+                    android:padding="6dp"
+                    android:layout_marginEnd="12dp"
+                    app:layout_constraintEnd_toStartOf="@+id/call_img"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/message_icon_white" />
+
+                <android.widget.Button
+                    android:id="@+id/promo_delete_button"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/delete_button_layout"
+                    android:drawableEnd="@drawable/ic_delete_black_24dp"
+                    android:fontFamily="@font/a_google"
+                    android:text="احذف الإعلان"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/_11sdp"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@+id/call_img"
+                    app:layout_constraintEnd_toEndOf="@+id/fav_image"
+                    app:layout_constraintStart_toStartOf="@+id/message_img"
+                    app:layout_constraintTop_toTopOf="@+id/call_img" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:text="تقييم الاعلان"
+                    android:textColor="#515C6F"
+                    android:textSize="@dimen/_9sdp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ratingBar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <hyogeun.github.com.colorratingbarlib.ColorRatingBar
+                    android:id="@+id/ratingBar"
+                    style="@style/RatingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:rating="0"
+                    android:stepSize="0.5"
+                    app:empty_color="#9C9C9C"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ratingNumberTv"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:progress_color="#BD1421" />
+
+                <TextView
+                    android:id="@+id/ratingNumberTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:text="(0)"
+                    android:textColor="#515C6F"
+                    android:textSize="@dimen/_10sdp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/promotionDescTitleTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/promotion_desc_round_back"
+                android:fontFamily="@font/a_google"
+                android:paddingStart="@dimen/_9sdp"
+                android:paddingTop="@dimen/_2sdp"
+                android:paddingEnd="@dimen/_9sdp"
+                android:paddingBottom="@dimen/_2sdp"
+                android:text="تفاصيل الاعلان"
+                android:textColor="#BD1421"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/promoInfoTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:padding="@dimen/_10sdp"
+                android:fontFamily="@font/a_google"
+                android:layout_gravity="center"
+                android:paddingTop="5dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="30dp"
+                android:gravity="center"
+                android:textColor="#515C6F"
+                android:textSize="@dimen/_10sdp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#F5F5F5"
+                android:gravity="end"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:fontFamily="@font/a_google"
+                    android:text="إعلانات ذات صلة"
+                    android:textColor="#515C6F"
+                    android:textSize="@dimen/_12sdp" />
+
+                <View
+                    android:layout_width="@dimen/_3sdp"
+                    android:layout_height="@dimen/_13sdp"
+                    android:layout_marginEnd="10dp"
+                    android:background="#BE1522"
+                    android:layout_gravity="center_vertical"
+                     />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/horizontalRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/_40sdp"/>
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+
+</LinearLayout>

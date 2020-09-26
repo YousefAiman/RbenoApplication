@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chattingUserRv"
+        android:layout_width="match_parent"
+        android:background="#F7F8F9"
+        android:paddingBottom="@dimen/_70sdp"
+        android:paddingTop="@dimen/_20sdp"
+        android:clipToPadding="false"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/noMessagesTv"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/_20sdp"
+        android:layout_centerInParent="true"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/moreMessagesTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:drawableTopCompat="@drawable/ic_arrow_gray_down"
+        android:drawablePadding="@dimen/_2sdp"
+        android:layout_marginBottom="@dimen/_20sdp"
+        android:gravity="center_horizontal"
+        android:visibility="gone"
+        android:fontFamily="@font/a_google"
+        android:textSize="@dimen/_12sdp"
+        android:textColor="@color/textGreyColor"
+        android:text="عرض المزيد من الرسائل"/>
+</LinearLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/_10sdp"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <androidx.appcompat.widget.AppCompatTextView
+        app:autoSizeTextType="uniform"
+        app:autoSizeMinTextSize="5sp"
+        android:id="@+id/counterTv"
+        android:layout_width="@dimen/_17sdp"
+        android:padding="@dimen/_3sdp"
+        android:layout_height="@dimen/_17sdp"
+        android:background="@drawable/red_circle"
+        android:gravity="center"
+        android:textColor="@color/white" />
+</LinearLayout>

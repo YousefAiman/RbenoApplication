@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/messagingViewProfile"
+        android:title="عرض البروفايل"
+        />
+    <item
+        android:id="@+id/messagingDeleteMessages"
+        android:title="حذف المحادثة"
+        />
+    <item
+        android:id="@+id/messagingBlockUser"
+        android:title="حظر المشترك"
+        />
+
+    <item android:title="ابلغ عن ألمشترك"
+        />
+
+</menu>

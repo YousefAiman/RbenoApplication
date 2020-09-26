@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!--        <item android:title="menu"-->
+<!--            app:showAsAction="always"-->
+<!--            android:icon="@drawable/ic__menu_icon"-->
+<!--            >-->
+<!--                <menu>-->
+                        <item
+                            android:id="@+id/edit_account"
+                            android:title="تعديل الملف"
+                            android:icon="@drawable/user_icon"
+                            app:showAsAction="never"
+                            />
+
+                        <item
+                            android:id="@+id/status_present"
+                            android:title="تغيير الحالة"
+                            android:icon="@drawable/green_circle"
+                            app:showAsAction="never"
+                            />
+
+<!--                </menu>-->
+<!--        </item>-->
+<!--            >-->
+<!--                <menu>-->
+<!--                        <item-->
+<!--                            android:id="@+id/status_present"-->
+<!--                            android:title="نشط"-->
+<!--                            android:icon="@drawable/green_circle"-->
+<!--                            />-->
+<!--                        <item-->
+<!--                            android:id="@+id/status_gone"-->
+<!--                            android:title="غير نشط"-->
+<!--                            android:icon="@drawable/red_circle"-->
+<!--                            />-->
+<!--                </menu>-->
+<!--        </item>-->
+
+</menu>

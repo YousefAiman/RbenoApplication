@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:clickable="true"
+    android:tag="UserFragment"
+    android:orientation="vertical"
+    android:focusable="true"
+    tools:context=".UserFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/promotiontoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="40dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:id="@+id/back_arrow"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            app:srcCompat="@drawable/settings_back_arrow"
+            android:layout_marginStart="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/userNameTv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/a_google"
+            android:gravity="center"
+            android:maxLines="2"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:textColor="#BE1522"
+            android:textSize="@dimen/_17sdp"
+            app:autoSizeMaxTextSize="20sp"
+            app:autoSizeMinTextSize="15sp"
+            app:autoSizeTextType="uniform"/>
+
+<!--        -->
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+
+<!--         -->
+
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+    </androidx.appcompat.widget.Toolbar>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/gradient_grey_down" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center_horizontal"
+                    app:civ_border_color="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/staticusername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="5dp"
+                    android:fontFamily="@font/a_google"
+                    android:textColor="#515C6F"
+                    android:textSize="@dimen/_17sdp" />
+
+                <hyogeun.github.com.colorratingbarlib.ColorRatingBar
+                    android:id="@+id/ratingBar"
+                    style="@style/RatingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:numStars="5"
+                    android:stepSize=".5"
+                    app:empty_color="#9C9C9C"
+                    app:progress_color="#BD1421" />
+
+
+                <LinearLayout
+                    android:id="@+id/greyLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="#F6F6F6"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/a_google"
+                            android:gravity="center"
+                            android:text="الدولة"
+                            android:textColor="#515C6F"
+                            android:textSize="@dimen/_13sdp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/a_google"
+                            android:gravity="center_horizontal"
+                            android:text="التقييم"
+                            android:textColor="#515C6F"
+                            android:textSize="@dimen/_13sdp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/a_google"
+                            android:gravity="center_horizontal"
+                            android:text="الحالة"
+                            android:textColor="#515C6F"
+                            android:textSize="@dimen/_13sdp" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <androidx.constraintlayout.widget.Guideline
+                                    android:id="@+id/guideline2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    app:layout_constraintGuide_percent="0.89" />
+
+                                <TextView
+                                    android:id="@+id/countryTv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/a_google"
+
+                                    android:gravity="center"
+                                    android:maxLines="2"
+                                    android:textColor="#515C6F"
+                                    android:textSize="@dimen/_13sdp"
+                                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="0dp"
+                                    android:paddingStart="3dp"
+                                    android:paddingEnd="3dp"
+                                    app:layout_constraintBottom_toBottomOf="@+id/countryTv"
+                                    app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                                    app:layout_constraintStart_toEndOf="@+id/countryTv"
+                                    app:layout_constraintTop_toTopOf="@+id/countryTv"
+                                    app:srcCompat="@drawable/marker_icon" />
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.8"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal">
+
+
+                                <TextView
+                                    android:id="@+id/ratingTextView"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/a_google"
+                                    android:text="0%"
+                                    android:textColor="#515C6F"
+                                    android:textSize="@dimen/_13sdp"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="0dp"
+                                    android:paddingStart="3dp"
+                                    app:layout_constraintBottom_toBottomOf="@+id/ratingTextView"
+                                    app:layout_constraintStart_toEndOf="@+id/ratingTextView"
+                                    app:layout_constraintTop_toTopOf="@+id/ratingTextView"
+                                    app:srcCompat="@drawable/red_star" />
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal">
+
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/StatusTv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:fontFamily="@font/a_google"
+                                    android:textColor="#515C6F"
+                                    android:textSize="@dimen/_13sdp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <ImageView
+                                    android:id="@+id/StatusImage"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="0dp"
+                                    android:paddingStart="3dp"
+                                    android:scaleType="fitStart"
+                                    app:layout_constraintBottom_toBottomOf="@+id/StatusTv"
+                                    app:layout_constraintStart_toEndOf="@+id/StatusTv"
+                                    app:layout_constraintTop_toTopOf="@+id/StatusTv"
+                                    app:srcCompat="@drawable/green_circle" />
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <com.google.android.gms.ads.AdView
+                    android:id="@+id/adView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    app:adSize="BANNER"
+                    app:adUnitId="ca-app-pub-6990486336142688/8279246162" />
+
+                <TextView
+                    android:id="@+id/userPromosTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:fontFamily="@font/a_google"
+                    android:layout_marginTop="5dp"
+                    android:text="إعلاناتي"
+                    android:textColor="#515C6F"
+                    android:textSize="@dimen/_15sdp" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/myPromosRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    android:paddingBottom="@dimen/_100sdp" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+</LinearLayout>

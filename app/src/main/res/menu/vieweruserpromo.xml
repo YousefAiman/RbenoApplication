@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_to_fav"
+        android:title="اضافة الى المفضلة"
+        android:icon="@drawable/ic_heart_grey"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/report_promo"
+        android:title="ابلاغ عن الاعلان"
+        android:icon="@drawable/grey_alert"
+        />
+</menu>

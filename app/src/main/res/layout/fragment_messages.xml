@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:focusable="true"
+    android:clickable="true"
+    tools:context=".MessagesFragment">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/promotiontoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/a_google"
+                android:text="الرسائل الخاصة"
+                android:textColor="#BE1522"
+                android:textSize="@dimen/_16sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userImageIndicator"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/com_facebook_profile_picture_blank_square"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+ />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+
+
+    <TextView
+        android:id="@+id/textView62"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:text="ردود على اعلاناتك واعلانات المستخدمين"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_9sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />
+
+
+<!--    <com.google.android.material.tabs.TabLayout-->
+<!--        android:id="@+id/tabLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView62"-->
+<!--        app:tabIndicatorColor="@color/red"-->
+<!--        app:tabIndicatorHeight="@dimen/_1sdp"-->
+<!--        app:tabSelectedTextColor="@color/red"-->
+<!--        app:tabTextAppearance="@style/tab_text"-->
+<!--        app:tabTextColor="#515C5F">-->
+
+<!--    </com.google.android.material.tabs.TabLayout>-->
+
+    <LinearLayout
+        android:id="@+id/messagesLinear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="@dimen/_12sdp"
+        app:layout_constraintTop_toBottomOf="@+id/textView62">
+
+
+        <TextView
+            android:id="@+id/sentTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="الرسائل الصادرة"
+            android:textColor="@color/textGreyColor"
+            android:textSize="@dimen/_11sdp"
+            app:layout_constraintEnd_toStartOf="@+id/receivedTv"
+            app:layout_constraintTop_toTopOf="@+id/receivedTv" />
+
+
+        <View
+            android:layout_width="0.8dp"
+            android:layout_height="@dimen/_16sdp"
+            android:background="#89909D"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/receivedTv"
+            app:layout_constraintEnd_toStartOf="@+id/receivedTv"
+            app:layout_constraintStart_toEndOf="@+id/sentTv"
+            app:layout_constraintTop_toTopOf="@+id/receivedTv" />
+
+        <TextView
+            android:id="@+id/receivedTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:text="الرسائل الواردة"
+            android:textColor="@color/textGreyColor"
+            android:textSize="@dimen/_11sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView62" />
+
+
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:background="#9FA6B0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/messagesLinear" />
+
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/messagesViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layoutDirection="rtl"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view5" />
+
+    <ImageView
+        android:id="@+id/arrowIv"
+        android:layout_width="@dimen/_14sdp"
+        android:layout_height="@dimen/_7sdp"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view5"
+        app:srcCompat="@drawable/messages_arrow" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

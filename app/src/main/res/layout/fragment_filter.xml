@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/promotiontoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:minHeight="?attr/actionBarSize"
+        app:contentInsetStart="0dp"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/a_google"
+                android:text="التصنيف"
+                android:textColor="@color/textGreyColor"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageView
+                android:id="@+id/cancelIv"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:padding="@dimen/_5sdp"
+                app:srcCompat="@drawable/close_icon"
+                android:layout_marginStart="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/filterCheckImage"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                app:srcCompat="@drawable/ic_check_black_24dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_5sdp"
+        android:background="@drawable/gradient_grey_down"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="نوع الإعلان"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/typePromoTv_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="إعلان نصي"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/typePromoTv_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="إعلان بصورة"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/typePromoTv_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="إعلان فيديو"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="التصنيف"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/homeScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="عقارات"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/mobileScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="موبيلات"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/electronicScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="الكترونيات"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+
+                        <TextView
+                            android:id="@+id/furnitureScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="أثاث"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/carsScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="سيارات"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp"
+
+                            />
+
+                        <TextView
+                            android:id="@+id/pcScrollTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="كمبيوتر ولاب توب"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="السعر"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lowPriceTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:textSize="@dimen/_12sdp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="الارخص الى الاغلى"
+                            android:textColor="@color/textGreyColor"/>
+
+                        <TextView
+                            android:id="@+id/highPriceTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:textSize="@dimen/_12sdp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:paddingBottom="7dp"
+                            android:text="الاغلى الى الارخص"
+                            android:textColor="@color/textGreyColor"/>
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="عدد المشاهدات"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lowToHighViewsTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="الأقل إلى الأعلى"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/highToLowViewsTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="الأعلى إلى الأقل"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="تاريخ الإضافة"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginTop="@dimen/_15sdp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/timePromoTv_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="أية وقت"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/timePromoTv_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ دقيقة"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/timePromoTv_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ ساعة"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+
+                        <TextView
+                            android:id="@+id/timePromoTv_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ يوم"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/timePromoTv_5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ يومان"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp"
+
+                            />
+
+                        <TextView
+                            android:id="@+id/timePromoTv_6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="هذا الاسبوع"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <TextView
+                            android:id="@+id/timePromoTv_7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ اسبوع"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+
+                        <TextView
+                            android:id="@+id/timePromoTv_8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/signinedittext"
+                            android:fontFamily="@font/a_google"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7dp"
+                            android:paddingRight="15dp"
+                            android:paddingBottom="7dp"
+                            android:text="منذ 10 يوم"
+                            android:textColor="@color/textGreyColor"
+                            android:textSize="@dimen/_12sdp" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/a_google"
+                    android:layout_gravity="end"
+                    android:text="التقييم"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="@dimen/_12sdp" />
+
+                <hyogeun.github.com.colorratingbarlib.ColorRatingBar
+                    android:id="@+id/filterRatingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:numStars="5"
+                    android:layout_gravity="center"
+                    android:stepSize="0.5"
+                    app:empty_color="#9C9C9C"
+                    app:progress_color="#BD1421"
+                    />
+
+            </LinearLayout>
+        </ScrollView>
+
+</LinearLayout>

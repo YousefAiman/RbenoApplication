@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#fff"
+    android:layout_marginTop="@dimen/_10sdp"
+    app:cardCornerRadius="@dimen/_25sdp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.025" />
+
+        <ImageView
+            android:id="@+id/myPromoImage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/guideline7"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline33"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.89" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/myPromoDesc"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:textColor="#fff"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="@dimen/_13sdp"
+            android:gravity="center"
+            android:padding="@dimen/_8sdp"
+            app:autoSizeMaxTextSize="@dimen/_22sdp"
+            app:layout_constraintBottom_toTopOf="@+id/view4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline29" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline32"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.58" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline29"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.125" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline27"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.44" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline26"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.05" />
+
+        <View
+            android:id="@+id/view4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#30000000"
+            app:layout_constraintBottom_toBottomOf="@+id/myPromoImage"
+            app:layout_constraintTop_toTopOf="@+id/guideline20" />
+
+        <ImageView
+            android:id="@+id/imageView16"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_16sdp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline7"
+            app:layout_constraintEnd_toStartOf="@+id/guideline32"
+            app:layout_constraintStart_toStartOf="@+id/guideline27"
+            app:layout_constraintTop_toTopOf="@+id/view4"
+            app:srcCompat="@drawable/clock_icon_small_white" />
+
+        <TextView
+            android:id="@+id/myPromopublishTimeTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/a_google"
+            android:gravity="start"
+            android:textColor="#fff"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/myPromoImage"
+            app:layout_constraintEnd_toStartOf="@+id/imageView16"
+            app:layout_constraintStart_toStartOf="@+id/guideline25"
+            app:layout_constraintTop_toTopOf="@+id/view4" />
+
+        <TextView
+            android:id="@+id/myPromoViewsTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:fontFamily="@font/a_google"
+            android:gravity="end"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_goneMarginStart="@dimen/_10sdp"
+            android:lines="1"
+            android:textColor="#fff"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/myPromoImage"
+            app:layout_constraintEnd_toStartOf="@+id/imageView4"
+            app:layout_constraintStart_toStartOf="@+id/guideline32"
+            app:layout_constraintTop_toTopOf="@+id/view4" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_15sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/myPromoImage"
+            app:layout_constraintEnd_toStartOf="@+id/guideline33"
+            app:layout_constraintTop_toTopOf="@+id/view4"
+            app:srcCompat="@drawable/eye_icon_small_white" />
+
+
+        <View
+            android:id="@+id/imageView17"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:background="@drawable/newestpromoprice"
+            app:layout_constraintBottom_toTopOf="@+id/guideline29"
+            app:layout_constraintEnd_toStartOf="@+id/guideline27"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline26" />
+
+        <TextView
+            android:id="@+id/myPromoCurrencyTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/arial_bold"
+            android:lines="1"
+            android:textColor="#BE1522"
+            android:layout_marginStart="@dimen/_8sdp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline29"
+            app:layout_constraintStart_toStartOf="@+id/guideline25"
+            app:layout_constraintTop_toTopOf="@+id/guideline26" />
+
+        <TextView
+            android:id="@+id/myPromoPriceTv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:fontFamily="@font/arial_bold"
+            android:lines="1"
+            android:textColor="#BE1522"
+            app:layout_constraintBottom_toTopOf="@+id/guideline29"
+            app:layout_constraintEnd_toStartOf="@+id/guideline27"
+            app:layout_constraintStart_toEndOf="@+id/myPromoCurrencyTv"
+            app:layout_constraintTop_toTopOf="@+id/guideline26" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/myPromoTitleTv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fontFamily="@font/a_google"
+            android:gravity="center"
+            android:padding="@dimen/_10sdp"
+            app:autoSizeMinTextSize="@dimen/_13sdp"
+            app:autoSizeMaxTextSize="@dimen/_20sdp"
+            android:lines="1"
+            android:textColor="@color/textGreyColor"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/myPromoImage" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.76" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.63" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

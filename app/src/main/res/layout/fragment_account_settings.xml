@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#fff"
+    tools:context=".AccountSettingsFragment"
+    android:orientation="vertical">
+
+    <include layout="@layout/settings_toolbar"/>
+    <View
+        android:id="@+id/view10"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_5sdp"
+        android:background="@drawable/gradient_grey_down"
+        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="@dimen/_96sdp"
+        android:layout_height="@dimen/_96sdp"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:src="@drawable/com_facebook_profile_picture_blank_square"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />
+
+    <ImageView
+        android:id="@+id/editProfileImage"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_image"
+        app:layout_constraintEnd_toEndOf="@+id/profile_image"
+        app:layout_constraintStart_toStartOf="@+id/profile_image"
+        app:layout_constraintTop_toBottomOf="@+id/profile_image"
+        app:srcCompat="@drawable/edit_image_icon" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:fontFamily="@font/a_google"
+        android:text="اسم المستخدم"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/editProfileImage" />
+
+
+    <TextView
+        android:id="@+id/usernameTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:fontFamily="@font/a_google"
+        android:text="البريد الاليكتروني"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTv" />
+
+
+    <TextView
+        android:id="@+id/emailTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_13sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+
+    <TextView
+        android:id="@+id/textView25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:fontFamily="@font/a_google"
+        android:text="رقم الهاتف"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/emailTv" />
+
+
+
+    <android.widget.EditText
+        android:id="@+id/phonenumEd"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:inputType="phone"
+        android:paddingStart="@dimen/_20sdp"
+        android:background="@drawable/edit_file_edit_back"
+        android:textColorHint="#B8515C6F"
+        android:paddingEnd="@dimen/_20sdp"
+        android:paddingTop="@dimen/_2sdp"
+        android:paddingBottom="@dimen/_2sdp"
+        android:gravity="center"
+        android:textColor="#828AA5"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView25"
+        app:layout_constraintWidth_percent="0.57" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:padding="@dimen/_2sdp"
+        android:text="تعديل"
+        android:textColor="#BD1421"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/phonenumEd"
+        app:layout_constraintEnd_toEndOf="@+id/textView25"
+        app:layout_constraintStart_toStartOf="@+id/textView25"
+        app:layout_constraintTop_toBottomOf="@+id/textView25" />
+    <android.widget.Button
+        android:id="@+id/editBtn"
+        android:layout_width="@dimen/_90sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_32sdp"
+        android:paddingStart="@dimen/_15sdp"
+        android:paddingEnd="@dimen/_15sdp"
+        android:background="@drawable/signinbuttonlayout"
+        android:fontFamily="@font/a_google"
+        android:text="تحديث"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phonenumEd" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

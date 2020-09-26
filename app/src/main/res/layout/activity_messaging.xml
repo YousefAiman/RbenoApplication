@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true"
+    tools:context=".MessagingActivity">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/promotiontoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        app:contentInsetEnd="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="">
+
+        <ImageView
+            android:id="@+id/promoBackIv"
+            android:layout_width="@dimen/_32sdp"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            app:srcCompat="@drawable/settings_back_arrow" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/a_google"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="الرسائل الخاصة"
+            android:textColor="#BE1522"
+            android:textSize="@dimen/_17sdp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+<!--    <TextView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:fontFamily="@font/a_google"-->
+<!--        android:gravity="center"-->
+<!--        android:text="الرسائل الخاصة"-->
+<!--        android:textColor="#BE1522"-->
+<!--        android:textSize="@dimen/_17sdp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/promotiontoolbar"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+
+
+    <TextView
+        android:id="@+id/messagingUserNameTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:gravity="center"
+        android:lines="1"
+        android:text="سارة عبد الحميد"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />
+
+    <View
+        android:id="@+id/promoView"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginTop="@dimen/_1sdp"
+        android:background="@drawable/intedendpromotionback"
+        app:layout_constraintEnd_toStartOf="@+id/guideline86"
+        app:layout_constraintStart_toStartOf="@+id/guideline72"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/messagingPromoImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/intededPromoId"
+        app:layout_constraintEnd_toStartOf="@+id/guideline81"
+        app:layout_constraintStart_toStartOf="@+id/guideline72"
+        app:layout_constraintTop_toTopOf="@+id/promoView" />
+
+
+
+    <TextView
+        android:id="@+id/textView64"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:text="بخصوص اعلان رقم"
+        android:textColor="#515C6F"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline86"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="@+id/guideline72"
+        app:layout_constraintTop_toTopOf="@+id/promoView" />
+
+    <TextView
+        android:id="@+id/intededPromoId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:textColor="#BE1824"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintBottom_toTopOf="@+id/messagesRv"
+        app:layout_constraintEnd_toEndOf="@+id/textView64"
+        app:layout_constraintStart_toStartOf="@+id/textView64"
+        app:layout_constraintTop_toBottomOf="@+id/textView64" />
+
+    <View
+        android:layout_width="@dimen/_16sdp"
+        android:layout_height="@dimen/_16sdp"
+        app:layout_constraintBottom_toTopOf="@+id/messagesRv"
+        app:layout_constraintEnd_toStartOf="@+id/guideline86"
+        app:layout_constraintStart_toStartOf="@+id/guideline87"
+        app:layout_constraintTop_toTopOf="@+id/promoView"
+        android:background="@drawable/intedendmessagearrow"
+         />
+
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/red"
+        android:layout_marginTop="@dimen/_1sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline86"
+        app:layout_constraintTop_toBottomOf="@+id/messagingUserNameTv" />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline72"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.21" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline31"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.13" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/messagesRv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        android:scrollbarSize="1.5dp"
+        android:paddingEnd="1.5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promoView" />
+
+    <TextView
+        android:id="@+id/nomessageTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:text="لا توجد اي رسائل سابقة!"
+        android:textColor="#999999"
+        android:textSize="@dimen/_20sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/messagesRv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promoView"
+         />
+    <View
+        android:id="@+id/view10"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/gradient_grey"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout3"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline65"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.29" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline66"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.37" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline81"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <EditText
+            android:id="@+id/messageEd"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_40sdp"
+            android:fontFamily="@font/a_google"
+            android:background="@color/white"
+            android:gravity="center"
+            android:imeOptions="actionDone"
+            android:hint="اكتب رسالة..."
+            android:inputType="textPersonName"
+            android:nextFocusLeft="@id/messageEd"
+            android:nextFocusUp="@id/messageEd"
+            android:nextFocusDown="@id/messageEd"
+            android:textColorHint="#959CA7"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/sendMessageBtn"
+            app:layout_constraintStart_toEndOf="@+id/recordBtn" />
+
+
+        <ImageView
+            android:id="@+id/sendMessageBtn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/message_plane_white"
+            android:scaleType="centerInside"
+            android:paddingStart="17dp"
+            android:background="@drawable/message_button_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline71" />
+
+        <android.widget.Button
+            android:id="@+id/attachBtn"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:background="@drawable/add_attachment_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline76"
+            app:layout_constraintTop_toTopOf="@+id/messageEd" />
+
+        <ImageView
+            android:id="@+id/recordBtn"
+            android:layout_width="@dimen/_12sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:background="@drawable/ic_mic"
+            app:layout_constraintEnd_toEndOf="@+id/attachBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/attachBtn"
+            app:layout_constraintTop_toTopOf="@+id/messageEd" />
+
+
+        <ImageView
+            android:id="@+id/cameraBtn"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:background="@drawable/ic_camera_grey"
+            app:layout_constraintEnd_toEndOf="@+id/attachBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/attachBtn"
+            app:layout_constraintTop_toTopOf="@+id/messageEd" />
+
+        <ImageView
+            android:id="@+id/imageBtn"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:background="@drawable/ic_image_grey"
+            app:layout_constraintEnd_toEndOf="@+id/attachBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/attachBtn"
+            app:layout_constraintTop_toTopOf="@+id/messageEd" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline71"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.79" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline76"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.03" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <View
+        android:id="@+id/recordView"
+        android:layout_width="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline66"
+        app:layout_constraintStart_toStartOf="@+id/guideline65"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout3" />
+    <View
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline65"
+        app:layout_constraintStart_toStartOf="@+id/guideline72"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout3" />
+
+    <View
+        android:id="@+id/cameraView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline72"
+        app:layout_constraintStart_toStartOf="@+id/guideline31"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout3" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline86"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.79" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline87"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <FrameLayout
+        android:id="@+id/messagingFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
