@@ -24,7 +24,8 @@ jobs:
 
       - name: GitHub Action for Android Lint
         uses: yutailang0119/action-android-lint@v1.0.2
-
+        with:
+          xml_path: build/reports/lint-results.xml;
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
