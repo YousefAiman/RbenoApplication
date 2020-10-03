@@ -348,7 +348,6 @@ public class WelcomeActivity extends AppCompatActivity {
         } else {
             startActivity(new Intent(WelcomeActivity.this, RegisterActivity.class).putExtra("country", country).putExtra("currency", currency));
         }
-
         finish();
     }
 
