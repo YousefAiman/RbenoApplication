@@ -21,18 +21,13 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        
-      - name: Google Java Format
-  # You may pin to the exact commit or the version.
-  # uses: axel-op/googlejavaformat-action@8031d39244c98b85c09d8fb3129b108d6b05e2bc
-        uses: axel-op/googlejavaformat-action@v3.3.2
-        with:
-        # Arguments for the Google Java Format executable
-          args: --replace
-        # Pattern to match files to be formatted
-          files: java
-        # Set to true to not commit the changes
-          skipCommit: false
+
+
+      - name: GitHub Action for Android Lint
+        uses: yutailang0119/action-android-lint@v1.0.2
+        with: 
+         xml_path: app/build/reports/lint-results-release-fatal.xml
+
       - name: Run a one-line script
         run: echo Hello, world!
 
