@@ -8,20 +8,46 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 public class WifiReceiver extends BroadcastReceiver {
-    public boolean wifiIsOn;
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
+  private static ConnectivityManager connectivityManager;
+//  private NotificationManager notificationManager;
+//  private  ConnectivityReceiverListener mConnectivityReceiverListener;
+//  public interface ConnectivityReceiverListener {
+//    void onNetworkConnectionChanged(boolean isConnected);
+//  }
+//
+//  WifiReceiver(ConnectivityReceiverListener connectivityReceiverListener){
+//    mConnectivityReceiverListener = connectivityReceiverListener;
+//  }
+//  WifiReceiver(){
+//
+//  }
+//
+//  public static boolean isConnected(Context context) {
+//    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+//    return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+//  }
 
-        ConnectivityManager conMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        assert conMan != null;
-        NetworkInfo netInfo = conMan.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            Log.d("ttt", "wifi online");
-            GlobalVariables.setWifiIsOn(true);
-        } else {
-            GlobalVariables.setWifiIsOn(false);
-            Log.d("ttt", "wifi offline");
-        }
+  @Override
+  public void onReceive(Context context, Intent intent) {
+
+    if (connectivityManager == null)
+      connectivityManager = (ConnectivityManager) context.getApplicationContext()
+              .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+
+    final NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+
+    if (netInfo != null &&
+//            netInfo.getType() == ConnectivityManager.TYPE_WIFI
+            netInfo.isConnected()
+    ) {
+      Log.d("ttt", "wifi online");
+      GlobalVariables.setWifiIsOn(true);
+    } else {
+      GlobalVariables.setWifiIsOn(false);
+      Log.d("ttt", "wifi offline");
     }
+  }
+
 }

@@ -1,34 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipeRefreshLayout">
+    android:background="#fff"
+    android:layoutDirection="rtl"
+    tools:context=".CategoryPromotionsFragment">
 
-        <LinearLayout
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipeRefreshLayout">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbarSize="0dp"
+            android:overScrollMode="never">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:background="#C9CCD1"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/carPromosRecyclerView"
-                    android:clipToPadding="true"
-                    android:visibility="visible"
-                    app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                    app:spanCount="2"
+                    android:id="@+id/videosRv"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="0dp"
+                    android:paddingStart="10dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintTop_toBottomOf="@id/view3"
+                    android:paddingEnd="10dp"
+                    app:layout_constraintDimensionRatio="1:0.51"
+                    android:layoutDirection="rtl"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:orientation="horizontal" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/newestPromosRv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:layout_marginTop="10dp"
+                    android:overScrollMode="never"
+                    android:paddingBottom="@dimen/_80sdp"
+                    app:layout_constraintTop_toBottomOf="@+id/videosRv" />
+
                 <TextView
                     android:id="@+id/noPromosTv"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:textSize="@dimen/_20sdp"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="لا يوجد أي اعلانات لهذا القسم حاليا"
+                    android:textColor="@color/textGreyColor"
+                    android:textSize="18sp"
                     android:visibility="visible"
-                    android:gravity="center"
-                    android:text="لا يوجد أي اعلانات لهذا القسم"
-                    />
-        </LinearLayout>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/view3" />
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</LinearLayout>

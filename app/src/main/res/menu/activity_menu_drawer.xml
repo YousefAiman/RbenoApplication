@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
-  <group android:checkableBehavior="single">
-    <item
-        android:id="@+id/my_profile"
-        android:icon="@drawable/user_icon"
-        android:title="حسابي"
-        />
-    <item
-        android:id="@+id/my_ads"
-        android:icon="@drawable/promotion_icon"
-        android:title="اعلاناتي"
-        />
-    <item
-        android:id="@+id/my_messages"
-        android:icon="@drawable/bubble_grey"
-        android:title="الرسائل"
-        android:actionLayout="@layout/menu_counter"
-        app:actionViewClass="android.widget.TextView"
-        />
-    <item
-        android:id="@+id/my_notifications"
-        android:icon="@drawable/alarm_icon"
-        android:title="التنبيهات"
-        android:actionLayout="@layout/menu_counter"
-        app:actionViewClass="android.widget.TextView" />
-    <item
-        android:id="@+id/my_fav"
-        android:icon="@drawable/star_icon"
-        android:title="المفضلة"
-        />
-    <item
-        android:id="@+id/my_settings"
-        android:icon="@drawable/settings_icon"
-        android:title="الاعدادات"
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <!--    <item-->
+        <!--        android:id="@+id/my_profile"-->
+        <!--        android:icon="@drawable/user_icon"-->
+        <!--        android:title="حسابي"-->
+        <!--        />-->
+        <item
+            android:id="@+id/my_ads"
+            android:icon="@drawable/promotion_icon"
+            android:title="اعلاناتي" />
+        <!--    <item-->
+        <!--        android:id="@+id/my_messages"-->
+        <!--        android:icon="@drawable/bubble_grey"-->
+        <!--        android:title="الرسائل"-->
+        <!--        android:actionLayout="@layout/menu_counter"-->
+        <!--        app:actionViewClass="android.widget.TextView"-->
+        <!--        />-->
+        <!--    <item-->
+        <!--        android:id="@+id/my_notifications"-->
+        <!--        android:icon="@drawable/alarm_icon"-->
+        <!--        android:title="التنبيهات"-->
+        <!--        android:actionLayout="@layout/menu_counter"-->
+        <!--        app:actionViewClass="android.widget.TextView" />-->
+
+        <item
+            android:id="@+id/add_Promo"
+            android:icon="@drawable/add_promo_grey"
+            android:title="إضافة اعلان" />
+
+        <item
+            android:id="@+id/my_fav"
+            android:icon="@drawable/heart_grey_outlined"
+            android:title="المفضلة" />
+        <item
+            android:id="@+id/my_settings"
+            android:icon="@drawable/settings_icon"
+            android:title="الاعدادات"
         />
     <item
         android:id="@+id/my_guide"

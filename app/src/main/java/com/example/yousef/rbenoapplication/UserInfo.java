@@ -1,60 +1,25 @@
 package com.example.yousef.rbenoapplication;
 
-import com.google.firebase.firestore.PropertyName;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class UserInfo implements Serializable {
-    @PropertyName("email")
-    public String email;
-    @PropertyName("username")
-    public String username;
-    @PropertyName("imageurl")
-    public String imageurl;
-    @PropertyName("userId")
-    public String userId;
-    @PropertyName("staticusername")
-    public String staticusername;
-    @PropertyName("phonenum")
-    public String phonenum;
-    @PropertyName("favpromosids")
-    public ArrayList<Integer> favpromosids;
-    @PropertyName("status")
-    public boolean status;
-    @PropertyName("remembered")
-    public boolean remembered;
-    @PropertyName("country")
-    public String country;
-    //    @PropertyName("city")
-//    public String city;
-    @PropertyName("currency")
-    public String currency;
-    @PropertyName("reports")
-    public ArrayList<String> reports;
-    @PropertyName("usersBlocked")
-    public ArrayList<String> usersBlocked;
+public class UserInfo {
 
+    private String email;
+    private String username;
+    private String userId;
+    private String staticusername;
+    private String imageurl;
+    private String token;
+    private ArrayList<Long> favpromosids;
+    private ArrayList<String> reports;
+    private ArrayList<String> searchHistory;
+    private ArrayList<String> usersBlocked;
+    private boolean status;
+    private boolean remembered;
+    private String city;
+    private String countryCode;
+    private String phonenum;
 
-    public UserInfo() {
-
-    }
-
-    public UserInfo(String email, String username, String imageurl, String userId, String staticusername, ArrayList<Integer> favpromosids,
-                    boolean remembered, boolean status, String country, String currency, ArrayList<String> reports, ArrayList<String> usersBlocked) {
-        this.email = email;
-        this.username = username;
-        this.imageurl = imageurl;
-        this.userId = userId;
-        this.staticusername = staticusername;
-        this.favpromosids = favpromosids;
-        this.remembered = remembered;
-        this.status = status;
-        this.country = country;
-        this.currency = currency;
-        this.reports = reports;
-        this.usersBlocked = usersBlocked;
-    }
 
     public String getEmail() {
         return email;
@@ -72,12 +37,12 @@ public class UserInfo implements Serializable {
         this.username = username;
     }
 
-    public String getImageurl() {
-        return imageurl;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setImageurl(String imageurl) {
-        this.imageurl = imageurl;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getStaticusername() {
@@ -88,45 +53,28 @@ public class UserInfo implements Serializable {
         this.staticusername = staticusername;
     }
 
-
-    public String getUserId() {
-        return userId;
+    public String getImageurl() {
+        return imageurl;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setImageurl(String imageurl) {
+        this.imageurl = imageurl;
     }
 
-    public String getPhonenum() {
-        return phonenum;
+    public String getToken() {
+        return token;
     }
 
-    public void setPhonenum(String phonenum) {
-        this.phonenum = phonenum;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public ArrayList<Integer> getFavpromosids() {
+    public ArrayList<Long> getFavpromosids() {
         return favpromosids;
     }
 
-    public void setFavpromosids(ArrayList<Integer> favpromosids) {
+    public void setFavpromosids(ArrayList<Long> favpromosids) {
         this.favpromosids = favpromosids;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
-
-    public boolean getRemembered() {
-        return remembered;
-    }
-
-    public void setRemembered(boolean remembered) {
-        this.remembered = remembered;
     }
 
     public ArrayList<String> getReports() {
@@ -145,27 +93,51 @@ public class UserInfo implements Serializable {
         this.usersBlocked = usersBlocked;
     }
 
-    public String getCurrency() {
-        return currency;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
-    public String getCountry() {
-        return country;
+    public boolean isRemembered() {
+        return remembered;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setRemembered(boolean remembered) {
+        this.remembered = remembered;
     }
 
-//    public String getCity() {
-//        return city;
-//    }
-//
-//    public void setCity(String city) {
-//        this.city = city;
-//    }
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhonenum() {
+        return phonenum;
+    }
+
+    public void setPhonenum(String phonenum) {
+        this.phonenum = phonenum;
+    }
+
+    public ArrayList<String> getSearchHistory() {
+        return searchHistory;
+    }
+
+    public void setSearchHistory(ArrayList<String> searchHistory) {
+        this.searchHistory = searchHistory;
+    }
 }

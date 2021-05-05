@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <item
-            android:id="@+id/view_user_account"
-            android:title="عرض صفحة المعلن"
-            />
+    <item
+        android:title="المزيد"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/dots_icon">
+        <menu>
+            <item
+                android:id="@+id/report_this_promo"
+                android:title="ابلاغ عن اعلان" />
 
-        <item
-            android:id="@+id/message_publisher"
-            android:title="مراسلة المعلن"
-            />
-
-        <item
-            android:id="@+id/report_this_promo"
-            android:title="ابلاغ عن اعلان"
-
-           />
-
-        <item
-            android:id="@+id/block_user"
-            android:title="حظر المشترك"
-
-            />
+            <item
+                android:id="@+id/block_user"
+                android:title="حظر المشترك" />
+        </menu>
+    </item>
 </menu>

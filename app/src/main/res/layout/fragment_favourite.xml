@@ -5,144 +5,107 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
+    android:layoutDirection="ltr"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".favouriteFragment">
+    tools:context=".FavouriteFragment">
 
 
     <ImageView
         android:id="@+id/noPromosIv"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline11"
-        app:layout_constraintEnd_toStartOf="@+id/guideline8"
-        app:layout_constraintStart_toStartOf="@+id/guideline9"
+        android:alpha="0.68"
+        android:visibility="gone"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline10"
+        app:layout_constraintWidth_percent="0.24"
         app:srcCompat="@drawable/heart_white"
-        app:tint="#515c6f" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.66" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.34" />
+        app:tint="#ABABAB" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.28" />
+        app:layout_constraintGuide_percent="0.24" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline11"
+        android:id="@+id/guideline8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.46" />
+        app:layout_constraintGuide_percent="0.42" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/promotiontoolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:contentInsetLeft="0dp"
-        app:contentInsetStart="0dp"
+        android:layout_height="?actionBarSize"
+        android:background="@color/red"
+        android:elevation="2dp"
+        app:menu="@menu/back_menu"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:fontFamily="@font/a_google"
+            android:layout_marginEnd="15dp"
+            android:text="المفضلة"
+            android:textColor="#fff"
+            android:textSize="18sp" />
 
-            <ImageView
-                android:id="@+id/imageView41"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="12dp"
-                android:scaleType="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/heart_icon" />
-
-            <TextView
-                android:id="@+id/favouriteCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/a_google"
-                android:text="(0)"
-                android:textColor="#515C6F"
-                android:layout_marginStart="10dp"
-                android:textSize="@dimen/_15sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView41"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/a_google"
-                android:text="المفضلة"
-                android:textColor="#515C6F"
-                android:layout_marginEnd="12dp"
-                android:textSize="@dimen/_17sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
-
-<!--    <View-->
-<!--        android:id="@+id/view10"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="4dp"-->
-<!--        android:background="@drawable/gradient_grey_down"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />-->
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
-        app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-6990486336142688/8279246162"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar" />
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/favPromoRecyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/_100sdp"
-        app:layout_constraintTop_toBottomOf="@+id/adView" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/promotiontoolbar">
+
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone"
+                app:adSize="BANNER"
+                app:adUnitId="ca-app-pub-6990486336142688/4767693796" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/favPromoRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     <TextView
         android:id="@+id/noPromosTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/a_google"
-        android:text="لا يوجد اي اعلانات في المفضلة!"
-        android:textColor="#515C6F"
-        android:textSize="@dimen/_17sdp"
+        android:text="لا يوجد اي اعلانات في المفضلة"
+        android:textColor="@color/textGreyColor"
+        android:textSize="24sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline11" />
+        app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

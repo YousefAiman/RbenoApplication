@@ -4,45 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context="com.example.yousef.rbenoapplication.MainActivity">
+    android:background="#fff"
+    tools:context=".MainActivity">
 
     <ImageView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/rbeno_logo_png"
-        app:layout_constraintBottom_toTopOf="@+id/guideline199"
-        app:layout_constraintEnd_toStartOf="@+id/guideline183"
-        app:layout_constraintHorizontal_bias="0.505"
-        app:layout_constraintStart_toStartOf="@+id/guideline197"
-        app:layout_constraintTop_toTopOf="@+id/guideline198" />
+        app:srcCompat="@drawable/logo_icon_external"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.53" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline183"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8150852" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline197"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.19" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline198"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25718194" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline199"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5636115" />
 </androidx.constraintlayout.widget.ConstraintLayout>

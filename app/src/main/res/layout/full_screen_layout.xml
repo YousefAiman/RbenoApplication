@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/fillScreenTv"/>
+    android:layoutDirection="ltr"
+    android:background="@null"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fillScreenTv" />
+
+
+    <ImageView
+        android:id="@+id/videoCloseIv"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/play_circle"
+        android:layout_margin="10dp"
+        android:scaleType="center"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/back_arrow_white" />
+
+</RelativeLayout>

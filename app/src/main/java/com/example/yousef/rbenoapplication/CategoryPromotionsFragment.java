@@ -1,239 +1,519 @@
 package com.example.yousef.rbenoapplication;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.paging.PagedList;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
-import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
-import com.google.firebase.auth.FirebaseAuth;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class CategoryPromotionsFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener {
-  int itemsAdded = 0;
-  private SwipeRefreshLayout swipeRefreshLayout;
-  private RecyclerView lv;
-  private Query carsQuery;
-  private FirestorePagingAdapter<Promotion, StaggeredViewHolder> firestorePagingAdapter;
-  private DocumentSnapshot lastResult = null;
-  private ArrayList<Promotion> promotions;
-  private StaggeredRecyclerAdapter adapter;
-  private boolean isLoading = true;
-  private TextView noCarPromosTv;
+        implements SwipeRefreshLayout.OnRefreshListener,
+        VideosAdapter.VideoViewClickListener {
 
-  public CategoryPromotionsFragment() {
-  }
+    private static final int PAGE_SIZE = 6;
 
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    Log.d("fragment", "fragment created");
-  }
+    private static final int videoQueryLimit = 4;
+    private final ArrayList<Promotion> videoPromotionsAllVideo = new ArrayList<>(), promotions = new ArrayList<>();
+    private int itemsAdded = 0;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView newestPromosRv, videosRv;
+    private Query carsQuery;
+    private DocumentSnapshot lastResult = null;
+    private NewestPromosAdapter adapter;
+    private boolean isLoading = true;
+    private TextView noCarPromosTv;
+    private ArrayList<String> videoUrlsAdapter;
+    private VideosAdapter videosAdapter;
+    //  private List<String> allButFirstTen;
+    private NestedScrollView scrollview;
+    private ViewTreeObserver.OnScrollChangedListener scrollChangedListener;
+    private PromotionDeleteReceiver promotionDeleteReceiver;
+    private String[] categories;
+    private String category;
+
+    public CategoryPromotionsFragment(String[] categories) {
+        this.categories = categories;
+    }
+
+    public CategoryPromotionsFragment(String category) {
+        this.category = category;
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        carsQuery = FirebaseFirestore.getInstance().collection("promotions");
+
+        if (GlobalVariables.getInstance().getCountryCode() != null) {
+            carsQuery = carsQuery.whereEqualTo("country",
+                    GlobalVariables.getInstance().getCountryCode().toUpperCase());
+        }
+
+        if (categories != null) {
+            carsQuery = carsQuery.whereIn("type", Arrays.asList(categories));
+        } else {
+            carsQuery = carsQuery.whereEqualTo("type", category);
+        }
+
+        carsQuery = carsQuery.whereEqualTo("isBanned", false)
+                .whereEqualTo("isPaused", false);
+
+        carsQuery = carsQuery.orderBy("publishtime", Query.Direction.DESCENDING).limit(PAGE_SIZE);
+
+
+        videoUrlsAdapter = new ArrayList<>();
+        videosAdapter = new VideosAdapter(videoPromotionsAllVideo, this);
+
+        adapter = new NewestPromosAdapter(promotions,
+                getContext(), R.layout.newest_promo_item_grid, 3);
+        adapter.setHasStableIds(true);
+
+    }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_category_promotions, container, false);
-    lv = view.findViewById(R.id.carPromosRecyclerView);
-    swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-    noCarPromosTv = view.findViewById(R.id.noPromosTv);
+      View view = inflater.inflate(R.layout.fragment_category_promotions, container, false);
 
-    swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
-    swipeRefreshLayout.setOnRefreshListener(this);
+      setupDeletionReceiver();
 
-    return view;
+      newestPromosRv = view.findViewById(R.id.newestPromosRv);
+      videosRv = view.findViewById(R.id.videosRv);
+
+      swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+      noCarPromosTv = view.findViewById(R.id.noPromosTv);
+
+      swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
+      scrollview = view.findViewById(R.id.scrollview);
+      scrollview.setNestedScrollingEnabled(true);
+
+
+      swipeRefreshLayout.setOnRefreshListener(this);
+      swipeRefreshLayout.setRefreshing(true);
+//  ((NestedScrollView)view.findViewById(R.id.scrollview)).setNestedScrollingEnabled(true);
+
+      videosRv.setLayoutManager(new LinearLayoutManager(getContext(),
+              RecyclerView.HORIZONTAL, false) {
+          @Override
+          public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+              lp.width = (int) (getHeight() * 0.55);
+              return true;
+          }
+      });
+
+      final GridLayoutManager glm = new GridLayoutManager(getContext(), 2) {
+          @Override
+          public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+              lp.height = (int) (getWidth() * 0.55);
+              return true;
+          }
+      };
+
+      glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+          @Override
+          public int getSpanSize(int position) {
+              if (newestPromosRv.getAdapter().getItemViewType(position) == 2) {
+                  return 2;
+              }
+              return 1;
+          }
+      });
+
+      newestPromosRv.setLayoutManager(glm);
+
+
+      return view;
   }
+
 
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
+      super.onViewCreated(view, savedInstanceState);
 
-    carsQuery = FirebaseFirestore.getInstance().collection("promotions")
-            .whereIn("type", Arrays.asList(getArguments().getStringArray("category")))
-            .whereEqualTo("isBanned", false)
-            .orderBy("publishtime", Query.Direction.DESCENDING);
 
-    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-      if (GlobalVariables.getBlockedUsers() != null
-              && !GlobalVariables.getBlockedUsers().isEmpty()) {
-        initializePagingAdapter();
-      } else {
-        getPaging();
-      }
-    } else {
-      getPaging();
-    }
+      videosRv.setAdapter(videosAdapter);
+
+
+      newestPromosRv.setAdapter(adapter);
+
+
+      getUpdatedPromotions();
+
+
+//    newestPromosRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//      @Override
+//      public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//        super.onScrolled(recyclerView, dx, dy);
+//        if (!newestPromosRv.canScrollVertically(1) && dy > 0) {
+//          Log.d("ttt","category scrolled to bottom");
+//          if (!isLoading) {
+//            Log.d("ttt","loading more");
+//            getUpdatedPromotions();
+//          }
+//        }
+//      }
+//
+//      @Override
+//      public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//        super.onScrollStateChanged(recyclerView, newState);
+//        Log.d("ttt","scroll state changed");
+//      }
+//    });
+
+      getAllVideos();
 
   }
 
   @Override
   public void onRefresh() {
-    if (firestorePagingAdapter != null) {
-      firestorePagingAdapter.refresh();
-    } else {
-      promotions.clear();
-      adapter.notifyDataSetChanged();
-      lastResult = null;
-      getUpdatedPromotions();
-    }
-  }
-
-  private void getPaging() {
-
-    PagedList.Config config = new PagedList.Config.Builder()
-            .setEnablePlaceholders(true)
-            .setPageSize(10)
-            .build();
-
-    FirestorePagingOptions<Promotion> options = new FirestorePagingOptions.Builder<Promotion>()
-            .setLifecycleOwner(this)
-            .setQuery(carsQuery, config, snapshot -> snapshot.toObject(Promotion.class)).build();
-
-    firestorePagingAdapter = new FirestorePagingAdapter<Promotion, StaggeredViewHolder>(options) {
-      @NonNull
-      @Override
-      public StaggeredViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new StaggeredViewHolder(LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.relativeitem, parent, false));
-      }
-
-      @Override
-      protected void onError(@NonNull Exception e) {
-        super.onError(e);
-      }
-
-      @Override
-      protected void onBindViewHolder(@NonNull StaggeredViewHolder staggeredViewHolder,
-                                      int i, @NonNull Promotion promotion) {
-        staggeredViewHolder.bind(promotion, i, getContext());
-      }
-
-      @Override
-      protected void onLoadingStateChanged(@NonNull LoadingState state) {
-        super.onLoadingStateChanged(state);
-        switch (state) {
-          case LOADING_INITIAL:
-          case LOADING_MORE:
-
-            if (firestorePagingAdapter.getCurrentList().size() == 0) {
-              noCarPromosTv.setVisibility(View.VISIBLE);
-              lv.setVisibility(View.GONE);
-            } else {
-              noCarPromosTv.setVisibility(View.GONE);
-              lv.setVisibility(View.VISIBLE);
-            }
-
-            swipeRefreshLayout.setRefreshing(true);
-            break;
-          case LOADED:
-          case FINISHED:
-            if (firestorePagingAdapter.getCurrentList().size() == 0) {
-              noCarPromosTv.setVisibility(View.VISIBLE);
-              lv.setVisibility(View.GONE);
-            } else {
-              noCarPromosTv.setVisibility(View.GONE);
-              lv.setVisibility(View.VISIBLE);
-            }
-            swipeRefreshLayout.setRefreshing(false);
-            break;
-          case ERROR:
-            swipeRefreshLayout.setRefreshing(false);
-            break;
-
-            default:
-                break;
-        }
-      }
-    };
-
-    lv.setPadding((int) (25 * GlobalVariables.getDensity()), 0,
-            (int) (25 * GlobalVariables.getDensity()), 0);
-    firestorePagingAdapter.setHasStableIds(true);
-    lv.setAdapter(firestorePagingAdapter);
-
-  }
-
-  private void getUpdatedPromotions() {
-    swipeRefreshLayout.setRefreshing(true);
-    itemsAdded = 0;
-    Query updatedQuery;
-    if (lastResult == null) {
-      updatedQuery = carsQuery.limit(8);
-    } else {
-      updatedQuery = carsQuery.startAfter(lastResult).limit(10);
-    }
-
-    new Thread(() -> updatedQuery.get().addOnSuccessListener(snapshots -> {
-      if (!snapshots.isEmpty()) {
-        for (QueryDocumentSnapshot snap : snapshots) {
-          if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
-            continue;
-          }
-          promotions.add(snap.toObject(Promotion.class));
-          itemsAdded++;
-        }
-        lastResult = snapshots.getDocuments().get(snapshots.size() - 1);
-        if (itemsAdded > 0) {
-          noCarPromosTv.setVisibility(View.GONE);
-          lv.setVisibility(View.VISIBLE);
-          lv.post(() -> {
-            adapter.notifyItemRangeInserted(promotions.size(), itemsAdded);
-            swipeRefreshLayout.setRefreshing(false);
-          });
-          isLoading = false;
-        } else {
-          swipeRefreshLayout.setRefreshing(false);
-          noCarPromosTv.setVisibility(View.VISIBLE);
-          isLoading = false;
-          lv.setVisibility(View.GONE);
-        }
+      if (WifiUtil.checkWifiConnection(getContext())) {
+          videoPromotionsAllVideo.clear();
+          promotions.clear();
+          videosAdapter.notifyDataSetChanged();
+          adapter.notifyDataSetChanged();
+          lastResult = null;
+          getAllVideos();
+          getUpdatedPromotions();
       } else {
-        swipeRefreshLayout.setRefreshing(false);
-        isLoading = false;
+          swipeRefreshLayout.setRefreshing(false);
       }
-    })).start();
   }
 
-  void initializePagingAdapter() {
-    promotions = new ArrayList<>();
+    void addScrollListener() {
+        scrollview.getViewTreeObserver()
+                .addOnScrollChangedListener(scrollChangedListener = new ViewTreeObserver.OnScrollChangedListener() {
+                    float y = 0;
 
-    adapter = new StaggeredRecyclerAdapter(promotions);
-    adapter.setHasStableIds(true);
-    lv.setPadding((int) (8 * GlobalVariables.getDensity()), 0,
-            (int) (8 * GlobalVariables.getDensity()), (int) (80 * GlobalVariables.getDensity()));
-    lv.setAdapter(adapter);
-    getUpdatedPromotions();
+                    @Override
+                    public void onScrollChanged() {
+                        if (!scrollview.canScrollVertically(View.SCROLL_AXIS_VERTICAL) && scrollview.getScrollY() > y) {
+                            if (!isLoading) {
+                                getUpdatedPromotions();
+                            }
+                        }
+                        y = scrollview.getScrollY();
+                    }
+                });
+    }
 
-    lv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-        super.onScrolled(recyclerView, dx, dy);
-        if (!lv.canScrollVertically(1) && dy > 0) {
-          if (!isLoading) {
-            isLoading = true;
-            getUpdatedPromotions();
-          }
+    void removeScrollListener() {
+        scrollview.getViewTreeObserver().removeOnScrollChangedListener(scrollChangedListener);
+    }
+
+    private void getUpdatedPromotions() {
+
+        swipeRefreshLayout.setRefreshing(true);
+        isLoading = true;
+        itemsAdded = 0;
+
+        Query updatedQuery = carsQuery;
+        if (lastResult != null) {
+            updatedQuery = updatedQuery.startAfter(lastResult);
         }
-      }
-    });
 
-  }
+        updatedQuery.get().addOnSuccessListener(snapshots -> {
+
+            if (GlobalVariables.getBlockedUsers().isEmpty()) {
+                promotions.addAll(snapshots.toObjects(Promotion.class));
+                itemsAdded += snapshots.size();
+            } else {
+                final List<DocumentSnapshot> snaps = snapshots.getDocuments();
+
+                for (DocumentSnapshot snap : snaps) {
+                    if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+                        continue;
+                    }
+                    promotions.add(snap.toObject(Promotion.class));
+                    itemsAdded++;
+                }
+            }
+//      if (categories.length == 1) {
+//        if (GlobalVariables.getBlockedUsers().size() > 10) {
+//
+//          final List<DocumentSnapshot> snaps = snapshots.getDocuments();
+//
+//          for (DocumentSnapshot snap : snaps) {
+//            if (allButFirstTen.contains(snap.getString("uid"))) {
+//              continue;
+//            }
+//            promotions.add(snap.toObject(Promotion.class));
+//            itemsAdded++;
+//          }
+//
+//        } else {
+//          promotions.addAll(snapshots.toObjects(Promotion.class));
+//          itemsAdded += snapshots.size();
+//        }
+//
+//      } else {
+//
+//        final List<DocumentSnapshot> snaps = snapshots.getDocuments();
+//
+//        for (DocumentSnapshot snap : snaps) {
+//          if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//            continue;
+//          }
+//          promotions.add(snap.toObject(Promotion.class));
+//          itemsAdded++;
+//        }
+//
+//      }
+//
+
+//      if (categories.length == 0) {
+//
+//          if(GlobalVariables.getBlockedUsers().size() > 10){
+//            final List<DocumentSnapshot> documentSnapshots = snapshots.getDocuments();
+//
+//            for (DocumentSnapshot snap : documentSnapshots) {
+//              if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//                continue;
+//              }
+//              promotions.add(snap.toObject(Promotion.class));
+//              itemsAdded++;
+//            }
+//
+//          }else{
+//            promotions.addAll(snapshots.toObjects(Promotion.class));
+//            itemsAdded+= snapshots.size();
+//          }
+//
+//
+//      } else {
+//        final List<DocumentSnapshot> documentSnapshots = snapshots.getDocuments();
+//        if (GlobalVariables.getBlockedUsers().size() <= 10) {
+//          promotions.addAll(snapshots.toObjects(Promotion.class));
+//          itemsAdded+= snapshots.size();
+//        } else {
+//          for (DocumentSnapshot snap : documentSnapshots) {
+//            if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//              continue;
+//            }
+//            promotions.add(snap.toObject(Promotion.class));
+//            itemsAdded++;
+//          }
+//        }
+//      }
+            if (snapshots.size() > 0) {
+                lastResult = snapshots.getDocuments().get(snapshots.size() - 1);
+            }
+
+        }).addOnCompleteListener(task -> {
+
+            if (itemsAdded > 0) {
+
+                if (itemsAdded == PAGE_SIZE && promotions.size() - itemsAdded == 0) {
+                    addScrollListener();
+                }
+
+                noCarPromosTv.setVisibility(View.GONE);
+                newestPromosRv.setVisibility(View.VISIBLE);
+                Log.d("ttt", "updating adapter from: " +
+                        (promotions.size() - itemsAdded) + " to " + itemsAdded);
+
+                adapter.notifyItemRangeInserted(
+                        promotions.size() - itemsAdded, itemsAdded);
+
+
+            } else {
+
+                if (scrollChangedListener != null) {
+                    removeScrollListener();
+                }
+
+                if (promotions.size() == 0) {
+                    noCarPromosTv.setVisibility(View.VISIBLE);
+                    newestPromosRv.setVisibility(View.GONE);
+                }
+            }
+
+
+            isLoading = false;
+            swipeRefreshLayout.setRefreshing(false);
+
+//      updatedQuery.addSnapshotListener((value, error) -> {
+//        if (value != null) {
+//          for (DocumentChange documentChange : value.getDocumentChanges()) {
+//            if (documentChange.getType() == DocumentChange.Type.REMOVED) {
+//              long removedPromoId = documentChange.getDocument().getLong("promoid");
+//              for (Promotion promo : promotions) {
+//                if (promo.getPromoid() == removedPromoId) {
+//                  promotions.remove(promo);
+//                  break;
+//                }
+//              }
+//            }
+//          }
+//        }
+//      });
+        });
+    }
+
+    void getAllVideos() {
+
+        Query query = carsQuery.whereEqualTo("promoType", "video").limit(videoQueryLimit);
+
+        if (GlobalVariables.getInstance().getCountryCode() != null) {
+            query = query.whereEqualTo("country",
+                    GlobalVariables.getInstance().getCountryCode().toUpperCase());
+        }
+
+        query.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            final List<DocumentSnapshot> snaps = queryDocumentSnapshots.getDocuments();
+
+            if (GlobalVariables.getBlockedUsers().isEmpty()) {
+                for (DocumentSnapshot snap : snaps) {
+                    final Promotion promotion = snap.toObject(Promotion.class);
+                    videoPromotionsAllVideo.add(promotion);
+                    videoUrlsAdapter.add(promotion.getVideoUrl());
+                }
+            } else {
+                for (DocumentSnapshot snap : snaps) {
+                    if (!GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+                        final Promotion promotion = snap.toObject(Promotion.class);
+                        videoPromotionsAllVideo.add(promotion);
+                        videoUrlsAdapter.add(promotion.getVideoUrl());
+                    }
+                }
+            }
+
+//      if (categories.length == 0) {
+//
+//        if(GlobalVariables.getBlockedUsers().isEmpty()){
+//          for (DocumentSnapshot snap : snaps) {
+//            final Promotion promotion = snap.toObject(Promotion.class);
+//            videoPromotionsAllVideo.add(promotion);
+//            videoUrlsAdapter.add(promotion.getVideoUrl());
+//          }
+//        }else{
+//          for (DocumentSnapshot snap : snaps) {
+//            if (!GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//              final Promotion promotion = snap.toObject(Promotion.class);
+//              videoPromotionsAllVideo.add(promotion);
+//              videoUrlsAdapter.add(promotion.getVideoUrl());
+//            }
+//          }
+//        }
+//
+//      } else {
+//        for (DocumentSnapshot snap : snaps) {
+//          if (!GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//            final Promotion promotion = snap.toObject(Promotion.class);
+//            videoPromotionsAllVideo.add(promotion);
+//            videoUrlsAdapter.add(promotion.getVideoUrl());
+//          }
+//        }
+//      }
+
+
+        }).addOnCompleteListener(task -> {
+            if (videoPromotionsAllVideo.size() > 0) {
+                videosAdapter.notifyDataSetChanged();
+                videosRv.setVisibility(View.VISIBLE);
+            } else {
+                videosRv.setVisibility(View.GONE);
+            }
+
+        });
+    }
+
+    @Override
+    public void videoViewClickListener(int position) {
+        if (videoPromotionsAllVideo.size() > videoUrlsAdapter.size()) {
+            if (!videoUrlsAdapter.contains(videoPromotionsAllVideo.get(position).getVideoUrl())) {
+                videoPromotionsAllVideo.remove(position);
+                return;
+            }
+        }
+
+//    final VideoPagerFragment videoPagerFragment = VideoPagerFragment.newInstance();
+//    final Bundle videoBundle = new Bundle();
+
+        final ArrayList<Promotion> videoPromotionItemsInstance =
+                new ArrayList<>(videoPromotionsAllVideo);
+
+        if (position != 0) {
+            final Promotion firstPromo = videoPromotionItemsInstance.get(0);
+            videoPromotionItemsInstance.set(0, videoPromotionItemsInstance.get(position));
+            videoPromotionItemsInstance.set(position, firstPromo);
+        }
+
+//    videoPromotionItemsInstance.remove(position);
+//    videoPromotionItemsInstance.add(0, videoPromotionsAllVideo.get(position));
+//    videoBundle.putSerializable("videoPromotions", videoPromotionItemsInstance);
+
+        VideoPagerFragment videoPagerFragment = new VideoPagerFragment(videoPromotionItemsInstance);
+
+//    videoPagerFragment.setArguments(videoBundle);
+        ((HomeActivity) getActivity()).addFragmentToHomeContainer(videoPagerFragment);
+//    videoPagerFragment.show(getChildFragmentManager(), "fullScreen");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if (promotionDeleteReceiver != null)
+            getContext().unregisterReceiver(promotionDeleteReceiver);
+
+    }
+
+    void setupDeletionReceiver() {
+
+        promotionDeleteReceiver =
+                new PromotionDeleteReceiver() {
+                    @Override
+
+                    public void onReceive(Context context, Intent intent) {
+                        final long id = intent.getLongExtra("promoId", 0);
+                        checkAndDeletePromoFromList(promotions, id);
+                        checkAndDeletePromoFromList(videoPromotionsAllVideo, id);
+                    }
+                };
+
+
+        getContext().registerReceiver(promotionDeleteReceiver,
+                new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
+
+
+    }
+
+    void checkAndDeletePromoFromList(ArrayList<Promotion> promos, long id) {
+
+        if (promos != null && !promos.isEmpty()) {
+            for (Promotion promo : promos) {
+                if (promo.getPromoid() == id) {
+                    promo.setIsBanned(true);
+                    break;
+                }
+            }
+        }
+
+    }
 }
 

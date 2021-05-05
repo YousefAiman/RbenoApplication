@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:clickable="true"
+    android:layoutDirection="ltr"
     android:focusable="true"
     android:background="#fff"
     tools:context=".SearchFragment">
@@ -13,11 +14,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:background="@color/red"
         android:orientation="horizontal">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:theme="@style/SearchViewStyle"
+            app:defaultQueryHint="بحث"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/search_background" />
 
         <ImageView
             android:id="@+id/backImg"
@@ -30,19 +38,7 @@
             app:layout_constraintEnd_toStartOf="@+id/guideline137"
             app:layout_constraintStart_toStartOf="@+id/guideline16"
             app:layout_constraintTop_toTopOf="@+id/guideline13"
-            app:srcCompat="@drawable/settings_back_arrow" />
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="0dp"
-            android:layout_weight="6"
-            android:theme="@style/SearchViewStyle"
-            app:defaultQueryHint="بحث"
-            android:layout_height="wrap_content"
-            app:searchHintIcon="@drawable/ic_search"
-            app:searchIcon="@drawable/ic_search"
-            android:background="@drawable/search_background" />
-
+            app:srcCompat="@drawable/back_arrow_white" />
     </LinearLayout>
 
     <View
@@ -55,6 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="البحث السابق"
+        android:visibility="gone"
         android:textColor="@color/textGreyColor"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
@@ -62,14 +59,12 @@
         android:paddingStart="10dp"
         android:textSize="@dimen/_14sdp"
         android:gravity="start"
-        android:fontFamily="@font/a_google"
-        />
+        android:fontFamily="@font/a_google" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.3dp"
-        android:background="#C9515C6F"
-         />
+        android:background="#C9515C6F" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -91,15 +86,19 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recentSearchesRv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/searchRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:visibility="invisible"
             android:paddingBottom="@dimen/_3sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

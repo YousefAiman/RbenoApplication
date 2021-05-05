@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
+
+    <hyogeun.github.com.colorratingbarlib.ColorRatingBar
+        android:id="@+id/ratingDialogRb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:numStars="5"
+        app:empty_color="#9C9C9C"
+        android:stepSize="0.5"
+        app:progress_color="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/rateDialogTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="تقييم"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/a_google"
+        android:textColor="#3D3D3D"
+        android:textSize="17sp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="@+id/ratingDialogRb"
+        app:layout_constraintTop_toBottomOf="@+id/ratingDialogRb" />
+
+    <TextView
+        android:id="@+id/cancelDialogTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:fontFamily="@font/a_google"
+        android:text="إغلاق"
+        android:textColor="@color/red"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="@+id/ratingDialogRb"
+        app:layout_constraintTop_toTopOf="@+id/rateDialogTv" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

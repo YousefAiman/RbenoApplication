@@ -4,29 +4,34 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
-public class FilterFragment extends DialogFragment {
+public class FilterFragment extends Fragment {
 
-    TextView[] typeTextViews = new TextView[3];
-    TextView[] categoryTextViews = new TextView[6];
-    TextView[] priceTextViews = new TextView[2];
-    TextView[] viewsTextViews = new TextView[2];
-    TextView[] timeTextViews = new TextView[8];
-    ArrayList<String> types;
-    //    Spinner dateSpinner;
-    int dateFilter;
-    String category;
-    int priceFilter = 0;
-    int viewsFilter = 0;
-    RatingBar filterRatingBar;
+    private final TextView[]
+            typeTextViews = new TextView[3],
+            priceTextViews = new TextView[2],
+            viewsTextViews = new TextView[2],
+            timeTextViews = new TextView[8];
+    private final ArrayList<String> types = new ArrayList<>(), categories = new ArrayList<>();
+    private TextView[] categoryTextViews;
+    private ImageView[] categoryImageViews;
+    private int dateFilter, priceFilter = 0, viewsFilter = 0, textGreyColor, textWhiteColor;
+    private RatingBar filterRatingBar;
+    private String type;
+    private Button filterButton;
+    Fragment dialogFragment;
 
     public FilterFragment() {
         // Required empty public constructor
@@ -36,28 +41,24 @@ public class FilterFragment extends DialogFragment {
         return new FilterFragment();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_filter, container, false);
+//    ViewGroup viewGroup = (ViewGroup) view;
+        ((Toolbar) view.findViewById(R.id.filterToolBar)).setNavigationOnClickListener(view1 ->
+                getActivity().onBackPressed());
 
-        view.findViewById(R.id.cancelIv).setOnClickListener(v -> dismiss());
+        textGreyColor = getResources().getColor(R.color.textGreyColor);
+        textWhiteColor = getResources().getColor(R.color.white);
+        view.findViewById(R.id.deleteFiltersTv).setOnClickListener(v -> clearAllFilters());
+
+
         typeTextViews[0] = view.findViewById(R.id.typePromoTv_1);
         typeTextViews[1] = view.findViewById(R.id.typePromoTv_2);
         typeTextViews[2] = view.findViewById(R.id.typePromoTv_3);
-
-//        for(int i=0;i<typeTextViews.length;i++){
-//            typeTextViews[i] = view.findViewById(getResources().getIdentifier("R.id.typePromoTv_%"+i+1,
-//                    "id", getContext().getPackageName()));
-//        }
 
 
         timeTextViews[0] = view.findViewById(R.id.timePromoTv_1);
@@ -69,17 +70,32 @@ public class FilterFragment extends DialogFragment {
         timeTextViews[6] = view.findViewById(R.id.timePromoTv_7);
         timeTextViews[7] = view.findViewById(R.id.timePromoTv_8);
 
-//        for(int i=1;i<=timeTextViews.length;i++){
-//            timeTextViews[i-1] = view.findViewById(getResources().getIdentifier("R.id.timePromoTv_%"+i,
-//                    "id", getContext().getPackageName()));
-//        }
 
-        categoryTextViews[0] = view.findViewById(R.id.homeScrollTv);
-        categoryTextViews[1] = view.findViewById(R.id.mobileScrollTv);
-        categoryTextViews[2] = view.findViewById(R.id.electronicScrollTv);
-        categoryTextViews[3] = view.findViewById(R.id.furnitureScrollTv);
-        categoryTextViews[4] = view.findViewById(R.id.carsScrollTv);
-        categoryTextViews[5] = view.findViewById(R.id.pcScrollTv);
+        categoryTextViews = new TextView[]{
+                view.findViewById(R.id.homeScrollTv),
+                view.findViewById(R.id.mobileScrollTv),
+                view.findViewById(R.id.electronicScrollTv),
+                view.findViewById(R.id.furnitureScrollTv),
+                view.findViewById(R.id.carsScrollTv),
+                view.findViewById(R.id.allScrollTv),
+                view.findViewById(R.id.servicesScrollTv),
+                view.findViewById(R.id.animalScrollTv),
+                view.findViewById(R.id.personalScrollTv),
+                view.findViewById(R.id.otherScrollTv)
+        };
+        categoryImageViews = new ImageView[]{
+                view.findViewById(R.id.homeScrollIv),
+                view.findViewById(R.id.mobileScrollIv),
+                view.findViewById(R.id.electronicScrollIv),
+                view.findViewById(R.id.furnitureScrollIv),
+                view.findViewById(R.id.carsScrollIv),
+                view.findViewById(R.id.allScrollIv),
+                view.findViewById(R.id.servicesScrollIv),
+                view.findViewById(R.id.animalScrollIv),
+                view.findViewById(R.id.personalScrollIv),
+                view.findViewById(R.id.otherScrollIv)
+        };
+
 
         priceTextViews[0] = view.findViewById(R.id.highPriceTv);
         priceTextViews[1] = view.findViewById(R.id.lowPriceTv);
@@ -87,9 +103,10 @@ public class FilterFragment extends DialogFragment {
 
         viewsTextViews[0] = view.findViewById(R.id.lowToHighViewsTv);
         viewsTextViews[1] = view.findViewById(R.id.highToLowViewsTv);
-//        dateSpinner = view.findViewById(R.id.dateSpinner);
 
         filterRatingBar = view.findViewById(R.id.filterRatingBar);
+
+        filterButton = view.findViewById(R.id.filterBtn);
         return view;
     }
 
@@ -97,73 +114,124 @@ public class FilterFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         typeClickListeners();
         categoryClickListeners();
         priceClickListeners();
         viewsClickListeners();
         timeClickListeners();
 
-
-        view.findViewById(R.id.filterCheckImage).setOnClickListener(v -> {
+        filterButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            if (category != null && !category.isEmpty()) {
-                bundle.putString("category", category);
+            if (!categories.isEmpty()) {
+                bundle.putStringArrayList("category", categories);
             }
 
             bundle.putInt("price", priceFilter);
 
             bundle.putInt("views", viewsFilter);
-            if (!types.isEmpty()) {
-                bundle.putStringArrayList("promoType", types);
+//      if (!types.isEmpty()) {
+//        bundle.putStringArrayList("promoType", types);
+//      }
+
+            if (type != null && !type.isEmpty()) {
+
+                bundle.putString("promoType", type);
             }
 
             bundle.putInt("date", dateFilter);
             if (filterRatingBar.getRating() != 0) {
-                bundle.putFloat("rating", filterRatingBar.getRating());
+                bundle.putDouble("rating", filterRatingBar.getRating());
             }
-            DialogFragment dialogFragment = FilteredPromosFragment.newInstance();
+            dialogFragment = FilteredPromosFragment.newInstance();
             dialogFragment.setArguments(bundle);
-            dialogFragment.show(getChildFragmentManager(), "filtered");
+            ((HomeActivity) getActivity()).addFragmentToHomeContainer(dialogFragment);
+//      dialogFragment.show(getChildFragmentManager(), "filtered");
         });
+
+
+//    typeTextViews[0].performClick();
+//    filter();
+//
+//    typeTextViews[0].performClick();
+//    categoryTextViews[0].performClick();
+//    filter();
+//
+//    typeTextViews[0].performClick();
+//    categoryTextViews[0].performClick();
+//    filter();
+//
+//
+//    typeTextViews[0].performClick();
+//    categoryTextViews[0].performClick();
+//    priceTextViews[0].performClick();
+//    filter();
+//
+//    typeTextViews[0].performClick();
+//    categoryTextViews[0].performClick();
+//    priceTextViews[0].performClick();
+//    timeTextViews[0].performClick();
+//    filter();
+//
+//    typeTextViews[0].performClick();
+//    categoryTextViews[0].performClick();
+//    priceTextViews[0].performClick();
+//    timeTextViews[0].performClick();
+//    filterRatingBar.setRating(3);
+//    filter();
 
 
     }
 
     void typeClickListeners() {
-        types = new ArrayList<>();
+
         for (int i = 0; i < typeTextViews.length; i++) {
-            final TextView textView = typeTextViews[i];
             int finalI = i + 1;
+            final TextView textView = typeTextViews[i];
             textView.setOnClickListener(v -> {
-                if (textView.getCurrentTextColor() == getResources().getColor(R.color.textGreyColor)) {
-                    textView.setBackgroundResource(R.drawable.signinbuttonlayout);
-                    textView.setTextColor(getResources().getColor(R.color.white));
+                if (textView.getCurrentTextColor() == textGreyColor) {
+//          textView.setBackgroundResource(R.drawable.filter_red_back);
+//          textView.setTextColor(textWhiteColor);
+
+                    for (TextView textView2 : typeTextViews) {
+                        textView2.setBackgroundResource(R.drawable.filter_grey_back);
+                        textView2.setTextColor(textGreyColor);
+                    }
+                    textView.setBackgroundResource(R.drawable.filter_red_back);
+                    textView.setTextColor(textWhiteColor);
+
                     switch (finalI) {
                         case 1:
-                            addTypeToList("text");
+                            type = "text";
+//              addTypeToList("text");
                             break;
                         case 2:
-                            addTypeToList("image");
+                            type = "image";
+//              addTypeToList("image");
                             break;
                         case 3:
-                            addTypeToList("video");
+                            type = "video";
+//              addTypeToList("video");
                             break;
                     }
+
+//          type = textView.getText().toString();
+//          dateFilter = finalI;
                 } else {
-                    textView.setBackgroundResource(R.drawable.signinedittext);
-                    textView.setTextColor(getResources().getColor(R.color.textGreyColor));
-                    switch (finalI) {
-                        case 1:
-                            types.remove("text");
-                            break;
-                        case 2:
-                            types.remove("image");
-                            break;
-                        case 3:
-                            types.remove("video");
-                            break;
-                    }
+                    textView.setBackgroundResource(R.drawable.filter_grey_back);
+                    textView.setTextColor(textGreyColor);
+
+                    type = "";
+//          switch (finalI) {
+//            case 1:
+//              types.remove("text");
+//              break;
+//            case 2:
+//              types.remove("image");
+//              break;
+//            case 3:
+//              types.remove("video");
+//              break;
+//          }
                 }
             });
         }
@@ -175,43 +243,108 @@ public class FilterFragment extends DialogFragment {
             TextView textView = timeTextViews[i];
             int finalI = i;
             textView.setOnClickListener(v -> {
-                if (textView.getCurrentTextColor() == getResources().getColor(R.color.textGreyColor)) {
+                if (textView.getCurrentTextColor() == textGreyColor) {
 
                     for (TextView textView2 : timeTextViews) {
-                        textView2.setBackgroundResource(R.drawable.signinedittext);
-                        textView2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                        textView2.setBackgroundResource(R.drawable.filter_grey_back);
+                        textView2.setTextColor(textGreyColor);
                     }
-                    textView.setBackgroundResource(R.drawable.signinbuttonlayout);
-                    textView.setTextColor(getResources().getColor(R.color.white));
+                    textView.setBackgroundResource(R.drawable.filter_red_back);
+                    textView.setTextColor(textWhiteColor);
                     dateFilter = finalI;
 
                 } else {
-                    textView.setBackgroundResource(R.drawable.signinedittext);
-                    textView.setTextColor(getResources().getColor(R.color.textGreyColor));
+                    textView.setBackgroundResource(R.drawable.filter_grey_back);
+                    textView.setTextColor(textGreyColor);
                     dateFilter = 0;
                 }
             });
         }
     }
 
-
     void categoryClickListeners() {
-        for (TextView textView : categoryTextViews) {
+
+        for (int i = 0; i < categoryTextViews.length; i++) {
+            final TextView textView = categoryTextViews[i];
+            final ImageView imageView = categoryImageViews[i];
             textView.setOnClickListener(v -> {
-                if (textView.getCurrentTextColor() == getResources().getColor(R.color.textGreyColor)) {
-                    for (TextView textView2 : categoryTextViews) {
-                        textView2.setBackgroundResource(R.drawable.signinedittext);
-                        textView2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                if (textView.getCurrentTextColor() == textGreyColor) {
+
+                    textView.setBackgroundResource(R.drawable.filter_red_back);
+                    textView.setTextColor(textWhiteColor);
+
+                    DrawableCompat.setTint(
+                            DrawableCompat.wrap(imageView.getDrawable()),
+                            textWhiteColor
+                    );
+                    imageView.setBackgroundResource(R.drawable.red_circle_back);
+
+                    if (textView.getText().toString().equals("هواتف")) {
+                        categories.add("موبيلات");
+                        return;
                     }
-                    textView.setBackgroundResource(R.drawable.signinbuttonlayout);
-                    textView.setTextColor(getResources().getColor(R.color.white));
-                    category = textView.getText().toString();
+                    if (textView.getText().toString().equals("الكترونيات")) {
+                        categories.add("اليكترونيات");
+                        return;
+                    }
+                    if (textView.getText().toString().equals("الكل")) {
+                        for (int j = 0; j < categoryTextViews.length; j++) {
+                            TextView textView1 = categoryTextViews[j];
+                            if (textView == textView1) continue;
+                            textView1.setBackgroundResource(R.drawable.filter_grey_back);
+                            textView1.setTextColor(textGreyColor);
+
+                            ImageView imageView1 = categoryImageViews[j];
+                            DrawableCompat.setTint(
+                                    DrawableCompat.wrap(imageView1.getDrawable()),
+                                    textGreyColor
+                            );
+                            imageView1.setBackgroundResource(R.drawable.grey_circle_back);
+                        }
+                        categories.clear();
+                        return;
+                    } else if (categoryTextViews[5].getCurrentTextColor() == textWhiteColor) {
+                        TextView allTv = categoryTextViews[5];
+                        ImageView allIv = categoryImageViews[5];
+
+                        allTv.setBackgroundResource(R.drawable.filter_grey_back);
+                        allTv.setTextColor(textGreyColor);
+
+                        DrawableCompat.setTint(
+                                DrawableCompat.wrap(allIv.getDrawable()),
+                                textGreyColor
+                        );
+                        allIv.setBackgroundResource(R.drawable.grey_circle_back);
+                    }
+
+
+                    categories.add(textView.getText().toString());
                 } else {
-                    textView.setBackgroundResource(R.drawable.signinedittext);
-                    textView.setTextColor(getResources().getColor(R.color.textGreyColor));
-                    category = "";
+                    textView.setBackgroundResource(R.drawable.filter_grey_back);
+                    textView.setTextColor(textGreyColor);
+
+                    DrawableCompat.setTint(
+                            DrawableCompat.wrap(imageView.getDrawable()),
+                            textGreyColor
+                    );
+                    imageView.setBackgroundResource(R.drawable.grey_circle_back);
+
+
+                    if (textView.getText().toString().equals("هواتف")) {
+                        categories.remove("موبيلات");
+                        return;
+                    }
+
+                    if (textView.getText().toString().equals("الكترونيات")) {
+                        categories.remove("اليكترونيات");
+                        return;
+                    }
+
+
+                    categories.remove(textView.getText().toString());
                 }
             });
+            imageView.setOnClickListener(v -> textView.performClick());
         }
     }
 
@@ -220,22 +353,22 @@ public class FilterFragment extends DialogFragment {
             TextView tv = priceTextViews[i];
             int finalI = i;
             tv.setOnClickListener(v -> {
-                if (tv.getCurrentTextColor() == getResources().getColor(R.color.textGreyColor)) {
+                if (tv.getCurrentTextColor() == textGreyColor) {
                     for (TextView tv2 : priceTextViews) {
-                        setTextViewBackground(tv2, R.drawable.signinedittext);
-                        tv2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                        setTextViewBackground(tv2, R.drawable.filter_grey_back);
+                        tv2.setTextColor(textGreyColor);
                     }
                     for (TextView tv2 : viewsTextViews) {
-                        setTextViewBackground(tv2, R.drawable.signinedittext);
-                        tv2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                        setTextViewBackground(tv2, R.drawable.filter_grey_back);
+                        tv2.setTextColor(textGreyColor);
                     }
-                    setTextViewBackground(tv, R.drawable.signinbuttonlayout);
-                    tv.setTextColor(getResources().getColor(R.color.white));
+                    setTextViewBackground(tv, R.drawable.filter_red_back);
+                    tv.setTextColor(textWhiteColor);
                     viewsFilter = 0;
                     priceFilter = finalI + 1;
                 } else {
-                    setTextViewBackground(tv, R.drawable.signinedittext);
-                    tv.setTextColor(getResources().getColor(R.color.textGreyColor));
+                    setTextViewBackground(tv, R.drawable.filter_grey_back);
+                    tv.setTextColor(textGreyColor);
                     priceFilter = 0;
                 }
             });
@@ -247,22 +380,22 @@ public class FilterFragment extends DialogFragment {
             TextView tv = viewsTextViews[i];
             int finalI = i;
             tv.setOnClickListener(v -> {
-                if (tv.getCurrentTextColor() == getResources().getColor(R.color.textGreyColor)) {
+                if (tv.getCurrentTextColor() == textGreyColor) {
                     for (TextView tv2 : viewsTextViews) {
-                        setTextViewBackground(tv2, R.drawable.signinedittext);
-                        tv2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                        setTextViewBackground(tv2, R.drawable.filter_grey_back);
+                        tv2.setTextColor(textGreyColor);
                     }
                     for (TextView tv2 : priceTextViews) {
-                        setTextViewBackground(tv2, R.drawable.signinedittext);
-                        tv2.setTextColor(getResources().getColor(R.color.textGreyColor));
+                        setTextViewBackground(tv2, R.drawable.filter_grey_back);
+                        tv2.setTextColor(textGreyColor);
                     }
-                    setTextViewBackground(tv, R.drawable.signinbuttonlayout);
-                    tv.setTextColor(getResources().getColor(R.color.white));
+                    setTextViewBackground(tv, R.drawable.filter_red_back);
+                    tv.setTextColor(textWhiteColor);
                     priceFilter = 0;
                     viewsFilter = finalI + 1;
                 } else {
-                    setTextViewBackground(tv, R.drawable.signinedittext);
-                    tv.setTextColor(getResources().getColor(R.color.textGreyColor));
+                    setTextViewBackground(tv, R.drawable.filter_grey_back);
+                    tv.setTextColor(textGreyColor);
                     viewsFilter = 0;
                 }
             });
@@ -275,5 +408,58 @@ public class FilterFragment extends DialogFragment {
 
     void setTextViewBackground(TextView tv, int drawable) {
         tv.setBackgroundResource(drawable);
+    }
+
+
+    void clearAllFilters() {
+
+
+        for (TextView type : typeTextViews) {
+            if (type.getCurrentTextColor() == textWhiteColor) {
+                type.performClick();
+            }
+        }
+
+        for (TextView category : categoryTextViews) {
+            if (category.getCurrentTextColor() == textWhiteColor) {
+                category.performClick();
+            }
+        }
+
+        for (TextView price : priceTextViews) {
+            if (price.getCurrentTextColor() == textWhiteColor) {
+                price.performClick();
+            }
+        }
+
+        for (TextView price : priceTextViews) {
+            if (price.getCurrentTextColor() == textWhiteColor) {
+                price.performClick();
+            }
+        }
+
+        for (TextView view : viewsTextViews) {
+            if (view.getCurrentTextColor() == textWhiteColor) {
+                view.performClick();
+            }
+        }
+
+        for (TextView time : timeTextViews) {
+            if (time.getCurrentTextColor() == textWhiteColor) {
+                time.performClick();
+            }
+        }
+
+        if (filterRatingBar.getRating() > 0) {
+            filterRatingBar.setRating(0);
+        }
+
+    }
+
+    private void filter() {
+
+        filterButton.performClick();
+        getActivity().getSupportFragmentManager().beginTransaction().remove(dialogFragment).commit();
+
     }
 }

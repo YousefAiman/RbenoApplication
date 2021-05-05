@@ -1,237 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:id="@+id/homedrawer"
+    android:layoutDirection="ltr"
+    android:background="#fff"
     tools:context=".HomeActivity">
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/homedrawer"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/homenavigation">
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinatorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/coordinatorLayout"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                app:layout_constraintTop_toTopOf="parent">
+                android:orientation="vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                <com.google.android.material.appbar.AppBarLayout
+                <View
                     android:layout_width="match_parent"
-                    android:background="@color/white"
-                    app:elevation="0dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="0.8dp"
+                    android:background="#1A707070" />
 
-                    <androidx.appcompat.widget.Toolbar
-                        android:id="@+id/toolbar1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#FFFFFF"
-                        app:layout_scrollFlags="scroll|enterAlways"
-                        app:contentInsetLeft="0dp"
-                        app:contentInsetStart="0dp"
-                        android:minHeight="?attr/actionBarSize"
-                        android:theme="?attr/actionBarTheme">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <de.hdodenhof.circleimageview.CircleImageView
-                                android:id="@+id/userImageIndicator"
-                                android:layout_width="@dimen/_30sdp"
-                                android:layout_height="@dimen/_30sdp"
-                                android:layout_marginStart="@dimen/_8sdp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent" />
-
-                            <TextView
-                                android:id="@+id/toolbarTitleTv"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/a_google"
-                                android:gravity="center"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                android:text="Rbeno"
-                                android:textColor="#BE1522"
-                                android:textSize="@dimen/_16sdp"
-                                />
-
-                            <ImageView
-                                android:id="@+id/filterIcon"
-                                android:layout_width="30dp"
-                                android:layout_gravity="end"
-                                android:layout_height="40dp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                android:layout_marginEnd="12dp"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                android:scaleType="fitCenter"
-                                android:src="@drawable/filter_icon"/>
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.appcompat.widget.Toolbar>
-
-                    <SearchView
-                        android:id="@+id/searchView"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_marginBottom="5dp"
-                        android:background="@drawable/search_background"
-                        android:queryHint="بحث"
-                        app:layout_scrollFlags="scroll|enterAlways"
-                        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/toolbar1"
-                        app:searchHintIcon="@drawable/ic_search"
-                        app:searchIcon="@drawable/ic_search" />
-
-                </com.google.android.material.appbar.AppBarLayout>
-
-                <LinearLayout
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    android:orientation="vertical">
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/tabLayout"
+                    android:layoutDirection="rtl"
+                    android:overScrollMode="never"
+                    app:tabGravity="start"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabMode="scrollable" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+                    android:layoutDirection="rtl" />
+
+            </LinearLayout>
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                app:elevation="0dp">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar1"
+                    android:layout_width="match_parent"
+                    android:layout_height="?actionBarSize"
+                    android:background="@color/red"
+                    app:layout_scrollFlags="scroll|snap|enterAlways"
+                    app:navigationIcon="@drawable/menu_icon">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:tabIconTint="@color/tab_selector"
-                        app:tabIndicatorColor="@color/red"
-                        app:tabIndicatorHeight="3dp"
-                        android:layoutDirection="rtl"
-                        app:tabGravity="start"
-                        app:tabMode="scrollable"
-                        app:tabSelectedTextColor="@color/red"
-                        app:tabTextColor="#515C5F" />
+                        android:layout_height="match_parent">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="3dp"
-                        android:background="@drawable/gradient_grey_down"/>
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintHeight_percent="0.6"
+                            app:srcCompat="@drawable/logo_icon_internal"
+                            android:scaleType="fitCenter" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-                    <androidx.viewpager.widget.ViewPager
-                        android:id="@+id/viewPager"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="-3dp"
-                        android:layout_height="wrap_content"
-                        />
-                </LinearLayout>
+                    <!--     t                   <TextView-->
+                    <!--                            android:id="@+id/toolbarTitleTv"-->
+                    <!--                            android:layout_width="match_parent"-->
+                    <!--                            android:layout_height="match_parent"-->
+                    <!--                            android:gravity="center"-->
+                    <!--                            android:lines="1"-->
+                    <!--                            android:textSize="20sp"-->
+                    <!--                            android:paddingStart="@dimen/_15sdp"-->
+                    <!--                            android:textColor="#fff" />-->
 
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                </androidx.appcompat.widget.Toolbar>
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <FrameLayout
+            android:id="@+id/homeFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_3sdp"
+            android:background="@drawable/gradient_grey"
+            app:layout_constraintBottom_toTopOf="@+id/bottomFrameLayout" />
+
+        <FrameLayout
+            android:id="@+id/bottomFrameLayout"
+            android:layout_width="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.1">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottomNavigationView"
                 style="@style/Theme.MaterialComponents.BottomNavigationView"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp"
-                android:background="@drawable/back_image_2"
-                app:itemIconSize="@dimen/_22sdp"
+                android:layout_height="match_parent"
                 app:itemIconTint="@drawable/navigationitem_selector"
                 app:itemTextColor="@drawable/navigationitem_selector"
                 app:labelVisibilityMode="labeled"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:menu="@menu/bottomnavigationmenu" />
 
+        </FrameLayout>
 
-            <android.widget.Button
-                android:id="@+id/addPromotionBtn2"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
-                android:background="@drawable/red_camera_circle"
-                android:layout_marginBottom="@dimen/_20sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+        <android.widget.Button
+            android:id="@+id/addPromotionBtn2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintWidth_percent="0.13"
+            app:layout_constraintDimensionRatio="1"
+            android:elevation="5dp"
+            android:background="@drawable/red_camera_circle"
+            android:layout_marginBottom="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <FrameLayout
-                android:id="@+id/homeFragmentContainer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_3sdp"
-                android:background="@drawable/gradient_grey"
-                app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView" />
 
-            <View
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="@dimen/_17sdp"
-                android:background="#2A000000"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/bottomNavigationView" />
+        <FrameLayout
+            android:id="@+id/homeDialogFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="invisible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/homenavigation"
-            android:layout_width="@dimen/_185sdp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="#FFFFFF"
-            app:itemIconSize="@dimen/_18sdp"
-            app:itemIconPadding="40dp"
-            app:headerLayout="@layout/navigation_header"
-            app:itemIconTint="#515C6F"
-            app:itemTextColor="#515C6F"
-            app:layout_constraintStart_toStartOf="@+id/constraintLayout"
-            app:menu="@menu/activity_menu_drawer">
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/homenavigation"
+        android:layout_width="@dimen/_185sdp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#fff"
+        app:itemIconSize="@dimen/_18sdp"
+        app:itemIconPadding="40dp"
+        app:headerLayout="@layout/navigation_header"
+        app:itemIconTint="#ABABAB"
+        app:itemTextColor="#3D3D3D"
+        app:menu="@menu/activity_menu_drawer">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_35sdp"
-                android:layout_gravity="bottom"
-                android:background="#BE1522"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/a_google"
-                android:orientation="vertical">
+        <Button
+            android:id="@+id/nav_footer_Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:background="#BE1522"
+            android:fontFamily="@font/a_google"
+            android:gravity="center"
+            android:layout_gravity="bottom"
+            android:paddingLeft="20dp"
+            android:drawableLeft="@drawable/logout_icon"
+            android:text="تسجيل خروج"
+            android:textColor="#fff"
+            android:textSize="16sp" />
+    </com.google.android.material.navigation.NavigationView>
 
-                <Button
-                    android:id="@+id/nav_footer_Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#00BE1522"
-                    android:fontFamily="@font/a_google"
-                    android:gravity="center"
-                    android:text="تسجيل الخروج"
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/_12sdp"
-                    />
-
-                <ImageView
-                    android:layout_width="@dimen/_18sdp"
-                    android:layout_height="@dimen/_18sdp"
-                    android:layout_marginStart="@dimen/_20sdp"
-                    app:srcCompat="@drawable/logout_icon"
-                    app:layout_constraintBottom_toBottomOf="@+id/nav_footer_Button"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/nav_footer_Button" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.navigation.NavigationView>
-    </androidx.drawerlayout.widget.DrawerLayout>
-</LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

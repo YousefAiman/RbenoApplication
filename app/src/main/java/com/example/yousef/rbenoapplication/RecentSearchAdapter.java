@@ -15,16 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapter.searchviewholder> implements Filterable {
-    private List<String> searches;
+    private final List<String> searches;
+    private final Context context;
+    private final SearchFragment searchFragment;
+    private final RecentSearchClickListener recentSearchClickListener;
     private List<String> filteredSearches;
-    private Context context;
-    private SearchFragment searchFragment;
 
-    RecentSearchAdapter(Context context, List<String> searches, SearchFragment searchFragment) {
+    RecentSearchAdapter(Context context, List<String> searches, SearchFragment searchFragment, RecentSearchClickListener recentSearchClickListener) {
         this.searches = searches;
         this.filteredSearches = searches;
         this.context = context;
         this.searchFragment = searchFragment;
+        this.recentSearchClickListener = recentSearchClickListener;
     }
 
     @NonNull
@@ -35,9 +37,9 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
 
     @Override
     public void onBindViewHolder(@NonNull searchviewholder holder, int position) {
-        holder.recentSearchTv.setText(filteredSearches.get(position));
+        holder.bind(filteredSearches.get(position));
         holder.itemView.setOnClickListener(v -> {
-            searchFragment.submitSearch(filteredSearches.get(position));
+            recentSearchClickListener.setOnRecentSearchClickListener(filteredSearches.get(position));
         });
     }
 
@@ -50,7 +52,6 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
     public int getItemCount() {
         return filteredSearches.size();
     }
-
 
     @Override
     public Filter getFilter() {
@@ -87,12 +88,26 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
         };
     }
 
+
+    public interface RecentSearchClickListener {
+        void setOnRecentSearchClickListener(String search);
+    }
+
     static class searchviewholder extends RecyclerView.ViewHolder {
-        TextView recentSearchTv;
+        private final TextView recentSearchTv;
 
         searchviewholder(@NonNull View itemView) {
             super(itemView);
             recentSearchTv = itemView.findViewById(R.id.searchHintTv);
         }
+
+        void bind(String search) {
+            recentSearchTv.setText(search);
+        }
+//
+//    @Override
+//    public void onClick(View view) {
+//      recentSearchClickListener.setOnRecentSearchClickListener(getAdapterPosition());
+//    }
     }
 }

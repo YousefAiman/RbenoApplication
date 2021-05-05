@@ -2,7 +2,10 @@ package com.example.yousef.rbenoapplication;
 
 import com.google.firebase.firestore.PropertyName;
 
-public class Notification {
+import java.io.Serializable;
+
+public class Notification implements Serializable {
+
     @PropertyName("promoId")
     public long promoId;
     @PropertyName("senderId")
@@ -11,11 +14,10 @@ public class Notification {
     public String receiverId;
     @PropertyName("type")
     public String type;
-    @PropertyName("seen")
-    public Boolean seen;
     @PropertyName("timeCreated")
     public long timeCreated;
-
+//  @PropertyName("sent")
+//  private Boolean sent;
 
     public String getSenderId() {
         return senderId;
@@ -42,13 +44,6 @@ public class Notification {
         this.type = type;
     }
 
-    public Boolean getSeen() {
-        return seen;
-    }
-
-    public void setSeen(Boolean seen) {
-        this.seen = seen;
-    }
 
     public long getPromoId() {
         return promoId;
@@ -65,4 +60,12 @@ public class Notification {
     public void setTimeCreated(long timeCreated) {
         this.timeCreated = timeCreated;
     }
+
+//  public Boolean getSent() {
+//    return sent;
+//  }
+//
+//  public void setSent(Boolean sent) {
+//    this.sent = sent;
+//  }
 }

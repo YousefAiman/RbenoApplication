@@ -15,9 +15,9 @@ import java.util.ArrayList;
 
 public class PromotionViewPager extends PagerAdapter {
 
-    private Context context;
-    private ArrayList<String> images;
-    private Picasso picasso = Picasso.get();
+    private final Context context;
+    private final ArrayList<String> images;
+    private final Picasso picasso = Picasso.get();
 
     PromotionViewPager(Context context, ArrayList<String> images) {
         this.context = context;
@@ -40,8 +40,13 @@ public class PromotionViewPager extends PagerAdapter {
 
         View view = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.promo_pager_layout, null);
         final ImageView imageView = view.findViewById(R.id.pagerImageView);
-        picasso.load(images.get(position)).fit().centerCrop().into(imageView);
-        view.setOnClickListener(v -> ((HomeActivity) context).showImageFullScreen(images.get(position)));
+        picasso.load(images.get(position)).fit().centerInside().into(imageView);
+
+        view.setOnClickListener(v -> FullScreenImagesUtil.showImageFullScreen(context,
+                images.get(position), null));
+
+
+//    view.setOnClickListener(v -> ((HomeActivity) context).showImageFullScreen(images.get(position)));
         container.addView(view);
         return view;
     }

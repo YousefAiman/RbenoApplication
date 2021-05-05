@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--    <item-->
+    <!--        android:id="@+id/edit_promo"-->
+    <!--        android:title="تعديل الاعلان"-->
+    <!--        android:icon="@drawable/alarm_icon"-->
+    <!--        />-->
+    <item
+        android:title="المزيد"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/dots_icon">
+
+        <menu>
+
+            <item
+                android:id="@+id/delete_item"
+                android:title="حذف الاعلان"
+                android:icon="@drawable/ic_delete_grey" />
+
+            <item
+                android:id="@+id/pause_item"
+                android:title="إيقاف الاعلان" />
+
+        </menu>
+    </item>
+
+</menu>

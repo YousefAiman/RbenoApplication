@@ -3,33 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/favouriteNavigationItem"
-        android:title="المفضلة"
-        android:icon="@drawable/heart_icon"
+        android:id="@+id/userNavigationItem"
+        android:title="حسابي"
+        android:icon="@drawable/user_icon"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/messagesNavigationItem"
-        android:title="الرسائل"
+        android:title="مسجاتي"
         android:icon="@drawable/messages_grey_icon"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/add_promo_tv"
-        android:title="اضافة اعلان"
-        android:checked="true"
-        app:showAsAction="ifRoom"
-        android:checkable="false" />
+        android:title="إضافة اعلان"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/notificationNavigationItem"
         android:icon="@drawable/notification_grey_icon"
-        android:title="الاشعارات"
+        android:title="تنبيهات"
         app:showAsAction="ifRoom"
         app:actionLayout="@layout/menu_counter" />
 
     <item
         android:id="@+id/homeNavigationItem"
         android:title="الرئيسية"
-        android:icon="@drawable/home_grey_icon"
+        android:icon="@drawable/home_icon"
         android:checked="true"
         app:showAsAction="ifRoom" />
 

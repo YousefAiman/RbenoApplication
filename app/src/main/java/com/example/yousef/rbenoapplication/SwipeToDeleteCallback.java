@@ -5,21 +5,25 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
-    private notificationadapter mAdapter;
+    private final NotificationsAdapter mAdapter;
 
-    SwipeToDeleteCallback(notificationadapter adapter) {
+    SwipeToDeleteCallback(NotificationsAdapter adapter) {
         super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         mAdapter = adapter;
     }
 
     @Override
-    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+    public boolean onMove(@NonNull RecyclerView recyclerView,
+                          @NonNull RecyclerView.ViewHolder viewHolder,
+                          @NonNull RecyclerView.ViewHolder target) {
         return false;
     }
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        int position = viewHolder.getAdapterPosition();
-        mAdapter.deleteNotification(position);
+        if (WifiUtil.checkWifiConnection(viewHolder.itemView.getContext())) {
+            ((NotificationsAdapter.notificationViewHolder) viewHolder)
+                    .deleteNotification(mAdapter.notifications.get(viewHolder.getAdapterPosition()));
+        }
     }
 }

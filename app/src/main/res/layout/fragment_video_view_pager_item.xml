@@ -4,40 +4,196 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".VideoPageVerticalFragment"
+    android:layoutDirection="ltr"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/videoPlayerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
         app:use_controller="false"
-        app:resize_mode="fit"
+        app:resize_mode="fill"
         android:orientation="vertical" />
+
+    <ImageView
+        android:id="@+id/videoCloseIv"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/play_circle"
+        android:layout_marginEnd="15dp"
+        android:visibility="gone"
+        android:layout_marginTop="18dp"
+        android:scaleType="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/close_icon"
+        app:tint="#fff" />
+
+
+    <ImageView
+        android:id="@+id/videoPromoPlayIv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.15"
+        app:layout_constraintDimensionRatio="1"
+        android:background="@drawable/play_circle"
+        android:visibility="invisible"
+        android:scaleType="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/play_arrow_white" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/video_graident_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent="0.24" />
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/videoUserImageIv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/user_icon"
+        android:layout_marginEnd="14dp"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view2"
+        app:layout_constraintWidth_percent="0.075" />
+
+    <TextView
+        android:id="@+id/videoUsernameTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_10sdp"
+        android:fontFamily="@font/a_google"
+        android:textColor="@color/white"
+        android:layout_marginEnd="6dp"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/videoUserImageIv"
+        app:layout_constraintEnd_toStartOf="@+id/videoUserImageIv"
+        app:layout_constraintTop_toTopOf="@+id/videoUserImageIv" />
+
 
     <TextView
         android:id="@+id/videoTitleTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@color/red"
         android:fontFamily="@font/a_google"
-        android:layout_margin="@dimen/_10sdp"
-        android:textSize="@dimen/_16sdp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_marginTop="8dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/videoUserImageIv"
+        app:layout_constraintTop_toBottomOf="@+id/videoUserImageIv" />
+
 
     <TextView
-        android:id="@+id/videoDescTv"
+        android:id="@+id/videoPriceTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_10sdp"
-        android:gravity="center"
         android:fontFamily="@font/a_google"
-        android:textColor="#fff"
-        android:textSize="@dimen/_16sdp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/white"
+        android:textDirection="ltr"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/videoUserImageIv"
+        app:layout_constraintTop_toBottomOf="@+id/videoTitleTv" />
+
+    <TextView
+        android:id="@+id/videoCategoryTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:background="@drawable/category_background_video"
+        android:textColor="#3D3D3D"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/videoUserImageIv"
+        app:layout_constraintTop_toBottomOf="@+id/videoPriceTv" />
+
+
+    <TextView
+        android:id="@+id/videoShowTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:text="عرض الاعلان"
+        android:textColor="#FBFBFB"
+        android:textSize="16sp"
+        android:layout_marginBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/videoShareIv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.06"
+        app:layout_constraintDimensionRatio="1"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="@+id/videoUserImageIv"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewsIv"
+        app:layout_constraintStart_toStartOf="@+id/videoViewsIv"
+        app:layout_constraintTop_toTopOf="@+id/videoUserImageIv"
+        app:srcCompat="@drawable/share_icon_white" />
+
+    <ImageView
+        android:id="@+id/videoViewsIv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.1"
+        app:layout_constraintDimensionRatio="1"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/videoViewsTv"
+        app:layout_constraintEnd_toEndOf="@+id/videoFavsIv"
+        app:layout_constraintStart_toStartOf="@+id/videoFavsIv"
+        app:srcCompat="@drawable/eye_icon_white_large" />
+
+    <TextView
+        android:id="@+id/videoViewsTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="@font/a_google"
+        android:textColor="#FBFBFB"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewsIv"
+        app:layout_constraintStart_toStartOf="@+id/videoViewsIv" />
+
+
+    <ImageView
+        android:id="@+id/videoFavsIv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_percent="0.1"
+        app:layout_constraintDimensionRatio="1"
+        android:layout_marginStart="14dp"
+        app:layout_constraintBottom_toTopOf="@+id/videoFavsTv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/heart_white" />
+
+    <TextView
+        android:id="@+id/videoFavsTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:fontFamily="@font/a_google"
+        android:textColor="#FBFBFB"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/videoViewsIv"
+        app:layout_constraintEnd_toEndOf="@+id/videoFavsIv"
+        app:layout_constraintStart_toStartOf="@+id/videoFavsIv" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

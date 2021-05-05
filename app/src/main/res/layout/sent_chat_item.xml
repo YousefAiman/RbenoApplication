@@ -4,49 +4,54 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline23"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
-
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/frameLayout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/_2sdp"
-        android:gravity="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/messageTimeTv"
-        app:layout_constraintStart_toStartOf="@+id/guideline23"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.7">
+
 
         <TextView
             android:id="@+id/messageTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_13sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_marginBottom="@dimen/_4sdp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/sent_message_back"
             android:fontFamily="@font/a_google"
-            android:gravity="center"
-            android:paddingStart="@dimen/_10sdp"
-            android:paddingTop="@dimen/_6sdp"
-            android:paddingEnd="@dimen/_10sdp"
-            android:paddingBottom="@dimen/_6sdp"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/_13sdp" />
-    </LinearLayout>
+            android:textIsSelectable="true"
+            android:autoLink="web"
+            android:textColorLink="#fff"
+            android:focusable="true"
+            android:enabled="true"
+            android:longClickable="true"
+            app:layout_constraintWidth_max="wrap"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingTop="6dp"
+            android:layout_gravity="end"
+            android:paddingBottom="6dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColor="#fff"
+            android:textSize="14sp" />
+
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/messageTimeTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/a_google"
+        android:visibility="gone"
+        android:textColor="#999"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:textSize="@dimen/_10sdp"
-        android:textColor="#999999"
-        android:fontFamily="@font/a_google"/>
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

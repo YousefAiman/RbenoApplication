@@ -8,27 +8,26 @@
         <item name="colorPrimaryDark">@color/red</item>
         <item name="colorAccent">@color/red</item>
         <item name="popupMenuStyle">@style/PopupMenu</item>
-
-    </style>
-
-    <style name="FacebookLoginButton">
-        <item name="android:background">@drawable/facebook_icon</item>
     </style>
 
     <style name="PopupMenu" parent="@android:style/Widget.PopupMenu">
         <item name="android:textSize">14sp</item>
         <item name="android:gravity">end</item>
         <item name="android:fontFamily">@font/a_google</item>
-        <item name="android:itemBackground">#FFFFFF</item>
+        <item name="android:itemBackground">#fff</item>
         <item name="android:background">@drawable/signinedittext</item>
     </style>
 
     <style name="CircularProgress" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">#BE1421</item>
+        <item name="colorAccent">@color/red</item>
     </style>
 
     <style name="CircularProgressWhite" parent="Theme.AppCompat.Light">
         <item name="colorAccent">@color/white</item>
+    </style>
+
+    <style name="CircularProgressGrey" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/textGreyColor</item>
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView.ActionBar">
@@ -47,13 +46,16 @@
         parent="Theme.MaterialComponents">
         <item name="fontFamily">@font/a_google</item>
         <item name="android:singleLine">true</item>
-        <item name="android:height">@dimen/_24sdp</item>
-        <item name="android:textSize">@dimen/_11sdp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="FullScreenDialogTheme" parent="Theme.MaterialComponents">
+    <style name="FullScreenDialogTheme" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="android:windowAnimationStyle">@style/Theme.AppCompat.Dialog</item>
- </style>
+    </style>
+
+    <!--    <style name="SpinnerTheme" parent="android:Widget.Spinner">-->
+    <!--        <item name="android:background">@drawable/spinner_custom_layout</item>-->
+    <!--    </style>-->
 
 </resources>

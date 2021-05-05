@@ -9,7 +9,6 @@
     <androidx.appcompat.widget.AppCompatTextView
         app:autoSizeTextType="uniform"
         app:autoSizeMinTextSize="5sp"
-        android:id="@+id/counterTv"
         android:layout_width="@dimen/_17sdp"
         android:padding="@dimen/_3sdp"
         android:layout_height="@dimen/_17sdp"

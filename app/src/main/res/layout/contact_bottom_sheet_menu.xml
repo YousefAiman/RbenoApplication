@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:paddingStart="18dp"
+    android:layoutDirection="ltr"
+    android:paddingEnd="18dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/messageUserBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:layout_marginVertical="20dp"
+        android:textAlignment="center"
+        android:background="@drawable/sheet_btn_back"
+        android:text="مراسلة المستخدم"
+        android:drawableEnd="@drawable/message_plane_white"
+        android:textColor="#fff"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/phoneNumBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/sheet_btn_back"
+        android:drawableEnd="@drawable/copy_icon"
+        android:textColor="#fff"
+        android:textSize="16sp" />
+
+</LinearLayout>

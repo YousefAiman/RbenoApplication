@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#BE1522</color>
-    <color name="colorPrimaryDark">#95121C</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="red">#BE1522</color>
+    <color name="colorPrimary">#991914</color>
+    <color name="colorAccent">#ffed00</color>
+    <color name="red">#991914</color>
+    <color name="light_grey">#ABABAB</color>
     <color name="textGreyColor">#515C6F</color>
-    <color name="transparentGrey">#41525252</color>
     <color name="white">#FFFFFF</color>
-    <color name="blueMobile">#00008b</color>
-    <color name="greenFurniture">#006400</color>
     <color name="pcBlack">#373737</color>
-    <color name="houseOrange">#dc3c00</color>
-    <color name="electGrey">#5E6481</color>
-    <color name="settings_grey">#5C515C6F</color>
+    <color name="message_white">#F7F8F9</color>
+    <color name="message_color_light">#3D3D3D</color>
+    <color name="message_color_dark">#232323</color>
+    <color name="light_grey_back">#F6F6F6</color>
+
 
 </resources>

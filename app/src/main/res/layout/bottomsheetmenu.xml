@@ -1,61 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:paddingStart="18dp"
+    android:layoutDirection="ltr"
+    android:paddingEnd="18dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_marginEnd="@dimen/_5sdp"
-        android:fontFamily="@font/a_google"
-        android:text="اختر نوع الاعلان الذي تريد إضافته"
-        android:textColor="@color/textGreyColor"
-        android:textSize="@dimen/_12sdp" />
-
-    <TextView
-        android:id="@+id/textPromoTv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/a_google"
-        android:gravity="center"
-        android:padding="@dimen/_8sdp"
-        android:text="اعلان نصي"
-        android:textColor="@color/red"
-        android:textSize="@dimen/_13sdp" />
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/textGreyColor" />
+        <ImageView
+            android:id="@+id/closePromoIv"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/close_icon" />
 
-    <TextView
-        android:id="@+id/imagePromoTv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/a_google"
-        android:gravity="center"
-        android:padding="@dimen/_8sdp"
-        android:text="اعلان بصور"
-        android:textColor="@color/red"
-        android:textSize="@dimen/_13sdp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/a_google"
+            android:text="نوع الاعلان"
+            android:textColor="#3D3D3D"
+            android:textSize="16sp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/textGreyColor" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/videoPromoTv"
+    <Button
+        android:id="@+id/imagePromoBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/a_google"
         android:gravity="center"
-        android:padding="@dimen/_8sdp"
-        android:text="اعلان بفيديو"
-        android:textColor="@color/red"
-        android:textSize="@dimen/_13sdp" />
+        android:layout_marginTop="20dp"
+        android:background="@drawable/sheet_btn_back"
+        android:text="اعلان صورة"
+        android:textColor="#fff"
+        android:textSize="16sp" />
+
+
+    <Button
+        android:id="@+id/textPromoBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/sheet_btn_back"
+        android:text="اعلان نص"
+        android:textColor="#fff"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/videoPromoBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/a_google"
+        android:gravity="center"
+        android:layout_marginTop="14dp"
+        android:visibility="gone"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/sheet_btn_back"
+        android:text="اعلان فيديو"
+        android:textColor="#fff"
+        android:textSize="16sp" />
 
 </LinearLayout>

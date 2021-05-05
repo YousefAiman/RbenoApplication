@@ -1,28 +1,17 @@
 package com.example.yousef.rbenoapplication;
 
-
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.GestureDetector;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,191 +23,162 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.DialogFragment;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Log;
-import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import hyogeun.github.com.colorratingbarlib.ColorRatingBar;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+public class PromotionInfoFragment extends Fragment implements View.OnClickListener {
 
-public class PromotionInfoFragment extends DialogFragment {
-
-    private final GestureDetector gesture = new GestureDetector(getActivity(),
-            new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onDown(MotionEvent e) {
-                    return true;
-                }
-
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                       float velocityY) {
-                    final int SWIPE_MIN_DISTANCE = 110;
-                    final int SWIPE_MAX_OFF_PATH = 250;
-                    final int SWIPE_THRESHOLD_VELOCITY = 200;
-                    try {
-                        if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                            return false;
-                        if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-                                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                            getActivity().onBackPressed();
-                        }
-                    } catch (Exception e) {
-                        // nothing
-                    }
-                    return super.onFling(e1, e2, velocityX, velocityY);
-                }
-            });
-    Promotion p;
-    ImageView nextIv;
-    ImageView previousIv;
-    //    List<String> blockedUsers;
-    private FirebaseAuth auth;
-    private DocumentReference dr;
-    //    private String imageUrl;
-    private ViewPager viewPager;
-    private LinearLayout sliderLayout;
-    private int dotsCount;
-    private ImageView[] dots;
-    private ArrayList<String> images;
-    private CollectionReference promotionRef;
-    private CollectionReference usersRef;
+    private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final Promotion p;
+    private ViewPager promotionsPager;
+    private LinearLayout promotionDotsSlider;
     private String viewedDocumentID;
-    private Long promoviews;
     private ColorRatingBar ratingBar;
-    private ImageView favImage;
-    private String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    //    private List<Double> ratings;
-    private boolean ratingChanged;
-    //    private double ratingSum;
-//    private float ratingCalc;
-    private RecyclerView lv;
-    private List<Long> favPromosId;
-    private Boolean alreadyFav;
-    private TextView ratingNumberTv;
-    //    private boolean favWasClicked = false;
-    private Button deleteBtn;
-    private ImageView shareImage;
-    private ImageView callImage;
-    private TextView promotionViews;
-    private TextView promotionTitle;
-    private TextView promotionPrice;
-    private TextView promotionPublish;
-    private TextView promotionId;
-    private TextView promoInfoTv;
-    //    private String currentUsername;
-    private String favouredDocumentId;
-    private String phonenum;
-    private TextView promotionDescTitleTv2;
-    private TextView promoInfoTv2;
-    private TextView promotionDescTitleTv;
-    private CardView promoVideoCardView;
-    private ImageView message_img;
-    private CollectionReference notifRef;
-    private APIService apiService;
-    private PlayerView playerView;
-    private SimpleExoPlayer exoPlayer;
+    private ImageView favImage, promoUserIv, promoUserIv2, shareImageIv, onlineStatusIv;
+
+    private TextView promotionViews, promotionTitle, promotionPrice, promotionPublish,
+            promotionId, promotionDescTv, promotionFavsTv, userNameTv, promotionCategoryTv,
+            relatedTv, promotionCountryTv, promotionCurrencyTv;
+
     private DocumentSnapshot currentDs;
-    //    private boolean isFullScreen = false;
-    private CollectionReference chatsRef;
-    private ArrayList<Promotion> promotions;
-    private StaggeredRecyclerAdapter adapter;
-    private DocumentSnapshot lastResult;
-    private Query relatedQuery;
-    private boolean isLoading = true;
+    private PlayerView promoVideoPlayer;
+    private SimpleExoPlayer exoPlayer;
+    private RecyclerView relatedRv;
+    private ConstraintLayout messagingLayout;
+    private long lastPosition;
+    private File file;
+    private Toolbar toolbar;
+    private final CollectionReference
+            promotionRef = FirebaseFirestore.getInstance().collection("promotions"),
+            usersRef = FirebaseFirestore.getInstance().collection("users");
 
-    public PromotionInfoFragment() {
+    private boolean currentUserIsBlocked;
+
+    private List<String> currentlyBlocked;
+
+    private PromotionDeleteReceiver promotionDeleteReceiver;
+
+    private ArrayList<Promotion> relatedPromos;
+
+    private String userPhoneNumber;
+
+    public PromotionInfoFragment(Promotion p) {
+        this.p = p;
     }
 
-    static PromotionInfoFragment newInstance() {
-        return new PromotionInfoFragment();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-        setHasOptionsMenu(true);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_promotion_info, container, false);
-        NestedScrollView scrollview = view.findViewById(R.id.scrollview);
-        ratingNumberTv = view.findViewById(R.id.ratingNumberTv);
-        deleteBtn = view.findViewById(R.id.promo_delete_button);
-        favImage = view.findViewById(R.id.fav_image);
-        shareImage = view.findViewById(R.id.share_img);
-        callImage = view.findViewById(R.id.call_img);
+
+        final View view = inflater.inflate(R.layout.fragment_promotion_info_new, container, false);
+
+        //Initialize delete broadcast
+        setupDeletionReceiver();
+
+        //Initializing views
+        favImage = view.findViewById(R.id.favImage);
         ratingBar = view.findViewById(R.id.ratingBar);
+
+        promotionDescTv = view.findViewById(R.id.promotionDescTv);
         promotionViews = view.findViewById(R.id.promotionViewsTv);
-        //   navigation = view.findViewById(R.id.promotionnavigation);
         promotionTitle = view.findViewById(R.id.promotion_title);
         promotionPrice = view.findViewById(R.id.promotion_price);
         promotionPublish = view.findViewById(R.id.promotionPublishtimeTv);
+        promotionCategoryTv = view.findViewById(R.id.promotionCategoryTv);
         promotionId = view.findViewById(R.id.promotionIdTv);
-        promoInfoTv = view.findViewById(R.id.promoInfoTv);
-        viewPager = view.findViewById(R.id.promotionsPager);
-        message_img = view.findViewById(R.id.message_img);
-        sliderLayout = view.findViewById(R.id.promotiondotsSlider);
-        // drawerLayout = view.findViewById(R.id.promotiondrawer);
-        lv = view.findViewById(R.id.horizontalRecyclerView);
-        promotionDescTitleTv = view.findViewById(R.id.promotionDescTitleTv);
-        promotionDescTitleTv2 = view.findViewById(R.id.promotionDescTitleTv2);
-        promoInfoTv2 = view.findViewById(R.id.promoInfoTv2);
-        promoVideoCardView = view.findViewById(R.id.promoVideoCardView);
-        scrollview.setOnTouchListener((v, event) -> gesture.onTouchEvent(event));
-        view.findViewById(R.id.promoBackIv).setOnClickListener(v->getActivity().onBackPressed());
-//        view.setOnTouchListener(new OnSwipeTouchListener(getActivity()){
-//            @Override
-//            public void onSwipeRight() {
-//                super.onSwipeRight();
-//                Toast.makeText(getActivity(), "RIGHT SWIPE", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        userNameTv = view.findViewById(R.id.userNameTv);
+        promoUserIv = view.findViewById(R.id.promoUserIv);
+        promoUserIv2 = view.findViewById(R.id.promoUserIv2);
+        promotionFavsTv = view.findViewById(R.id.promotionFavsTv);
+        relatedRv = view.findViewById(R.id.relatedRv);
+        messagingLayout = view.findViewById(R.id.messagingLayout);
+        relatedTv = view.findViewById(R.id.relatedTv);
+        promotionCountryTv = view.findViewById(R.id.promotionCountryTv);
+        shareImageIv = view.findViewById(R.id.shareImageIv);
+        toolbar = view.findViewById(R.id.toolbar);
+        onlineStatusIv = view.findViewById(R.id.onlineStatusIv);
+        promotionCurrencyTv = view.findViewById(R.id.promotionCurrencyTv);
+        final AdView adView = view.findViewById(R.id.adView);
+
+        //Back navigation
+        toolbar.setNavigationOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
+
+        //Loading AdView
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                adView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //Inflating menu
+        if (p.getUid().equals(Objects.requireNonNull(currentUser).getUid())) {
+            inflateOwnerUserMenu();
+        } else {
+            inflatePromoMenu();
+        }
+
+        //Creating video or image pager depending on promo type
+        checkPromoTypeAndCreateVideoOrImagePager(view);
+
         return view;
     }
 
@@ -227,915 +187,1213 @@ public class PromotionInfoFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        //filing promo data from promo object
+        fillPromoData();
 
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        if (Objects.requireNonNull(currentUser).isAnonymous()) {
 
-        images = new ArrayList<>();
-
-
-        usersRef = firestore.collection("users");
-        promotionRef = firestore.collection("promotions");
-        notifRef = firestore.collection("notifications");
-
-        if (getArguments() != null) {
-            Bundle bundle = getArguments();
-            p = (Promotion) bundle.getSerializable("promo");
-
-            if (p.getPromoType().equals("image")) {
-                images.addAll(p.getPromoimages());
-
-                viewPager.getLayoutParams().height = GlobalVariables.getWindowHeight() / 3;
-
-                promoVideoCardView.setVisibility(View.GONE);
-                promotionDescTitleTv2.setVisibility(View.GONE);
-                promoInfoTv2.setVisibility(View.GONE);
-            } else if (p.getPromoType().equals("video")) {
-//                HomeActivity homeActivity = ((HomeActivity) getActivity());
-                if (GlobalVariables.getVideoViewedCount() % 10 != 0) {
-                    GlobalVariables.setVideoViewedCount(GlobalVariables.getVideoViewedCount() + 1);
-                }  //  homeActivity.showRewardVideo();
-
-                viewPager.setVisibility(View.GONE);
-                promotionDescTitleTv2.setVisibility(View.GONE);
-                promoInfoTv2.setVisibility(View.GONE);
-                promoVideoCardView.setVisibility(View.VISIBLE);
-                playerView = view.findViewById(R.id.promoVideoPlayer);
-                exoPlayer = new SimpleExoPlayer.Builder(getContext()).build();
-                exoPlayer.prepare(new ProgressiveMediaSource.Factory(new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), "RbenoApp")))
-                        .createMediaSource(Uri.parse(p.getVideoUrl())));
-                exoPlayer.setPlayWhenReady(true);
-
-//                if(exoPlayer.getPlayWhenReady()){
-                playerView.findViewById(R.id.exo_rew).setOnClickListener(v -> {
-                    if (exoPlayer.getCurrentPosition() < 3000) {
-                        exoPlayer.seekTo(0);
-                    } else {
-                        exoPlayer.seekTo(exoPlayer.getCurrentPosition() - 3000);
-                    }
-                });
-                playerView.findViewById(R.id.exo_ffwd).setOnClickListener(v -> {
-                    if (exoPlayer.getCurrentPosition() < exoPlayer.getDuration() - 3000) {
-                        exoPlayer.seekTo(exoPlayer.getCurrentPosition() + 3000);
-                    } else {
-                        exoPlayer.seekTo(exoPlayer.getDuration());
-                    }
-                });
-                playerView.findViewById(R.id.exo_previous).setVisibility(View.GONE);
-                playerView.findViewById(R.id.exo_nextvideo).setVisibility(View.GONE);
-                playerView.findViewById(R.id.exoplayer_fullscreen_icon).setOnClickListener(v -> {
-                    FullScreenVideoFragment dialogFragment = FullScreenVideoFragment.newInstance();
-                    Bundle videoBundle = new Bundle();
-                    videoBundle.putString("videoUrl", p.getVideoUrl());
-                    videoBundle.putLong("videoPosition", exoPlayer.getCurrentPosition());
-                    dialogFragment.setArguments(videoBundle);
-                    exoPlayer.setPlayWhenReady(false);
-                    dialogFragment.getLifecycle().addObserver((LifecycleEventObserver) (source, event) -> {
-                        if (event == Lifecycle.Event.ON_STOP) {
-                            exoPlayer.seekTo(dialogFragment.newExoPlayer.getCurrentPosition());
-                            exoPlayer.setPlayWhenReady(true);
-                            dialogFragment.playerView.setPlayer(null);
-                            dialogFragment.newExoPlayer.release();
-                            dialogFragment.newExoPlayer = null;
-                        }
-                    });
-                    dialogFragment.show(getChildFragmentManager(), "fullScreen");
-                });
-
-                playerView.setPlayer(exoPlayer);
-                promotionDescTitleTv.setVisibility(View.VISIBLE);
-                promoInfoTv.setVisibility(View.VISIBLE);
-            } else {
-                promoVideoCardView.setVisibility(View.GONE);
-                promotionDescTitleTv.setVisibility(View.GONE);
-                promoInfoTv.setVisibility(View.GONE);
-                viewPager.setVisibility(View.GONE);
-            }
-        }
-
-        auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() != null) {
-
-
-            favPromosId = new ArrayList<>();
-
-
-            usersRef.whereEqualTo("userId", currentUserUid).limit(1).get().addOnCompleteListener(task -> {
-                alreadyFav = false;
-
-                currentDs = task.getResult().getDocuments().get(0);
-
-                favPromosId = (List<Long>) currentDs.get("favpromosids");
-
-                if (favPromosId.size() != 0) {
-                    if (favPromosId.contains(p.getPromoid())) {
-                        alreadyFav = true;
-                        favImage.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.promo_icon_round_red));
-                    }
-                }
-
-                message_img.setOnClickListener(view1 -> {
-                    Intent messagingIntent = new Intent(getContext(), MessagingActivity.class);
-                    messagingIntent.putExtra("promouserid", p.getUid());
-//                    messagingIntent.putExtra("currentuserid", auth.getCurrentUser().getUid());
-                    messagingIntent.putExtra("promodocumentid", viewedDocumentID);
-                    messagingIntent.putExtra("intendedpromoid", p.getPromoid());
-
-                    startActivity(messagingIntent);
-                });
-
-                favImage.setOnClickListener(v -> {
-                    favImage.setClickable(false);
-//                    favWasClicked = true;
-                    String documentId = task.getResult().getDocuments().get(0).getId();
-
-                    if (!alreadyFav) {
-                        //Toast.makeText(getContext(), promoUserid, Toast.LENGTH_SHORT).show();
-                        sendNotification();
-                        favImage.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.promo_icon_round_red));
-                        usersRef.document(documentId).update("favpromosids", FieldValue.arrayUnion(p.getPromoid())).addOnCompleteListener(task17 -> {
-                            Toast.makeText(getContext(), "تمت الاضافة الى المفضلة!", Toast.LENGTH_SHORT).show();
-                            alreadyFav = true;
-                        });
-
-                        addToFavCount();
-
-                        addNotification("favourite");
-
-                    } else {
-                        subtractFromFavCount();
-                        if (favouredDocumentId != null) {
-                            notifRef.document(favouredDocumentId).delete();
-                        } else {
-                            notifRef.whereEqualTo("receiverId", p.getUid()).whereEqualTo("senderId", currentUserUid)
-                                    .whereEqualTo("promoId", p.getPromoid()).whereEqualTo("type", "favourite").get().addOnCompleteListener(task14 -> {
-                                if (!task14.getResult().isEmpty()) {
-                                    notifRef.document(task14.getResult().getDocuments().get(0).getId()).delete();
-                                }
-                            });
-                        }
-                        favImage.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.promo_icon_round));
-                        usersRef.document(documentId).update("favpromosids", FieldValue.arrayRemove(p.getPromoid())).addOnCompleteListener(task13 -> {
-                            Toast.makeText(getContext(), "تمت الازالة من المفضلة!", Toast.LENGTH_SHORT).show();
-                            alreadyFav = false;
-                        });
-
-                    }
-                });
-
-            });
-
-            ratingBar.setIsIndicator(false);
-            ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> ratingChanged = fromUser);
-        } else {
-            ratingBar.setIsIndicator(true);
-            message_img.setOnClickListener(v -> showSigninDialog());
+            //current user is anon
+            messagingLayout.setOnClickListener(v -> showSigninDialog());
             favImage.setOnClickListener(v -> showSigninDialog());
-        }
+
+            promoUserIv2.setOnClickListener(v -> showProfile());
+            userNameTv.setOnClickListener(v -> showProfile());
+
+            shareImageIv.setOnClickListener(this);
+
+            getUserInfo();
+
+        } else {
+
+            //Already favoured
+            if (GlobalVariables.getFavPromosIds().contains(p.getPromoid())) {
+                favImage.setImageResource(R.drawable.heart_icon);
+            }
 
 
-        usersRef.document(p.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-            phonenum = documentSnapshot.getString("phonenum");
-            dr = usersRef.document(documentSnapshot.getId());
-            if (phonenum == null) {
-                callImage.setBackgroundResource(R.drawable.promo_icon_round);
+            if (currentUser.getUid().equals(p.getUid())) {
+
+                //Current user is same as publisher
+                messagingLayout.setVisibility(View.GONE);
+
+                initFavAndProfileClickers();
+
+                getUserInfo();
+
             } else {
-                callImage.setOnClickListener(v -> {
-                    final Dialog dialog = new Dialog(getContext());
-                    dialog.setContentView(R.layout.phone_number_layout);
-                    final TextView phoneTv = dialog.findViewById(R.id.phoneNumTv);
-                    final ImageView copyImage = dialog.findViewById(R.id.copyImage);
-                    phoneTv.setText(phonenum);
-                    dialog.show();
-                    copyImage.setOnClickListener(v1 -> {
-                        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("تم نسخ رقم الهاتف!", phonenum);
-                        clipboard.setPrimaryClip(clip);
-                        dialog.dismiss();
-                        Toast.makeText(getContext(), "تم نسخ رقم الهاتف الى الحافظة!", Toast.LENGTH_SHORT).show();
-                    });
+
+                //current user is not same as publisher
+                usersRef.whereEqualTo("userId", p.getUid()).addSnapshotListener((value, error) -> {
+
+                    if (value == null)
+                        return;
+
+                    for (DocumentChange dc : value.getDocumentChanges()) {
+
+                        currentDs = dc.getDocument();
+                        if (dc.getType() == DocumentChange.Type.ADDED) {
+
+                            final String imageUrl = currentDs.getString("imageUrl");
+                            userNameTv.setText(currentDs.getString("username"));
+                            userPhoneNumber = currentDs.getString("phonenum");
+
+                            if (!currentDs.getBoolean("status")) {
+                                onlineStatusIv.setImageResource(R.drawable.red_circle);
+                            }
+
+                            if (imageUrl != null && !imageUrl.isEmpty()) {
+                                Picasso.get().load(imageUrl).fit().into(promoUserIv);
+                                Picasso.get().load(imageUrl).fit().into(promoUserIv2);
+                            }
+
+                            currentlyBlocked = (List<String>) currentDs.get("usersBlocked");
+
+                            if (currentlyBlocked != null) {
+                                currentUserIsBlocked = currentlyBlocked.contains(currentUser.getUid());
+                            }
+//            promotionCountryTv
+                            initFavAndProfileClickers();
+
+                        } else {
+
+                            currentlyBlocked = (List<String>) currentDs.get("usersBlocked");
+
+                            if (currentlyBlocked != null) {
+                                currentUserIsBlocked = currentlyBlocked.contains(currentUser.getUid());
+                            }
+
+                        }
+
+                    }
                 });
             }
-        });
-        deleteBtn.setClickable(false);
-        deleteBtn.setVisibility(View.INVISIBLE);
+
+            messagingLayout.setOnClickListener(this);
+        }
+
+        getRelatedPromotions();
 
 
-        promotionRef.whereEqualTo("promoid", p.getPromoid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            DocumentSnapshot ds = queryDocumentSnapshots.getDocuments().get(0);
-            promoviews = ds.getLong("viewcount");
-            promotionViews.setText(promoviews + "");
-            viewedDocumentID = ds.getId();
-            if (p.getUid().equals(currentUserUid)) {
-                deleteBtn.setVisibility(View.VISIBLE);
-                deleteBtn.setClickable(true);
+    }
 
-                deleteBtn.setOnClickListener(v -> {
+    void startMessagingActivity() {
+        Intent messagingIntent = new Intent(getContext(), MessagingRealTimeActivity.class);
+        messagingIntent.putExtra("promouserid", p.getUid());
+        messagingIntent.putExtra("promodocumentid", viewedDocumentID);
+        messagingIntent.putExtra("intendedpromoid", p.getPromoid());
+        startActivity(messagingIntent);
+    }
 
-                    Dialog dialog = new Dialog(getContext());
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialog.setContentView(R.layout.delete_promo_alert_layout);
-                    TextView closeButton = dialog.findViewById(R.id.delete_close);
-                    TextView confirmButton = dialog.findViewById(R.id.delete_confirm);
-                    closeButton.setOnClickListener(v12 -> {
-                        dialog.dismiss();
-                        Toast.makeText(getContext(), "لم يتم حذف الإعلان!", Toast.LENGTH_SHORT).show();
-                    });
-                    confirmButton.setOnClickListener(v13 -> {
+    void showRatingDialog() {
 
-                        final ProgressDialog progressDialog = ProgressDialog.show(getContext(), "جاري حذف الإعلان",
-                                "الرجاء الإنتظار!", true);
-                        progressDialog.show();
-                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                        chatsRef = firestore.collection("chats");
-                        promotionRef.document(viewedDocumentID).delete().addOnSuccessListener(task110 -> {
-                            promotionRef.document("promotionidnum").update("promoCount", FieldValue.increment(-1));
-                            if (images != null && !images.isEmpty()) {
-                                for (int i = 0; i < images.size(); i++) {
-                                    storage.getReferenceFromUrl(images.get(i)).delete();
-                                }
-                            }
-                            chatsRef.whereEqualTo("intendedpromoid", p.getPromoid()).get().addOnCompleteListener(task19 -> {
-                                if (task19.isSuccessful() && !task19.getResult().isEmpty()) {
-                                    List<DocumentSnapshot> documents = task19.getResult().getDocuments();
-                                    for (DocumentSnapshot ds13 : documents) {
-                                        chatsRef.document(ds13.getId()).delete();
-                                    }
-                                }
-                                usersRef.whereArrayContains("favpromosids", Long.toString(p.getPromoid())).get().addOnCompleteListener(task18 -> {
-                                    if (task18.isSuccessful()) {
-                                        List<DocumentSnapshot> documents = task18.getResult().getDocuments();
-                                        for (DocumentSnapshot ds12 : documents) {
-                                            usersRef.document(ds12.getId()).update("favpromosids", FieldValue.arrayRemove(Long.toString(p.getPromoid())));
-                                        }
-                                    }
-                                    notifRef.whereEqualTo("promoId", p.getPromoid()).get().addOnSuccessListener(task12 -> {
-                                        if (!task12.isEmpty()) {
-                                            List<DocumentSnapshot> documents = task12.getDocuments();
-                                            for (DocumentSnapshot ds1 : documents) {
-                                                notifRef.document(ds1.getId()).delete();
+        if (getContext() == null)
+            return;
+
+        final Dialog dialog = new Dialog(getContext());
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.rating_dialog_layout);
+        dialog.setCanceledOnTouchOutside(true);
+        final ColorRatingBar newRatingBar = dialog.findViewById(R.id.ratingDialogRb);
+
+        dialog.findViewById(R.id.rateDialogTv).setOnClickListener(v -> {
+            if (WifiUtil.checkWifiConnection(getContext())) {
+
+                if (newRatingBar.getRating() > 0) {
+
+                    final HashMap<String, Object> ratingMap = new HashMap<>();
+                    ratingMap.put("userid", Objects.requireNonNull(currentUser).getUid());
+                    ratingMap.put("rating", newRatingBar.getRating());
+
+                    final CollectionReference ratingsRef =
+                            promotionRef.document(viewedDocumentID).collection("ratings");
+
+                    ratingsRef.add(ratingMap)
+                            .addOnSuccessListener(documentReference -> {
+
+                                ratingBar.setOnClickListener(view14 -> Toast.makeText(getContext()
+                                        , "لقد قمت بتقييم هذا الإعلان من قبل!",
+                                        Toast.LENGTH_SHORT).show());
+
+                                ratingsRef.get().addOnSuccessListener(snapshots -> {
+                                    if (!snapshots.isEmpty()) {
+                                        int size = 0;
+                                        double ratingSum = 0;
+                                        for (QueryDocumentSnapshot snapshot : snapshots) {
+                                            double currentRating = snapshot.getDouble("rating");
+                                            if (currentRating != 0) {
+                                                ratingSum += currentRating;
+                                                size++;
                                             }
                                         }
-                                    });
-                                });
-                            });
-                            progressDialog.dismiss();
-                            dialog.dismiss();
-                            dismiss();
-                        }).addOnFailureListener(e -> {
-                            Toast.makeText(getContext(), "لقد فشل حذف الإعلان!", Toast.LENGTH_SHORT).show();
-                            Log.d("deletePromoError", e.getMessage());
-                            progressDialog.dismiss();
-                            dialog.dismiss();
-                            dismiss();
-                        });
+                                        promotionRef.document(viewedDocumentID).update("rating",
+                                                ratingSum / size);
 
-
-                    });
-                    dialog.show();
-
-                });
-
-                ratingBar.setIsIndicator(true);
-                favImage.setVisibility(View.INVISIBLE);
-//                shareImage.setVisibility(View.INVISIBLE);
-                callImage.setVisibility(View.INVISIBLE);
-
-            } else if (auth.getCurrentUser() != null) {
-                promotionRef.document(viewedDocumentID).update("viewcount", FieldValue.increment(1));
-            }
-
-            shareImage.setOnClickListener(v -> sharePromo());
-
-            if (!viewedDocumentID.isEmpty()) {
-                promotionRef.document(viewedDocumentID).collection("ratings")
-                        .get().addOnSuccessListener(queryDocumentSnapshots1 -> {
-                    if (!queryDocumentSnapshots1.isEmpty()) {
-                        int size = 0;
-                        double ratingSum = 0;
-                        for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots1) {
-                            double currentRating = snapshot.getDouble("rating");
-                            if (currentRating != 0) {
-                                ratingSum += currentRating;
-                                size++;
-                            }
-                        }
-                        ratingNumberTv.setText("(" + size + ")");
-                        ratingBar.setRating((float) (ratingSum / size));
-                    }
-                }).addOnFailureListener(e -> Log.d("ttt", e.toString()));
-            }
-        });
-
-
-        if (p.getCurrency() != null && !p.getCurrency().isEmpty()) {
-            promotionPrice.setText(p.getPrice() + " " + p.getCurrency());
-        } else {
-            promotionPrice.setText(String.format(Locale.getDefault(), "%,d", ((long) p.getPrice())));
-        }
-        promotionTitle.setText(p.getTitle());
-        promotionPublish.setText(TimeConvertor.getTimeAgo(p.getPublishtime()));
-        promotionId.setText(p.getPromoid() + "#");
-        promoInfoTv.setText(p.getDescription());
-        promoInfoTv2.setText(p.getDescription());
-        if (!images.isEmpty()) {
-//            promotionDescTitleTv2.setVisibility(View.GONE);
-//            promoInfoTv2.setVisibility(View.GONE);
-
-            PromotionViewPager viewPagerAdapter = new PromotionViewPager(getContext(), images);
-            viewPager.setAdapter(viewPagerAdapter);
-            viewPager.setPageMargin((int) (15 * GlobalVariables.getDensity()));
-
-//            viewPager.setPadding(10,0,10,0);
-            dotsCount = viewPagerAdapter.getCount();
-            viewPager.setOffscreenPageLimit(dotsCount - 1);
-
-            if (dotsCount > 1) {
-                nextIv = view.findViewById(R.id.pagerPromoNextIv);
-                previousIv = view.findViewById(R.id.pagerPromoPreviousIv);
-                nextIv.setVisibility(View.VISIBLE);
-                nextIv.setOnClickListener(v -> viewPager.setCurrentItem(viewPager.getCurrentItem() + 1));
-                previousIv.setOnClickListener(v -> viewPager.setCurrentItem(viewPager.getCurrentItem() - 1));
-            }
-
-            dots = new ImageView[dotsCount];
-            for (int i = 0; i < dotsCount; i++) {
-                dots[i] = new ImageView(getContext());
-                dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.promotion_slider_dots));
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10, 0, 10, 0);
-                sliderLayout.addView(dots[i], params);
-            }
-            dots[0].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.promoton_active_slider));
-
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    for (int i = 0; i < dotsCount; i++) {
-                        dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.promotion_slider_dots));
-                    }
-                    dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.promoton_active_slider));
-
-                    if (position == 0) {
-                        previousIv.setVisibility(View.GONE);
-                    } else {
-                        previousIv.setVisibility(View.VISIBLE);
-                    }
-
-                    if (position + 1 < dotsCount) {
-                        nextIv.setVisibility(View.VISIBLE);
-                    } else {
-                        nextIv.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
-        }
-//        else {
-//
-//            LinearLayout promotiondotsSlider = view.findViewById(R.id.promotiondotsSlider);
-//
-//
-//        }
-
-//        ImageView userImageIndicator = view.findViewById(R.id.userImageIndicator);
-//        if (GlobalVariables.getProfileImageUrl() != null) {
-//            Picasso.get().load(GlobalVariables.getProfileImageUrl()).fit().centerCrop().into(userImageIndicator);
-//        }
-        ((AppCompatActivity) getContext()).setSupportActionBar(view.findViewById(R.id.promotiontoolbar));
-//        ((AppCompatActivity) getContext()).getSupportActionBar().setTitle("");
-//
-//        if (auth.getCurrentUser() != null) {
-////            blockedUsers = ((HomeActivity) getActivity()).blockedUsers;
-//            userImageIndicator.setOnClickListener(v -> ((HomeActivity) getActivity()).showDrawer());
-//        } else {
-//            userImageIndicator.setOnClickListener(v -> showSigninDialog());
-//        }
-
-
-        ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            if (auth.getCurrentUser() != null) {
-                ratingChanged = fromUser;
-            }
-        });
-        if (p.getType().equals("كمبيوتر و لاب توب") || p.getType().equals("اليكترونيات")) {
-            relatedQuery = promotionRef
-                    .whereIn("type", Arrays.asList("كمبيوتر و لاب توب", "اليكترونيات"));
-        } else {
-            relatedQuery = promotionRef
-                    .whereEqualTo("type", p.getType());
-        }
-        relatedQuery =
-                relatedQuery.whereEqualTo("isBanned", false)
-                        .orderBy("publishtime", Query.Direction.DESCENDING)
-                        .limit(14);
-
-
-        lv.setNestedScrollingEnabled(true);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        lv.setLayoutManager(staggeredGridLayoutManager);
-        promotions = new ArrayList<>();
-        adapter = new StaggeredRecyclerAdapter(promotions);
-        adapter.setHasStableIds(true);
-        getUpdatedPromotions();
-        lv.setAdapter(adapter);
-        lv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (!lv.canScrollVertically(View.SCROLL_AXIS_VERTICAL) && newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    if (!isLoading) {
-                        isLoading = true;
-                        getUpdatedPromotions();
-                    }
-                }
-            }
-        });
-
-
-//        PagedList.Config config = new PagedList.Config.Builder()
-//                .setPageSize(4)
-//                .build();
-//
-//        final FirestorePagingOptions<Promotion> options = new FirestorePagingOptions.Builder<Promotion>()
-//                .setLifecycleOwner(this)
-//                .setQuery(relatedQuery, config, Promotion.class)
-//                .build();
-//
-//        FirestorePagingAdapter<Promotion, StaggeredViewHolder> mAdapter = new FirestorePagingAdapter<Promotion, StaggeredViewHolder>(options) {
-//            @NonNull
-//            @Override
-//            public StaggeredViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//                return new StaggeredViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.relativeitem, parent, false));
-//            }
-//
-//            @Override
-//            protected void onError(@NonNull Exception e) {
-//                super.onError(e);
-//            }
-//
-//            @Override
-//            protected void onBindViewHolder(@NonNull StaggeredViewHolder staggeredViewHolder, int i, @NonNull Promotion promotion) {
-//                staggeredViewHolder.bind(promotion, i,getContext());
-//            }
-//        };
-//        mAdapter.setHasStableIds(true);
-//        lv.setNestedScrollingEnabled(true);
-//        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-//        lv.setLayoutManager(staggeredGridLayoutManager);
-//        lv.setAdapter(mAdapter);
-        lv.setPadding(15, 0, 15, (int) (GlobalVariables.getWindowWidth() / 1.5));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.view_user_account:
-                if (auth.getCurrentUser() != null) {
-                    Bundle bundle = new Bundle();
-                    UserFragment fragment = new UserFragment();
-                    bundle.putString("promouserid", p.getUid());
-                    fragment.setArguments(bundle);
-
-                    if (getContext() instanceof HomeActivity) {
-                        ((HomeActivity) getContext()).replaceNonPromoFragment(fragment);
-                    } else if (getContext() instanceof MessagingActivity) {
-                        ((MessagingActivity) getContext()).replaceNonPromoFragment(fragment);
-                    }
-                    // ((HomeActivity) getContext()).replacePromoFragment(fragment);
-                } else {
-                    showSigninDialog();
-                }
-                return true;
-            case R.id.report_this_promo:
-                if (auth.getCurrentUser() != null) {
-                    promotionRef.document(viewedDocumentID).get().addOnSuccessListener(documentSnapshot -> {
-                        long currentTimeInMillies = System.currentTimeMillis() / 1000;
-                        ArrayList<String> reports = (ArrayList<String>) documentSnapshot.get("reports");
-                        if (reports != null) {
-                            for (String report : reports) {
-                                if (report.split("-")[0].equals(currentUserUid)) {
-                                    Toast.makeText(getContext(), "لقد قمت بالإبلاغ عن هذا الاعلان من قبل!", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                            }
-                            promotionRef.document(viewedDocumentID).update("reports", FieldValue.arrayUnion(currentUserUid + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> {
-                                reports.add(currentUserUid + "-" + currentTimeInMillies);
-                                if (reports.size() >= 10) {
-                                    if (((currentTimeInMillies - Long.parseLong(reports.get(reports.size() - 10).split("-")[1])) / 30) < 86400) {
-                                        promotionRef.document(viewedDocumentID).update("isBanned", true);
-                                        dismiss();
+                                        p.setRating(ratingSum / size);
+                                        ratingBar.setRating((float) (ratingSum / size));
                                     }
+                                }).addOnCompleteListener(task -> ratingBar.setClickable(true));
+
+                                Toast.makeText(getContext(), "تم التقييم!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+
+                                if (!currentUser.getUid().equals(p.getUid())) {
+
+                                    FirestoreNotificationSender.sendFirestoreNotification(p.getPromoid(),
+                                            p.getUid(),
+                                            "rating");
+
+                                    usersRef.whereEqualTo("userId", currentUser.getUid())
+                                            .get().addOnSuccessListener(snapshots -> {
+
+                                        final DocumentSnapshot ds = snapshots.getDocuments()
+                                                .get(0);
+
+                                        final String currentUserName = ds.getString("username");
+
+                                        final String imageUrl = ds.getString("imageurl");
+
+                                        CloudMessagingNotificationsSender.sendNotification(
+                                                p.getUid(),
+                                                new Data(
+                                                        currentUser.getUid(),
+                                                        p.getTitle(),
+                                                        currentUserName + " قام بتقييم اعلانك " +
+                                                                newRatingBar.getRating() + " نجوم ",
+                                                        imageUrl,
+                                                        currentUserName,
+                                                        "rating",
+                                                        p.getPromoid()
+                                                ));
+
+
+                                    });
                                 }
-                                Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا الإعلان!", Toast.LENGTH_SHORT).show();
-                            });
-                        } else {
-                            promotionRef.document(viewedDocumentID).update("reports", FieldValue.arrayUnion(currentUserUid + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا الإعلان!", Toast.LENGTH_SHORT).show());
-                        }
-                    });
-                } else {
-                    showSigninDialog();
-                }
-                return true;
-
-            case R.id.message_publisher:
-                if (auth.getCurrentUser() != null) {
-                    Intent messagingIntent = new Intent(getContext(), MessagingActivity.class);
-                    messagingIntent.putExtra("promouserid", p.getUid());
-//                    messagingIntent.putExtra("currentuserid", auth.getCurrentUser().getUid());
-                    messagingIntent.putExtra("intendedpromoid", p.getPromoid());
-                    startActivity(messagingIntent);
-                } else {
-                    showSigninDialog();
-                }
-                return true;
-            case R.id.block_user:
-                if (auth.getCurrentUser() != null) {
-                    ArrayList<String> usersBlocked = (ArrayList<String>) currentDs.get("usersBlocked");
-                    if (usersBlocked != null) {
-                        if (!usersBlocked.contains(p.getUid())) {
-                            blockUser();
-
-                        } else {
-                            Toast.makeText(getContext(), "لقد تم حظر هذا المستخدم من قبل!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        blockUser();
-                    }
-                } else {
-                    showSigninDialog();
-                }
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-//    public boolean isLoggedIn() {
-//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//        return accessToken != null;
-//    }
+//                    if (!GlobalVariables.getPreviousSentNotifications()
+//                            .contains(currentUser.getUid() + "rating" + p.getPromoid())) {
+//                      usersRef.whereEqualTo("userId", currentUser.getUid())
+//                              .get().addOnSuccessListener(snapshots -> {
 //
-//    private void addRatingSubCollection() {
-//        PromoRating promoRating = new PromoRating();
-//        promoRating.setUserid(auth.getCurrentUser().getUid());
-//        promoRating.setRating();
-//        promotionRef.document(viewedDocumentID).collection("ratings").add(promoRating);
-//    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        if (currentUserUid != null && !p.getUid().equals(currentUserUid)) {
-            inflater.inflate(R.menu.promotion_menu, menu);
-        }
-    }
-
-    private void sendNotification() {
-
-        usersRef.whereEqualTo("userId", currentUserUid).limit(1).get().addOnSuccessListener(snapshots -> {
-            DocumentSnapshot ds = snapshots.getDocuments().get(0);
-            String userName = ds.getString("username");
-            Data data = new Data(currentUserUid, R.mipmap.ic_launcher, userName + " قام بالاعجاب باعلانك ", "تسجيل اعحاب", currentUserUid, ds.getString("imageurl"), userName);
-            dr.get().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.contains("token")) {
-                    Sender sender = new Sender(data, documentSnapshot.getString("token"));
-                    apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {
-                        @Override
-                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-
-                        }
-
-                        @Override
-                        public void onFailure(Call<MyResponse> call, Throwable t) {
-
-                        }
+////                              ratingBar.setOnTouchListener((view1, motionEvent) -> {
+////                                ratingBar.performClick();
+////                                return false;
+////                              });
+//
+////                                ratingBar.setOnTouchListener(null);
+//                      }).addOnCompleteListener(task -> {
+//                        Toast.makeText(getContext(), "تم التقييم!", Toast.LENGTH_SHORT).show();
+//                        dialog.dismiss();
+//                      });
+//                    }
+                            }).addOnFailureListener(e -> {
+                        ratingBar.setClickable(true);
+                        Toast.makeText(getContext(), "لقد فشل التقييم! حاول مرة اخرى",
+                                Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
                     });
+                } else {
+
+
+                    Toast.makeText(getContext(),
+                            "لا يمكنك تقييم هذا الإعلان بصفر نجمة", Toast.LENGTH_SHORT).show();
                 }
-            });
-        });
-    }
-
-    private void addNotification(String type) {
-
-        notifRef.whereEqualTo("promoId", p.getPromoid()).
-                whereEqualTo("receiverId", p.getUid())
-                .whereEqualTo("senderId", auth.getCurrentUser().getUid())
-                .whereEqualTo("type", type).get().addOnSuccessListener(snapshots -> {
-            if (snapshots.isEmpty()) {
-                Notification notification = new Notification();
-                notification.setPromoId(p.getPromoid());
-
-                notification.setSenderId(auth.getCurrentUser().getUid());
-                notification.setReceiverId(p.getUid());
-                notification.setType(type);
-                notification.setTimeCreated(System.currentTimeMillis() / 1000);
-                notification.setSeen(false);
-                notifRef.add(notification).addOnSuccessListener(documentReference -> favouredDocumentId = documentReference.getId());
             }
         });
-    }
 
-
-    private void showSigninDialog() {
-        final Dialog dialog = new Dialog(getContext());
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.setContentView(R.layout.signin_alert_layout);
-        TextView closeOption = dialog.findViewById(R.id.alert_close);
-        TextView signinOption = dialog.findViewById(R.id.alert_signin);
-        dialog.show();
-        closeOption.setOnClickListener(v -> dialog.cancel());
-
-        signinOption.setOnClickListener(v -> {
-            Intent i = new Intent(getContext(), WelcomeActivity.class);
-            startActivity(i);
+        dialog.findViewById(R.id.cancelDialogTv).setOnClickListener(v -> {
+            dialog.dismiss();
+            ratingBar.setClickable(true);
         });
+        dialog.show();
     }
 
-//    public void onBackPressed() {
-//        Toast.makeText(getContext(), "fasdfsdf  ", Toast.LENGTH_SHORT).show();
-//        if(playerView!=null) {
-//            if (playerView.getPlayer() != null) {
-//                playerView.setPlayer(null);
-//                exoPlayer.release();
-//                exoPlayer = null;
-//            }
-//        }
-//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("promoFragments", "promo fragment onDestroy");
         if (exoPlayer != null) {
-            playerView.setPlayer(null);
+            promoVideoPlayer.setPlayer(null);
             exoPlayer.release();
             exoPlayer = null;
         }
+        deleteShareFile();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("promoFragments", "promo fragment onDetach");
+
+        if (exoPlayer != null) {
+            promoVideoPlayer.setPlayer(null);
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+        deleteShareFile();
+
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.d("promoFragments", "promo fragment onHiddenChanged");
+        if (hidden) {
+            Log.d("promoFragments", "promo fragment is hidden true");
+            if (exoPlayer != null) {
+                promoVideoPlayer.setVisibility(View.INVISIBLE);
+                exoPlayer.setPlayWhenReady(false);
+                lastPosition = exoPlayer.getCurrentPosition();
+            }
+        } else {
+            if (exoPlayer != null) {
+                promoVideoPlayer.setVisibility(View.VISIBLE);
+                exoPlayer.seekTo(lastPosition);
+                exoPlayer.setPlayWhenReady(true);
+            }
+//      if(promoVideoPlayer!=null){
+//        promoVideoPlayer.setVisibility(View.VISIBLE);
+//      }
+            Log.d("promoFragments", "promo fragment is hidden false");
+        }
+    }
+
+    void deleteShareFile() {
+        if (file != null && file.exists()) {
+            Log.d("ttt", "deleted file: " + file.getName());
+            file.delete();
+            file = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("promoFragments", "promo fragment onResume");
+//    if (exoPlayer != null) {
+//      exoPlayer.setPlayWhenReady(true);
+//    }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (exoPlayer != null) {
+        Log.d("promoFragments", "promo fragment onPause");
+        if (exoPlayer != null && exoPlayer.getPlayWhenReady()) {
             exoPlayer.setPlayWhenReady(false);
+//      lastPosition = exoPlayer.getCurrentPosition();
         }
-        updatePromoRating();
-    }
-
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        super.onDismiss(dialog);
-        updatePromoRating();
-    }
-
-    private void addToFavCount() {
-        promotionRef.document(viewedDocumentID).update("favcount", FieldValue.increment(1)).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                favImage.setClickable(true);
-            }
-        });
-//        promotionRef.document(viewedDocumentID).get().addOnCompleteListener(task -> promotionRef.document(viewedDocumentID).update("favcount", (long) task.getResult().get("favcount") + 1));
-    }
-
-    private void subtractFromFavCount() {
-        promotionRef.document(viewedDocumentID).update("favcount", FieldValue.increment(-1)).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                favImage.setClickable(true);
-            }
-        });
-//        promotionRef.document(viewedDocumentID).get().addOnCompleteListener(task -> promotionRef.document(viewedDocumentID).update("favcount", (long) task.getResult().get("favcount") - 1));
-    }
-
-//    public void showImageFullScreen(String imageUrl) {
-//        Dialog imageDialog = new Dialog(getContext());
-//        imageDialog.setCanceledOnTouchOutside(true);
-//        imageDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        imageDialog.setContentView(R.layout.full_screen_layout);
-//        imageDialog.show();
-//        ImageView fillScreenTv = imageDialog.findViewById(R.id.fillScreenTv);
-//        Picasso.get().load(imageUrl).into(fillScreenTv);
-//    }
-
-    private void getUpdatedPromotions() {
-
-        int oldPosition = promotions.size();
-        Query updatedQuery;
-        if (lastResult == null) {
-            updatedQuery = relatedQuery.limit(4);
-        } else {
-            updatedQuery = relatedQuery.startAfter(lastResult).limit(4);
-        }
-        updatedQuery.get().addOnSuccessListener(snapshots -> {
-            if (GlobalVariables.getBlockedUsers() != null && !GlobalVariables.getBlockedUsers().isEmpty()) {
-                for (QueryDocumentSnapshot snap : snapshots) {
-                    if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) continue;
-                    promotions.add(snap.toObject(Promotion.class));
-                }
-            } else {
-                if (lastResult == null) {
-                    for (QueryDocumentSnapshot snap : snapshots) {
-                        if (snap.getLong("promoid") == p.getPromoid()) continue;
-                        promotions.add(snap.toObject(Promotion.class));
-                    }
-                } else {
-                    for (QueryDocumentSnapshot snap : snapshots) {
-                        promotions.add(snap.toObject(Promotion.class));
-                    }
-                }
-            }
-
-            adapter.notifyItemRangeInserted(oldPosition, promotions.size() - oldPosition);
-            if (snapshots.size() > 0) {
-                lastResult = snapshots.getDocuments().get(snapshots.size() - 1);
-            }
-            isLoading = false;
-        });
+//    updatePromoRating();
     }
 
     void blockUser() {
-        usersRef.document(currentDs.getId()).update("usersBlocked", FieldValue.arrayUnion(p.getUid())).addOnSuccessListener(aVoid -> {
-            GlobalVariables.getBlockedUsers().add(p.getUid());
-            Toast.makeText(getContext(), "لقد تم حظر هذا المستخدم!", Toast.LENGTH_SHORT).show();
-            getActivity().onBackPressed();
+
+        usersRef.whereEqualTo("userId", Objects.requireNonNull(currentUser).getUid())
+                .get().addOnSuccessListener(snapshots ->
+                snapshots.getDocuments().get(0).getReference().update("usersBlocked",
+                        FieldValue.arrayUnion(p.getUid())).addOnSuccessListener(aVoid -> {
+
+                    GlobalVariables.getBlockedUsers().add(p.getUid());
+                    Toast.makeText(getContext(), "لقد تم حظر هذا المستخدم!",
+                            Toast.LENGTH_SHORT).show();
+
+                    Objects.requireNonNull(getActivity()).onBackPressed();
+
+                    //      getDialog().onBackPressed();
+                }));
+    }
+
+    void getRelatedPromotions() {
+
+        Query relatedQuery =
+                promotionRef.whereEqualTo("isBanned", false)
+                        .whereEqualTo("isPaused", false)
+                        .orderBy("promoid")
+                        .whereNotEqualTo("promoid", p.getPromoid());
+
+
+        if (p.getType().equals("كمبيوتر و لاب توب") || p.getType().equals("اليكترونيات")) {
+
+            relatedQuery = relatedQuery
+                    .whereIn("type", Arrays.asList("كمبيوتر و لاب توب", "اليكترونيات"));
+        } else {
+
+            relatedQuery = relatedQuery
+                    .whereEqualTo("type", p.getType());
+
+        }
+
+
+        relatedQuery = relatedQuery.
+                orderBy("publishtime", Query.Direction.DESCENDING).limit(4);
+
+        relatedRv.setLayoutManager(new LinearLayoutManager(getContext(),
+                RecyclerView.HORIZONTAL, false) {
+            @Override
+            public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+                lp.width = (int) (getWidth() * 0.4);
+                return true;
+            }
+        });
+
+        relatedPromos = new ArrayList<>();
+        final NewestPromosAdapter newestpromosadapter = new NewestPromosAdapter(relatedPromos,
+                getContext(), R.layout.newest_promo_item_grid, 3);
+
+        newestpromosadapter.setHasStableIds(true);
+        relatedRv.setHasFixedSize(true);
+        relatedRv.setAdapter(newestpromosadapter);
+
+        relatedQuery.get().addOnSuccessListener(snapshots -> {
+
+            Log.d("ttt", "related all size: " + snapshots.size());
+
+            if (GlobalVariables.getBlockedUsers().isEmpty()) {
+                relatedPromos.addAll(snapshots.toObjects(Promotion.class));
+
+            } else {
+
+                for (DocumentSnapshot snap : snapshots.getDocuments()) {
+
+                    if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+                        Log.d("ttt", "removed a blocked promo manually");
+                        continue;
+                    }
+
+                    relatedPromos.add(snap.toObject(Promotion.class));
+
+                }
+
+            }
+
+        }).addOnCompleteListener(task -> {
+            if (relatedPromos.size() > 0) {
+                newestpromosadapter.notifyDataSetChanged();
+            } else {
+                relatedTv.setVisibility(View.GONE);
+            }
         });
     }
 
-    void updatePromoRating() {
+    void showProfile() {
 
-        if (auth.getCurrentUser() != null) {
-            if (ratingChanged) {
-                new Thread(() -> promotionRef.document(viewedDocumentID).collection("ratings").whereEqualTo("userid", currentUserUid).limit(1).get().addOnSuccessListener(snapshots -> {
-                    if (snapshots.getDocuments().isEmpty()) {
-                        PromoRating promoRating = new PromoRating();
-                        promoRating.setUserid(auth.getCurrentUser().getUid());
-                        promoRating.setRating(ratingBar.getRating());
-                        updatePromoRating();
-                        promotionRef.document(viewedDocumentID).collection("ratings").add(promoRating)
-                                .addOnSuccessListener(documentReference -> addNotification("rating"));
-                    } else {
-                        promotionRef.document(viewedDocumentID).collection("ratings").
-                                document(snapshots.getDocuments().get(0).getId())
-                                .update("rating", ratingBar.getRating()).addOnSuccessListener(aVoid -> {
-                            addNotification("rating");
-                            promotionRef.document(viewedDocumentID).collection("ratings")
-                                    .get().addOnSuccessListener(queryDocumentSnapshots1 -> {
-                                if (!queryDocumentSnapshots1.isEmpty()) {
-                                    int size = 0;
-                                    double ratingSum = 0;
-                                    for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots1) {
-                                        double currentRating = snapshot.getDouble("rating");
-                                        if (currentRating != 0) {
-                                            ratingSum += currentRating;
-                                            size++;
-                                        }
-                                    }
-                                    promotionRef.document(viewedDocumentID).update("rating", ratingSum / size);
-                                }
-                            }).addOnFailureListener(e -> Log.d("ttt", e.toString()));
-                        });
+        UserFragment fragment = new UserFragment();
+        if (!p.getUid().equals(Objects.requireNonNull(currentUser).getUid())) {
+            Bundle bundle = new Bundle();
+            bundle.putString("promouserid", p.getUid());
+            fragment.setArguments(bundle);
+        }
+
+//    Log.d("ttt",fragment.getTag());
+        if (getContext() instanceof HomeActivity) {
+            ((HomeActivity) Objects.requireNonNull(getActivity())).addFragmentToHomeContainer(fragment);
+        } else if (getContext() instanceof MessagingRealTimeActivity) {
+            ((MessagingRealTimeActivity) Objects.requireNonNull(getActivity())).addFragmentToHomeContainer(fragment);
+        }
+
+
+//      fragment.show(getChildFragmentManager(), "UserFragment");
+    }
+
+    void inflateOwnerUserMenu() {
+
+        final int menu = p.getIsPaused() ?
+                R.menu.user_promo_menu_item_paused_dotted : R.menu.user_promo_menu_item_uppaused_dotted;
+
+        toolbar.inflateMenu(menu);
+
+        toolbar.setOnMenuItemClickListener(item -> {
+
+            if (WifiUtil.checkWifiConnection(getContext())) {
+                if (item.getItemId() == R.id.delete_item) {
+                    Promotion.deletePromo(getContext(), p);
+                } else if (item.getItemId() == R.id.pause_item) {
+                    Promotion.pauseOrUnPausePromo(getContext(), p, toolbar.getMenu(), viewedDocumentID);
+                }
+            }
+
+            return true;
+        });
+
+    }
+
+    void showSigninDialog() {
+        SigninUtil.getInstance(getContext(), getActivity()).show();
+    }
+
+    void inflatePromoMenu() {
+
+        toolbar.inflateMenu(R.menu.promotion_menu);
+
+        if (Objects.requireNonNull(currentUser).isAnonymous()) {
+
+            toolbar.setOnMenuItemClickListener(item -> {
+
+                if (item.getItemId() == R.id.report_this_promo ||
+                        item.getItemId() == R.id.block_user) {
+                    showSigninDialog();
+                }
+                return true;
+            });
+
+        } else {
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.report_this_promo) {
+                    if (WifiUtil.checkWifiConnection(getContext())) {
+                        Promotion.reportPromo(getContext(), p.getPromoid(), currentUser.getUid(),
+                                viewedDocumentID);
                     }
-                })).start();
+                } else if (item.getItemId() == R.id.block_user) {
+                    if (!GlobalVariables.getBlockedUsers().contains(p.getUid())) {
+                        if (WifiUtil.checkWifiConnection(getContext())) {
+                            blockUser();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "لقد تم حظر هذا المستخدم من قبل!"
+                                , Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return true;
+            });
+        }
+
+    }
+
+    void checkPromoTypeAndCreateVideoOrImagePager(View view) {
+
+        if (!p.getPromoType().equals("text")) {
+
+            final ConstraintLayout imageAndVideoConstraint =
+                    view.findViewById(R.id.imageAndVideoConstraint);
+            imageAndVideoConstraint.setVisibility(View.VISIBLE);
+
+            if (p.getPromoType().equals("video")) {
+
+                GlobalVariables.setVideoViewedCount(GlobalVariables.getVideoViewedCount() + 1);
+                if (GlobalVariables.getVideoViewedCount() != 0
+                        && GlobalVariables.getVideoViewedCount() % 5 == 0) {
+//          ((HomeActivity) getActivity()).showRewardVideo();
+                    InterstitialAdUtil.showAd(getContext());
+                }
+
+                promoVideoPlayer = view.findViewById(R.id.promoVideoPlayer);
+                promoVideoPlayer.setVisibility(View.VISIBLE);
+
+                createVideoPlayer();
+
+            } else {
+
+                promotionsPager = view.findViewById(R.id.promotionsPager);
+                promotionDotsSlider = view.findViewById(R.id.promotionDotsSlider);
+
+                promotionsPager.setVisibility(View.VISIBLE);
+                promotionDotsSlider.setVisibility(View.VISIBLE);
+
+                createImagePager();
+            }
+
+        }
+
+    }
+
+    void createVideoPlayer() {
+
+        DefaultTrackSelector trackSelector = new DefaultTrackSelector(Objects.requireNonNull(getContext()));
+
+        trackSelector.setParameters(
+                trackSelector.buildUponParameters().setMaxVideoSizeSd());
+
+        exoPlayer = new SimpleExoPlayer.Builder(getContext())
+                .setTrackSelector(trackSelector).build();
+
+        final MediaSource mediaSource =
+                new ProgressiveMediaSource.Factory(new VideoDataSourceFactory(getContext()))
+                        .createMediaSource(MediaItem.fromUri(p.getVideoUrl()));
+
+
+        exoPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onPlayerError(@NonNull ExoPlaybackException error) {
+                if (error.getMessage() != null) {
+                    Log.d("exoPlayerPlayback", "Error Message: " + error.getMessage());
+                }
+
+                if (error.type == ExoPlaybackException.TYPE_SOURCE) {
+                    IOException cause = error.getSourceException();
+                    if (cause instanceof HttpDataSource.HttpDataSourceException) {
+                        Log.d("exoPlayerPlayback", "HTTP error occurred");
+                        // An HTTP error occurred.
+                        HttpDataSource.HttpDataSourceException httpError =
+                                (HttpDataSource.HttpDataSourceException) cause;
+                        // This is the request for which the error occurred.
+                        DataSpec requestDataSpec = httpError.dataSpec;
+                        // It's possible to find out more about the error both by casting and by
+                        // querying the cause.
+                        if (httpError instanceof HttpDataSource.InvalidResponseCodeException) {
+                            Log.d("exoPlayerPlayback", "httpError, message: " +
+                                    httpError.getMessage());
+                            // Cast to InvalidResponseCodeException and retrieve the response code,
+                            // message and headers.
+                        } else {
+                            if (httpError.getCause() != null) {
+
+                                Log.d("exoPlayerPlayback", "httpError, cause: " +
+                                        httpError.getCause().toString());
+                            }
+
+
+                            // Try calling httpError.getCause() to retrieve the underlying cause,
+                            // although note that it may be null.
+                        }
+                    }
+                }
+            }
+        });
+
+
+        exoPlayer.setMediaSource(mediaSource);
+        exoPlayer.prepare();
+        exoPlayer.setPlayWhenReady(true);
+
+        promoVideoPlayer.findViewById(R.id.exo_rew).setOnClickListener(v -> {
+            if (exoPlayer.getCurrentPosition() < 3000) {
+                exoPlayer.seekTo(0);
+            } else {
+                exoPlayer.seekTo(exoPlayer.getCurrentPosition() - 3000);
+            }
+        });
+
+        promoVideoPlayer.findViewById(R.id.exo_ffwd).setOnClickListener(v -> {
+            if (exoPlayer.getCurrentPosition() < exoPlayer.getDuration() - 3000) {
+                exoPlayer.seekTo(exoPlayer.getCurrentPosition() + 3000);
+            } else {
+                exoPlayer.seekTo(exoPlayer.getDuration());
+            }
+        });
+
+        promoVideoPlayer.findViewById(R.id.exoplayer_fullscreen_icon).setOnClickListener(v -> {
+
+            final FullScreenVideoFragment fragment =
+                    new FullScreenVideoFragment(getContext(), p, exoPlayer.getCurrentPosition());
+
+            fragment.getLifecycle().addObserver((LifecycleEventObserver) (ON_DESTROYED, event) -> {
+
+                if (event == Lifecycle.Event.ON_DESTROY) {
+                    Log.d("promoFragments", "video fragment ON_DESTROY");
+
+                    if (exoPlayer != null) {
+                        promoVideoPlayer.setVisibility(View.VISIBLE);
+                        exoPlayer.seekTo(fragment.lastPosition);
+                        exoPlayer.setPlayWhenReady(true);
+                    }
+
+                    ((HomeActivity) Objects.requireNonNull(getActivity()))
+                            .lockDrawer(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
+
+            });
+
+            if (exoPlayer != null) {
+                promoVideoPlayer.setVisibility(View.INVISIBLE);
+                exoPlayer.setPlayWhenReady(false);
+            }
+
+            ((HomeActivity) Objects.requireNonNull(getActivity()))
+                    .lockDrawer(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+//      promoVideoPlayer.setVisibility(View.INVISIBLE);
+            ((HomeActivity) Objects.requireNonNull(getActivity())).addFragmentToHomeContainer(fragment);
+//      fragment.show(getChildFragmentManager(), "videoPagerVertical");
+//        dialogFragment.show(getChildFragmentManager(), "fullScreen");
+        });
+
+        promoVideoPlayer.setPlayer(exoPlayer);
+    }
+
+    void createImagePager() {
+
+        final PromotionViewPager viewPagerAdapter =
+                new PromotionViewPager(getContext(), p.getPromoimages());
+
+        promotionsPager.setAdapter(viewPagerAdapter);
+
+
+        if (p.getPromoimages().size() > 1) {
+
+            promotionsPager
+                    .setOffscreenPageLimit(viewPagerAdapter.getCount() - 1);
+
+            final ImageView[] dots = new ImageView[viewPagerAdapter.getCount()];
+
+            final LinearLayout.LayoutParams params =
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
+
+                dots[i] = new ImageView(getContext());
+
+                if (i == 0) {
+                    dots[0].setImageDrawable(ContextCompat.getDrawable(Objects.requireNonNull(getContext()),
+                            R.drawable.promoton_active_slider));
+                } else {
+                    dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(),
+                            R.drawable.promotion_slider_dots));
+                }
+
+                final float density = getResources().getDisplayMetrics().density;
+                params.setMargins((int) (4 * density), 0, (int) (4 * density), 0);
+
+                promotionDotsSlider.addView(dots[i], params);
+
+            }
+
+            promotionsPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                int previousDot = 0;
+
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+
+                    dots[previousDot].setImageDrawable
+                            (ContextCompat.getDrawable(Objects.requireNonNull(getContext()), R.drawable.promotion_slider_dots));
+
+                    previousDot = position;
+
+                    dots[position].setImageDrawable
+                            (ContextCompat.getDrawable(getContext(), R.drawable.promoton_active_slider));
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+        }
+    }
+
+    void getUserInfo() {
+        usersRef.whereEqualTo("userId", p.getUid()).get()
+                .addOnSuccessListener(snapshots -> {
+
+                    final DocumentSnapshot ds = snapshots.getDocuments().get(0);
+
+                    final String imageUrl = ds.getString("imageUrl");
+                    userNameTv.setText(ds.getString("username"));
+                    if (imageUrl != null && !imageUrl.isEmpty()) {
+                        Picasso.get().load(imageUrl).fit().into(promoUserIv);
+                        Picasso.get().load(imageUrl).fit().into(promoUserIv2);
+                    }
+                });
+    }
+
+    void fillPromoData() {
+
+        promotionId.setText("رقم الإعلان: " + p.getPromoid());
+
+        promotionTitle.setText(p.getTitle());
+
+        promotionPublish.setText(new SimpleDateFormat("MM/dd/yyyy",
+                Locale.getDefault()).format(p.getPublishtime() * 1000));
+
+        if (p.getType().equals("اليكترونيات")) {
+            promotionCategoryTv.setText("القسم: الكترونيات");
+        } else {
+            promotionCategoryTv.setText("القسم: " + p.getType());
+        }
+
+        SpannableString s = new SpannableString(promotionCategoryTv.getText());
+        s.setSpan(new UnderlineSpan(), 0, s.length(), 0);
+        promotionCategoryTv.setText(s);
+
+        promotionCategoryTv.setOnClickListener(this);
+
+        Currency currency = null;
+
+        if (p.getCurrency() != null) {
+            try {
+                currency = Currency.getInstance(p.getCurrency());
+            } catch (IllegalArgumentException e) {
+                Log.d("currency", "code shit");
             }
         }
 
+        String displayName = null;
+
+        if (currency == null)
+            return;
+
+        try {
+            Log.d("currency", "arabic display: " + currency.getDisplayName(new Locale("ar")));
+            displayName = currency.getDisplayName(new Locale("ar"));
+        } catch (IllegalArgumentException e) {
+            Log.d("currency", "arabic display exeption");
+        }
+//
+//    try{
+//      Log.d("currency","english display: "+currency.getDisplayName(new Locale("en")));
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","english display exeption");
+//    }
+//    try{
+//      Log.d("currency","display: "+currency.getDisplayName());
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","display exeption");
+//    }
+//
+//    try{
+//      Log.d("currency","arabic sympol: "+ currency.getSymbol(new Locale("ar")));
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","arabic sympol exeption");
+//    }
+//
+//    try{
+//      Log.d("currency","english sympol: "+ currency.getSymbol(new Locale("en")));
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","english sympol exeption");
+//    }
+//
+//    try{
+//      Log.d("currency","sympol: "+ currency.getSymbol());
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","sympol exeption");
+//    }
+//
+//    try{
+//      Log.d("currency","sympol: "+ Currency.getInstance(p.getCurrency()).getCurrencyCode());
+//    }catch (IllegalArgumentException e){
+//      Log.d("currency","sympol exeption");
+//    }
+
+        if (displayName != null) {
+            promotionCurrencyTv.setText(displayName);
+        } else {
+            promotionCurrencyTv.setText(p.getCurrency());
+        }
+
+        promotionPrice.setText(String.format(Locale.getDefault(),
+                "%,d", ((long) p.getPrice())));
+
+        String locationName = CountryUtil.getCountryName(p.getCountryCode()) + " " +
+                EmojiUtil.countryCodeToEmoji(p.getCountryCode());
+
+        Log.d("ttt", "p.getCityName(): " + p.getCityName());
+        if (p.getCityName() != null) {
+            locationName = locationName.concat(" - " + p.getCityName());
+        }
+
+        promotionCountryTv.setText(locationName);
+
+        promotionDescTv.setText(p.getDescription());
+
+        promotionRef.whereEqualTo("promoid", p.getPromoid()).get()
+                .addOnSuccessListener(snaps -> {
+
+                    final DocumentSnapshot ds = snaps.getDocuments().get(0);
+
+                    viewedDocumentID = ds.getId();
+
+                    ds.getReference().update("viewcount",
+                            FieldValue.increment(1));
+
+                    ratingBar.setRating(Objects.requireNonNull(ds.getDouble("rating")).floatValue());
+
+                    promotionFavsTv.setText(String.valueOf(ds.getLong("favcount")));
+                    promotionViews.setText(String.valueOf(ds.getLong("viewcount")));
+
+                    setRatingCLickListener(ds.getReference());
+
+                });
 
     }
 
-    void sharePromo(){
-//        Bitmap bitmap= BitmapFactory.decodeResource(getResources(),R.drawable.rbeno_logo_png);
-//        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Share.png";
-//        OutputStream out;
-//        File file = new File(path);
-//        try {
-//            out = new FileOutputStream(file);
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-//            out.flush();
-//            out.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
+    void setRatingCLickListener(DocumentReference dr) {
+        if (!Objects.requireNonNull(currentUser).isAnonymous()) {
+            dr.collection("ratings")
+                    .whereEqualTo("userid", currentUser.getUid())
+                    .get().addOnCompleteListener(task -> {
+
+                if (!task.getResult().isEmpty()) {
+                    ratingBar.setOnClickListener(v ->
+                            Toast.makeText(getContext(),
+                                    "لقد قمت بتقييم هذا الإعلان من قبل!",
+                                    Toast.LENGTH_SHORT).show());
+                } else {
+
+                    ratingBar.setOnClickListener(v -> showRatingDialog());
+                }
+
+            });
+        } else {
+            ratingBar.setOnClickListener(v -> SigninUtil.getInstance(getContext(),
+                    getActivity()).show());
+        }
+
+        ratingBar.setOnTouchListener((view1, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                ratingBar.setClickable(false);
+                ratingBar.performClick();
+            }
+            return true;
+        });
+    }
+
+    void messageUser() {
+
+        if (currentUserIsBlocked) {
+            Toast.makeText(getContext(),
+                    "عذرا, لا يمكنك مراسلة هذا المستخدم!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        messagingLayout.setClickable(false);
+
+//    if(chatsRef==null)
+//      chatsRef = FirebaseFirestore.getInstance().collection("chats");
+
+
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child("Messages").child(currentUser.getUid() + "-" + p.getUid() + "-" + p.getPromoid());
+
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.exists()) {
+                    if (snapshot.child("isDeletedFor:" + currentUser.getUid()).getValue(Boolean.class)) {
+                        Toast.makeText(getContext(), "عذرا لا يمكنك المراسلة على هذا" +
+                                " الإعلان بسبب حذفك للمحادثة!", Toast.LENGTH_LONG).show();
+                    } else {
+                        messagingLayout.setClickable(true);
+                        startMessagingActivity();
+                    }
+                } else {
+                    messagingLayout.setClickable(true);
+                    startMessagingActivity();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//    chatsRef.document(
+//            p.getUid() + "_" +
+//                    Objects.requireNonNull(currentUser).getUid() + "_" +
+//                    p.getPromoid())
+//            .get().addOnCompleteListener(task -> {
+//      if(task.getResult().exists()){
+//
+//        if(task.getResult().getBoolean("isDeletedFor:"+currentUser.getUid())){
+//
+//          Toast.makeText(getContext(), "عذرا لا يمكنك المراسلة على هذا" +
+//                  " الإعلان بسبب حذفك للمحادثة!", Toast.LENGTH_LONG).show();
+//
+//        }else{
+//
+//          messagingLayout.setClickable(true);
+//          startMessagingActivity();
+//
 //        }
-//        path=file.getPath();
-//        Uri bmpUri = Uri.parse("file://"+path);
-
-//        Bitmap b =BitmapFactory.decodeResource(getResources(),R.drawable.rbeno_logo_png);
-//        Intent share = new Intent(Intent.ACTION_SEND);
-//        share.setType("image/webp");
-//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//        b.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//        String path = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(),
-//                b, "Title", null);
-//        Uri imageUri =  Uri.parse(path);
 //
-//        Drawable mDrawable = getResources().getDrawable(R.drawable.rbeno_logo_png);
-//        Bitmap mBitmap = ((BitmapDrawable) mDrawable).getBitmap();
+//      }else{
 //
-//        String path = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), mBitmap, "Image Description", null);
-//        Uri uri = Uri.parse(path);
-//        String imageUri = "drawable://" + R.drawable.rbeno_logo_png;
-//        File file = new File(imageUri);
-//        Uri uri = Uri.fromFile(file);
-//        shareIntent.setType("image/WEBP");
-//        final File photoFile = new File("android.resource://com.example.yousef.rbenoapplication/" + R.drawable.rbeno_logo_png);
-//        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile));
-//        Uri bmpUri = getBitmapFromDrawable(((BitmapDrawable) getResources().getDrawable(R.drawable.rbeno_logo_png)).getBitmap());
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT,R.string.app_name);
-        shareIntent.putExtra(Intent.EXTRA_TEXT,p.getTitle()+" - "+p.getPrice()+" "+p.getCurrency()+"\n"+p.getDescription());
+//        chatsRef.document(
+//                currentUser.getUid() + "_" +
+//                        p.getUid() + "_" +
+//                        p.getPromoid())
+//                .get().addOnCompleteListener(task1 -> {
+//          if (task1.getResult().exists()) {
+//            if (task1.getResult().getBoolean("isDeletedFor:"+currentUser.getUid())) {
+//              Toast.makeText(getContext(), "عذرا لا يمكنك المراسلة على هذا" +
+//                      " الإعلان بسبب حذفك له!", Toast.LENGTH_LONG).show();
+//            } else {
+//              messagingLayout.setClickable(true);
+//              startMessagingActivity();
+//            }
+//          } else {
+//            messagingLayout.setClickable(true);
+//            startMessagingActivity();
+//          }
+//        });
+//
+//      }
+//    });
 
-        if(p.getPromoimages()!=null && !p.getPromoimages().isEmpty()){
-//            shareIntent.putExtra(Intent.EXTRA_STREAM, p.getPromoimages().get(0));
-            Picasso.get().load(p.getPromoimages().get(0)).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    shareIntent.putExtra(Intent.EXTRA_STREAM,getLocalBitmapUri(bitmap));
-                    startActivity(Intent.createChooser(shareIntent, "choose one"));
+    }
+
+    void setFavCLickListener() {
+        if (WifiUtil.checkWifiConnection(getContext())) {
+
+            favImage.setClickable(false);
+
+            if (GlobalVariables.getFavPromosIds().contains(p.getPromoid())) {
+                Log.d("ttt", "already facoured");
+
+                promotionRef.document(viewedDocumentID).update("favcount", FieldValue.increment(-1));
+
+                usersRef.whereEqualTo("userId", Objects.requireNonNull(currentUser).getUid())
+                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot snapshots) {
+
+                        if (snapshots.isEmpty())
+                            return;
+
+                        snapshots.getDocuments().get(0).getReference().update("favpromosids",
+                                FieldValue.arrayRemove(p.getPromoid())).addOnSuccessListener(v -> {
+                            if (getContext() != null) {
+
+//                GlobalVariables.getFavPromosIds().remove(p.getPromoid());
+
+                                favImage.setImageResource(R.drawable.heart_grey_outlined);
+
+                                promotionFavsTv.setText(String.valueOf(
+                                        Integer.parseInt(promotionFavsTv.getText().toString()) - 1));
+
+                                Toast.makeText(getContext(), "تمت الازالة من المفضلة!",
+                                        Toast.LENGTH_SHORT).show();
+                                favImage.setClickable(true);
+                            }
+                        }).addOnFailureListener(e -> {
+
+                            Toast.makeText(getContext(), "لقد فشلت الازالة من المفضلة" +
+                                    "! حاول مرة اخرى", Toast.LENGTH_SHORT).show();
+
+                            favImage.setClickable(true);
+
+                        });
+                    }
+                });
+
+                if (!p.getUid().equals(currentUser.getUid())) {
+                    FirestoreNotificationSender.deleteFirestoreNotification(p.getPromoid(),
+                            p.getUid(), "favourite");
                 }
 
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            } else {
+
+                Log.d("ttt", "not facoured");
+                promotionFavsTv.setText(String.valueOf(
+                        Integer.parseInt(promotionFavsTv.getText().toString()) + 1));
+
+                favImage.setImageResource(R.drawable.heart_icon);
+                usersRef.whereEqualTo("userId", Objects.requireNonNull(currentUser).getUid())
+                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot snapshots) {
+                        if (snapshots.isEmpty())
+                            return;
+
+                        snapshots.getDocuments().get(0).getReference().update("favpromosids",
+                                FieldValue.arrayUnion(p.getPromoid())).addOnCompleteListener(task17 -> {
+                            Toast.makeText(getContext(), "تمت الاضافة الى المفضلة!", Toast.LENGTH_SHORT)
+                                    .show();
+//              GlobalVariables.getFavPromosIds().add(p.getPromoid());
+                            favImage.setClickable(true);
+                        });
+
+                    }
+                });
+
+                promotionRef.document(viewedDocumentID).update("favcount", FieldValue.increment(1));
+
+
+                if (!p.getUid().equals(currentUser.getUid())) {
+
+                    final String name = currentDs.getString("username");
+
+                    if (!GlobalVariables.getPreviousSentNotifications()
+                            .contains(currentUser.getUid() + "favourite" + p.getPromoid())) {
+
+                        final String image = currentDs.getString("imageurl");
+
+
+                        CloudMessagingNotificationsSender.sendNotification(
+                                p.getUid(),
+                                new Data(
+                                        currentUser.getUid(),
+                                        p.getTitle(),
+                                        name + " قام بالإعجاب باعلانك رقم: " + p.getPromoid(),
+                                        image,
+                                        name,
+                                        "favourite",
+                                        p.getPromoid()
+                                ));
+                    }
+
+                    FirestoreNotificationSender.sendFirestoreNotification(p.getPromoid(),
+                            p.getUid(), "favourite");
 
                 }
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
 
+        }
+
+
+    }
+
+    void initFavAndProfileClickers() {
+        favImage.setOnClickListener(this);
+        promoUserIv2.setOnClickListener(this);
+        userNameTv.setOnClickListener(this);
+        shareImageIv.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        int id = view.getId();
+
+        if (id == R.id.promotionCategoryTv) {
+
+            final AllPromosFragment promosFragment = new AllPromosFragment();
+            Bundle b = new Bundle();
+            b.putString("category", p.getType());
+            promosFragment.setArguments(b);
+
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) Objects.requireNonNull(getActivity()))
+                        .addFragmentToHomeContainer(promosFragment);
+            } else {
+                ((MessagingRealTimeActivity) Objects.requireNonNull(getActivity()))
+                        .addFragmentToHomeContainer(promosFragment);
+            }
+
+
+        } else if (id == R.id.favImage) {
+            if (WifiUtil.checkWifiConnection(getContext())) {
+                if (currentUserIsBlocked) {
+                    favImage.setOnClickListener(view18 -> Toast.makeText(getContext(),
+                            "عذرا, لا يمكنك إضافة هذا الإعلان إلى المفضلة!",
+                            Toast.LENGTH_SHORT).show());
+                } else {
+                    setFavCLickListener();
                 }
-            });
-        }else if(p.getVideoThumbnail()!=null && !p.getVideoThumbnail().isEmpty()){
-            Picasso.get().load(p.getVideoThumbnail()).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    shareIntent.putExtra(Intent.EXTRA_STREAM,getLocalBitmapUri(bitmap));
-                    startActivity(Intent.createChooser(shareIntent, "choose one"));
+            }
+        } else if (id == R.id.promoUserIv2 || id == R.id.userNameTv) {
+            if (WifiUtil.checkWifiConnection(getContext())) {
+                if (currentUserIsBlocked) {
+                    Toast.makeText(getContext(),
+                            "عذرا, لا يمكنك زيارة صفحة هذا المستخدم!",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    showProfile();
+                }
+            }
+        } else if (id == R.id.shareImageIv) {
+            if (WifiUtil.checkWifiConnection(getContext())) {
+                file = Promotion.sharePromo(p, getContext(), file, shareImageIv);
+            }
+        } else if (id == R.id.messagingLayout) {
+            if (WifiUtil.checkWifiConnection(getContext())) {
+
+                BottomSheetDialog contactBottomDialog = new BottomSheetDialog(requireContext());
+                final View contactLayoutView =
+                        getLayoutInflater().inflate(R.layout.contact_bottom_sheet_menu, null);
+
+                contactLayoutView.findViewById(R.id.messageUserBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        contactBottomDialog.dismiss();
+                        messageUser();
+                    }
+                });
+
+                final Button phoneNumBtn = contactLayoutView.findViewById(R.id.phoneNumBtn);
+
+                if (userPhoneNumber != null && !userPhoneNumber.isEmpty()) {
+
+                    phoneNumBtn.setText("رقم الهاتف: " + userPhoneNumber);
+                    phoneNumBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            contactBottomDialog.dismiss();
+
+                            final ClipboardManager clipboardManager = (ClipboardManager)
+                                    requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+
+                            clipboardManager.setPrimaryClip(
+                                    ClipData.newPlainText("phoneNum", userPhoneNumber));
+
+                            Toast.makeText(requireContext(), "لقد تم نسخ رقم الهاتف!",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    phoneNumBtn.setVisibility(View.GONE);
                 }
 
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                contactBottomDialog.setContentView(contactLayoutView);
+                contactBottomDialog.show();
 
-                }
+            }
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            });
-//            shareIntent.putExtra(Intent.EXTRA_STREAM,p.getVideoThumbnail());
-//                Uri bmpUri = getBitmapFromDrawable(drawableImage);// see previous remote images section and notes for API > 23
-//                // Construct share intent as described above based on bitmap
-//                shareIntent = new Intent();
-//                shareIntent.setAction(Intent.ACTION_SEND);
-//                shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-//                shareIntent.setType("image/*");
-        }else{
-            shareIntent.putExtra(Intent.EXTRA_STREAM,getLocalBitmapUri(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.rbeno_logo_png)));
-            startActivity(Intent.createChooser(shareIntent, "choose one"));
         }
 
     }
 
-//    public Uri getBitmapFromDrawable(Bitmap bmp){
-//
-//        Uri bmpUri = null;
-//        try {
-//            File file =  new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
-//            FileOutputStream out = new FileOutputStream(file);
-//            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
-//            out.close();
-//
-//            bmpUri = FileProvider.getUriForFile(getActivity(), "com.example.yousef.rbenoapplication", file);  // use this version for API >= 24
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return bmpUri;
-//    }
-public Uri getLocalBitmapUri(Bitmap bmp) {
-    Uri bmpUri = null;
-    try {
-        File file =  new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
-        FileOutputStream out = new FileOutputStream(file);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
-        bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
-        out.close();
-        bmpUri = FileProvider.getUriForFile(
-                getContext(),
-                "com.example.yousef.rbenoapplication.provider",
-                file);
-//        bmpUri = Uri.fromFile(file);
-    } catch (IOException e) {
-        e.printStackTrace();
+        if (promotionDeleteReceiver != null)
+            Objects.requireNonNull(getContext()).unregisterReceiver(promotionDeleteReceiver);
+
     }
-    return bmpUri;
-}
+
+    void setupDeletionReceiver() {
+
+        final long oldId = p.getPromoid();
+
+        promotionDeleteReceiver =
+                new PromotionDeleteReceiver() {
+                    @Override
+
+                    public void onReceive(Context context, Intent intent) {
+                        final long promoId = intent.getLongExtra("promoId", 0);
+
+                        Log.d("ttt", "info deleted promoId: " + promoId);
+                        Log.d("ttt", "info promoId: " + oldId);
+
+                        if (promoId == oldId) {
+//                  Toast.makeText(context, R.string.promo_removed
+//                          , Toast.LENGTH_SHORT).show();
+
+                            Objects.requireNonNull(getActivity()).onBackPressed();
+
+                        } else {
+                            checkAndDeletePromoFromList(relatedPromos, promoId);
+                        }
+
+                    }
+                };
+
+
+        Objects.requireNonNull(getContext()).registerReceiver(promotionDeleteReceiver,
+                new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
+
+    }
+
+    void checkAndDeletePromoFromList(ArrayList<Promotion> promos, long id) {
+        if (promos != null && !promos.isEmpty()) {
+            for (Promotion promo : promos) {
+                if (promo.getPromoid() == id) {
+                    promo.setIsBanned(true);
+                    break;
+                }
+            }
+        }
+    }
+
+
 }
