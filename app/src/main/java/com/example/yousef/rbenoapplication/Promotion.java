@@ -51,6 +51,9 @@ import javax.annotation.Nullable;
 @IgnoreExtraProperties
 public class Promotion implements Serializable {
 
+    public static final int TEXT_LIMIT = -1, IMAGE_LIMIT = 5, VIDEO_LIMIT = 1;
+    public static final String TEXT_TYPE = "text", IMAGE_TYPE = "image", VIDEO_TYPE = "video";
+
     @PropertyName("type")
     public String type;
     @PropertyName("title")
@@ -61,6 +64,8 @@ public class Promotion implements Serializable {
     public String description;
     @Exclude
     public boolean negotiable;
+    @PropertyName("hidePhone")
+    public boolean hidePhone;
     @PropertyName("price")
     public double price;
     @PropertyName("promoid")
@@ -83,8 +88,8 @@ public class Promotion implements Serializable {
     public String videoThumbnail;
     @PropertyName("cityName")
     public String cityName;
-    @PropertyName("countryCode")
-    public String countryCode;
+    @PropertyName("country")
+    public String country;
     @Exclude
     public List<String> keyWords;
     @PropertyName("currency")
@@ -97,6 +102,12 @@ public class Promotion implements Serializable {
     private boolean isPaused;
 
     private boolean isDeleted;
+
+    @PropertyName("wasEdited")
+    private boolean wasEdited;
+
+    @PropertyName("lastEditTime")
+    private long lastEditTime;
 
 
     public Promotion() {
@@ -226,12 +237,12 @@ public class Promotion implements Serializable {
         this.videoThumbnail = videoThumbnail;
     }
 
-    public String getCountryCode() {
-        return countryCode;
+    public String getCountry() {
+        return country;
     }
 
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
 
@@ -304,7 +315,13 @@ public class Promotion implements Serializable {
 
                                 ref.delete().addOnSuccessListener(v -> {
 
-                                    if (!promotion.getPromoType().equals("text")) {
+
+                                    FirebaseFirestore.getInstance().collection("users")
+                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .update("promoTypesPublished." + promotion.getPromoType(), FieldValue.increment(-1));
+
+
+                                    if (!promotion.getPromoType().equals(Promotion.TEXT_TYPE)) {
                                         final FirebaseStorage storage = FirebaseStorage.getInstance();
                                         if (promotion.getPromoimages() != null && !promotion.getPromoimages().isEmpty()) {
                                             for (String imageUrl : promotion.getPromoimages()) {
@@ -373,6 +390,88 @@ public class Promotion implements Serializable {
             });
             dialog.show();
         }
+    }
+
+    public static void deletePromoFromDocumentSnapshot(DocumentSnapshot snapshot) {
+
+
+        snapshot.getReference().delete().addOnSuccessListener(v -> {
+
+            final String promoType = snapshot.getString("promoType");
+
+            FirebaseFirestore.getInstance().collection("users")
+                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .update("promoTypesPublished." + promoType, FieldValue.increment(-1));
+
+
+            if (promoType != null && !promoType.equals(Promotion.TEXT_TYPE)) {
+                final FirebaseStorage storage = FirebaseStorage.getInstance();
+
+                if (promoType.equals("image") && snapshot.contains("promoimages")) {
+
+                    final ArrayList<String> promoImages = (ArrayList<String>)
+                            snapshot.get("promoimages");
+
+                    if (promoImages != null) {
+                        for (String imageUrl : promoImages) {
+                            storage.getReferenceFromUrl(imageUrl).delete();
+                        }
+                    }
+
+
+                } else if (promoType.equals("video") && snapshot.contains("videoThumbnail")
+                        && snapshot.contains("videoUrl")) {
+
+                    final String videoThumbnail = snapshot.getString("videoThumbnail");
+                    final String videoUrl = snapshot.getString("videoUrl");
+
+                    if (videoThumbnail != null && !videoThumbnail.isEmpty()) {
+                        storage.getReferenceFromUrl(videoThumbnail).delete();
+                    }
+
+                    if (videoUrl != null && !videoUrl.isEmpty()) {
+                        storage.getReferenceFromUrl(videoUrl).delete();
+                    }
+
+
+                }
+            }
+
+
+        }).addOnFailureListener(e -> {
+            Log.d("ttt", "failed to delete ad: " + snapshot.getId() + " because: "
+                    + e.getMessage());
+            snapshot.getReference().update("isDeleted", false);
+        });
+
+
+        snapshot.getReference().collection("ratings").get()
+                .addOnSuccessListener(queryDocumentSnapshots2 -> {
+                    for (QueryDocumentSnapshot ratingSnapshot : queryDocumentSnapshots2) {
+                        ratingSnapshot.getReference().delete();
+                    }
+                });
+
+        final long promoId = snapshot.getLong("promoid");
+
+        FirebaseFirestore.getInstance().collection("users")
+                .whereArrayContains("favpromosids", Long.toString(promoId))
+                .get().addOnSuccessListener(snapshots1 -> {
+            for (DocumentSnapshot snap : snapshots1.getDocuments()) {
+                snap.getReference().update("favpromosids",
+                        FieldValue.arrayRemove(Long.toString(promoId)));
+            }
+        });
+
+        FirebaseFirestore.getInstance().collection("notifications")
+                .whereEqualTo("promoId", promoId).get()
+                .addOnSuccessListener(snapshots1 -> {
+                    for (DocumentSnapshot snaps : snapshots1.getDocuments()) {
+                        snaps.getReference().delete();
+                    }
+                });
+
+
     }
 
     static void pauseOrUnPausePromo(
@@ -523,6 +622,30 @@ public class Promotion implements Serializable {
         this.cityName = cityName;
     }
 
+    public boolean isHidePhone() {
+        return hidePhone;
+    }
+
+    public void setHidePhone(boolean hidePhone) {
+        this.hidePhone = hidePhone;
+    }
+
+    public boolean isWasEdited() {
+        return wasEdited;
+    }
+
+    public void setWasEdited(boolean wasEdited) {
+        this.wasEdited = wasEdited;
+    }
+
+    public long getLastEditTime() {
+        return lastEditTime;
+    }
+
+    public void setLastEditTime(long lastEditTime) {
+        this.lastEditTime = lastEditTime;
+    }
+
     private static class PromoReports {
         public List<String> reports;
     }
@@ -559,7 +682,8 @@ public class Promotion implements Serializable {
         } else {
 
 
-            if (p.getPromoType().equals("image") || p.getPromoType().equals("video")) {
+            if (p.getPromoType().equals(Promotion.IMAGE_TYPE) ||
+                    p.getPromoType().equals(Promotion.VIDEO_TYPE)) {
 
                 Log.d("ttt", "has an image");
 
@@ -569,7 +693,8 @@ public class Promotion implements Serializable {
                 progressDialog.show();
 
                 Glide.with(context).asBitmap().load(
-                        p.getPromoType().equals("image") ? p.getPromoimages().get(0) : p.getVideoThumbnail())
+                        p.getPromoType().equals(Promotion.IMAGE_TYPE) ?
+                                p.getPromoimages().get(0) : p.getVideoThumbnail())
                         .into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource,
@@ -601,7 +726,7 @@ public class Promotion implements Serializable {
                 sharingFile[0] = createShareFileAndStartIntent(
                         shareIntent,
                         context,
-                        BitmapFactory.decodeResource(context.getResources(), R.drawable.rbeno_logo_png),
+                        BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_icon_external),
                         shareImageIv);
             }
 
@@ -829,14 +954,15 @@ public class Promotion implements Serializable {
 //
 //  }
 
-    static boolean printPromoStatus(Context context, Promotion promotion, String currentUid) {
+    static boolean printPromoStatus(Context context, Promotion promotion, @Nullable String currentUid) {
         int message = 0;
 
         if (promotion.getIsBanned()) {
             message = R.string.promo_banned;
         } else if (promotion.isDeleted()) {
             message = R.string.promo_deleted;
-        } else if (promotion.getIsPaused() && !promotion.getUid().equals(currentUid)) {
+        } else if (promotion.getIsPaused() && (currentUid == null ||
+                (currentUid != null && !promotion.getUid().equals(currentUid)))) {
             message = R.string.promo_paused;
         }
 

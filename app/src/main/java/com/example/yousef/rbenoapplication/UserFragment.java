@@ -1,7 +1,10 @@
 package com.example.yousef.rbenoapplication;
 
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -25,20 +28,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,37 +66,38 @@ import java.util.List;
 import hyogeun.github.com.colorratingbarlib.ColorRatingBar;
 
 public class UserFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-  private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-  private final
-  CollectionReference userRef = FirebaseFirestore.getInstance().collection("users"),
-          promotionRef = FirebaseFirestore.getInstance().collection("promotions");
-  boolean status;
-  private NewestPromosAdapter adapter;
-  private ColorRatingBar ratingBar;
-  private ArrayList<Promotion> Promotions;
-  private double ratingSum;
-  private String CurrentUserDocumentId, vistingUserid;
-  private ImageView statusImage, profilePic;
-  private TextView statusTv, countryTv, staticusername, ratingTextView, userPromosTv, usernameTv;
-  private RecyclerView lv;
-  private SwipeRefreshLayout swipeRefreshLayout;
-  private Toolbar toolbar;
-  //  private ListenerRegistration listener;
-  private PromotionDeleteReceiver promotionDeleteReceiver;
+    private final FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final
+    CollectionReference userRef = FirebaseFirestore.getInstance().collection("users"),
+            promotionRef = FirebaseFirestore.getInstance().collection("promotions");
+    boolean status;
+    private NewestPromosAdapter adapter;
+    private ColorRatingBar ratingBar;
+    private ArrayList<Promotion> Promotions;
+    private double ratingSum;
+    private String CurrentUserDocumentId, vistingUserid;
+    private ImageView statusImage, profilePic;
+    private TextView statusTv, countryTv, staticusername, ratingTextView, userPromosTv, usernameTv;
+    private RecyclerView lv;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private Toolbar toolbar;
+    //  private ListenerRegistration listener;
+    private PromotionDeleteReceiver promotionDeleteReceiver;
 
+    private String currentImageUrl;
 
-  public UserFragment() {
-  }
-
-
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-//    setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-    if (getArguments() != null) {
-      vistingUserid = getArguments().getString("promouserid");
+    public UserFragment() {
     }
-  }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//    setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+        if (getArguments() != null) {
+            vistingUserid = getArguments().getString("promouserid");
+        }
+    }
 
 //  @NonNull
 //  @Override
@@ -102,243 +123,456 @@ public class UserFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //    };
 //  }
 
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_user, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_user, container, false);
 
-    setupDeletionReceiver();
+        setupDeletionReceiver();
 
 //    userNameTv = view.findViewById(R.id.userNameTv);
-    profilePic = view.findViewById(R.id.profile_image);
-    staticusername = view.findViewById(R.id.staticusername);
-    countryTv = view.findViewById(R.id.countryTv);
-    ratingBar = view.findViewById(R.id.ratingBar);
+        profilePic = view.findViewById(R.id.profile_image);
+        staticusername = view.findViewById(R.id.staticusername);
+        countryTv = view.findViewById(R.id.countryTv);
+        ratingBar = view.findViewById(R.id.ratingBar);
 //    view.findViewById(R.id.back_arrow).setOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
-    lv = view.findViewById(R.id.myPromosRecyclerView);
+        lv = view.findViewById(R.id.myPromosRecyclerView);
 
-    userPromosTv = view.findViewById(R.id.userPromosTv);
-    statusImage = view.findViewById(R.id.StatusImage);
-    statusTv = view.findViewById(R.id.StatusTv);
-    swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-    ratingTextView = view.findViewById(R.id.ratingTextView);
-    usernameTv = view.findViewById(R.id.usernameTv);
+        userPromosTv = view.findViewById(R.id.userPromosTv);
+        statusImage = view.findViewById(R.id.StatusImage);
+        statusTv = view.findViewById(R.id.StatusTv);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        ratingTextView = view.findViewById(R.id.ratingTextView);
+        usernameTv = view.findViewById(R.id.usernameTv);
 //        profilePic.getLayoutParams().height = GlobalVariables.getWindowHeight() / 5;
 //    view.findViewById(R.id.greyLinearLayout).getLayoutParams().height = GlobalVariables.getWindowHeight() / 9;
 
-    final AdView adView = view.findViewById(R.id.adView);
-    adView.loadAd(new AdRequest.Builder().build());
-    adView.setAdListener(new AdListener() {
-      @Override
-      public void onAdLoaded() {
-        adView.setVisibility(View.VISIBLE);
-      }
-    });
-
-    toolbar = view.findViewById(R.id.userToolbar);
-
-    if (vistingUserid != null) {
-      toolbar.setNavigationIcon(R.drawable.back_arrow_white);
-      toolbar.setNavigationOnClickListener(view1 -> getActivity().onBackPressed());
-      toolbar.inflateMenu(R.menu.user_visting_account);
-      toolbar.setOnMenuItemClickListener(item -> {
-        if (item.getItemId() == R.id.block_account_user) {
-
-          if (!currentUser.isAnonymous()) {
-            if (!GlobalVariables.getBlockedUsers().contains(vistingUserid)) {
-              if (WifiUtil.checkWifiConnection(getContext())) {
-                userRef.whereEqualTo("userId", currentUser.getUid())
-                        .get().addOnSuccessListener(snapshots ->
-                        userRef.document(snapshots.getDocuments().get(0).getId())
-                                .update("usersBlocked", FieldValue.arrayUnion(vistingUserid))
-                                .addOnSuccessListener(v -> {
-
-                                  GlobalVariables.getBlockedUsers().add(vistingUserid);
-                                  userRef.document(CurrentUserDocumentId)
-                                          .update("blocks", FieldValue.arrayUnion(currentUser))
-                                          .addOnSuccessListener(aVoid12 ->
-                                                  Toast.makeText(getContext(),
-                                                          "لقد تم حظر المشترك!",
-                                                          Toast.LENGTH_SHORT).show());
-
-                                }));
-              }
-            } else {
-              Toast.makeText(getContext(), "لقد تم حظر المشترك من قبل!"
-                      , Toast.LENGTH_SHORT).show();
+        final AdView adView = view.findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                adView.setVisibility(View.VISIBLE);
             }
+        });
 
-          } else {
-            showSigninDialog();
-          }
-        } else if (item.getItemId() == R.id.report_user) {
-          if (!currentUser.isAnonymous()) {
-            if (WifiUtil.checkWifiConnection(getContext())) {
-              userRef.document(CurrentUserDocumentId).get()
-                      .addOnSuccessListener(documentSnapshot -> {
-                        long currentTimeInMillies = System.currentTimeMillis() / 1000;
-                        ArrayList<String> reports = (ArrayList<String>) documentSnapshot.get("reports");
-                        if (reports != null) {
-                          for (String report : reports) {
-                            if (report.split("-")[0].equals(currentUser.getUid())) {
-                              Toast.makeText(getContext(), "لقد قمت بالإبلاغ عن هذا المستخدم من قبل!", Toast.LENGTH_SHORT).show();
-                              return;
+        toolbar = view.findViewById(R.id.userToolbar);
+
+        if (vistingUserid != null) {
+            toolbar.setNavigationIcon(R.drawable.back_arrow_white);
+            toolbar.setNavigationOnClickListener(view1 -> getActivity().onBackPressed());
+            toolbar.inflateMenu(R.menu.user_visting_account);
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.block_account_user) {
+
+                    if (!currentUser.isAnonymous()) {
+                        if (!GlobalVariables.getBlockedUsers().contains(vistingUserid)) {
+                            if (WifiUtil.checkWifiConnection(getContext())) {
+                                userRef.whereEqualTo("userId", currentUser.getUid())
+                                        .get().addOnSuccessListener(snapshots ->
+                                        userRef.document(snapshots.getDocuments().get(0).getId())
+                                                .update("usersBlocked", FieldValue.arrayUnion(vistingUserid))
+                                                .addOnSuccessListener(v -> {
+
+                                                    GlobalVariables.getBlockedUsers().add(vistingUserid);
+                                                    userRef.document(CurrentUserDocumentId)
+                                                            .update("blocks", FieldValue.arrayUnion(currentUser))
+                                                            .addOnSuccessListener(aVoid12 ->
+                                                                    Toast.makeText(getContext(),
+                                                                            "لقد تم حظر المشترك!",
+                                                                            Toast.LENGTH_SHORT).show());
+
+                                                }));
                             }
-                          }
-                          userRef.document(CurrentUserDocumentId).update("reports", FieldValue.arrayUnion(currentUser.getUid() + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> {
-//                                      reports = new ArrayList<>();
-                            reports.add(currentUser.getUid() + "-" + currentTimeInMillies);
-                            if (reports.size() >= 10) {
-                              if (((currentTimeInMillies - Long.parseLong(reports.get(reports.size() - 10).split("-")[1]))) < 86400000) {
-                                userRef.document(CurrentUserDocumentId).update("userBanned", true).addOnSuccessListener(aVoid1 -> promotionRef.whereEqualTo("uid", vistingUserid)
-                                        .get().addOnSuccessListener(snapshots -> {
-                                          for (DocumentSnapshot documentSnapshot1 : snapshots.getDocuments()) {
-                                            promotionRef.document(documentSnapshot1.getId())
-                                                    .update("isBanned", true);
-                                          }
-                                        }).addOnCompleteListener(task -> getActivity().onBackPressed()));
-                              }
-                            }
-                            Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا المستخدم!", Toast.LENGTH_SHORT).show();
-                          });
                         } else {
-                          userRef.document(CurrentUserDocumentId).update("reports", FieldValue.arrayUnion(currentUser.getUid() + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا المستخدم!", Toast.LENGTH_SHORT).show());
+                            Toast.makeText(getContext(), "لقد تم حظر المشترك من قبل!"
+                                    , Toast.LENGTH_SHORT).show();
                         }
-                      });
+
+                    } else {
+                        showSigninDialog();
+                    }
+                } else if (item.getItemId() == R.id.report_user) {
+                    if (!currentUser.isAnonymous()) {
+                        if (WifiUtil.checkWifiConnection(getContext())) {
+                            userRef.document(CurrentUserDocumentId).get()
+                                    .addOnSuccessListener(documentSnapshot -> {
+                                        long currentTimeInMillies = System.currentTimeMillis() / 1000;
+                                        ArrayList<String> reports = (ArrayList<String>) documentSnapshot.get("reports");
+                                        if (reports != null) {
+                                            for (String report : reports) {
+                                                if (report.split("-")[0].equals(currentUser.getUid())) {
+                                                    Toast.makeText(getContext(), "لقد قمت بالإبلاغ عن هذا المستخدم من قبل!", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+                                            }
+                                            userRef.document(CurrentUserDocumentId).update("reports", FieldValue.arrayUnion(currentUser.getUid() + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> {
+//                                      reports = new ArrayList<>();
+                                                reports.add(currentUser.getUid() + "-" + currentTimeInMillies);
+                                                if (reports.size() >= 10) {
+                                                    if (((currentTimeInMillies - Long.parseLong(reports.get(reports.size() - 10).split("-")[1]))) < 86400000) {
+                                                        userRef.document(CurrentUserDocumentId).update("userBanned", true).addOnSuccessListener(aVoid1 -> promotionRef.whereEqualTo("uid", vistingUserid)
+                                                                .get().addOnSuccessListener(snapshots -> {
+                                                                    for (DocumentSnapshot documentSnapshot1 : snapshots.getDocuments()) {
+                                                                        promotionRef.document(documentSnapshot1.getId())
+                                                                                .update("isBanned", true);
+                                                                    }
+                                                                }).addOnCompleteListener(task -> getActivity().onBackPressed()));
+                                                    }
+                                                }
+                                                Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا المستخدم!", Toast.LENGTH_SHORT).show();
+                                            });
+                                        } else {
+                                            userRef.document(CurrentUserDocumentId).update("reports", FieldValue.arrayUnion(currentUser.getUid() + "-" + currentTimeInMillies)).addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "لقد تم الإبلاغ عن هذا المستخدم!", Toast.LENGTH_SHORT).show());
+                                        }
+                                    });
+                        }
+                    } else {
+                        showSigninDialog();
+                    }
+                }
+
+                return true;
+            });
+        } else {
+            usernameTv.setText("حسابي");
+
+
+            if (currentUser != null && currentUser.getProviderData().get(1).getProviderId()
+                    .equals("facebook.com")) {
+
+                toolbar.inflateMenu(R.menu.account_edit_menu_with_deletion);
+
+            } else {
+                toolbar.inflateMenu(R.menu.account_edit_menu);
             }
-          } else {
-            showSigninDialog();
-          }
-        }
 
-        return true;
-      });
-    } else {
-      usernameTv.setText("حسابي");
-      toolbar.inflateMenu(R.menu.account_edit_menu);
-      toolbar.setOnMenuItemClickListener(item -> {
+            toolbar.setOnMenuItemClickListener(item -> {
 
 
-        if (item.getItemId() == R.id.edit_account) {
+                if (item.getItemId() == R.id.edit_account) {
 
-          if (WifiUtil.checkWifiConnection(getContext())) {
-            ((HomeActivity) getActivity())
-                    .addFragmentToHomeContainer(AccountSettingsFragment.newInstance());
-          }
+                    if (WifiUtil.checkWifiConnection(getContext())) {
+                        ((HomeActivity) getActivity())
+                                .addFragmentToHomeContainer(AccountSettingsFragment.newInstance());
+                    }
 
 
 //          new AccountSettingsFragment().show(getChildFragmentManager(), "accountSettings");
-        } else if (item.getItemId() == R.id.status_present) {
-          if (WifiUtil.checkWifiConnection(getContext())) {
-            userRef.document(CurrentUserDocumentId)
-                    .update("status", !status).addOnSuccessListener(aVoid -> {
-              status = !status;
-              if (status) {
-                setStatus(R.drawable.green_circle, "نشط الأن");
-                toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.green_circle);
-                ((HomeActivity) getActivity()).changeStatusIcon(R.drawable.green_circle);
-              } else {
-                toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.red_circle);
-                setStatus(R.drawable.red_circle, "غير نشط الأن");
-                ((HomeActivity) getActivity()).changeStatusIcon(R.drawable.red_circle);
-              }
+                } else if (item.getItemId() == R.id.status_present) {
+                    if (WifiUtil.checkWifiConnection(getContext())) {
+                        userRef.document(CurrentUserDocumentId)
+                                .update("status", !status).addOnSuccessListener(aVoid -> {
+                            status = !status;
+                            if (status) {
+                                setStatus(R.drawable.green_circle, "نشط الأن");
+                                toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.green_circle);
+                                ((HomeActivity) getActivity()).changeStatusIcon(R.drawable.green_circle);
+                            } else {
+                                toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.red_circle);
+                                setStatus(R.drawable.red_circle, "غير نشط الأن");
+                                ((HomeActivity) getActivity()).changeStatusIcon(R.drawable.red_circle);
+                            }
+                        });
+                    }
+                } else if (item.getItemId() == R.id.blocked_users) {
+                    if (WifiUtil.checkWifiConnection(getContext())) {
+                        ((HomeActivity) getActivity()).addFragmentToHomeContainer(new BlockedUsersFragment());
+                    }
+                } else if (item.getItemId() == R.id.delete_account) {
+
+                    showUserDeletionAlertDialog();
+
+                }
+                return true;
             });
-          }
-        } else if (item.getItemId() == R.id.blocked_users) {
-          if (WifiUtil.checkWifiConnection(getContext())) {
-            ((HomeActivity) getActivity()).addFragmentToHomeContainer(new BlockedUsersFragment());
-          }
         }
-        return true;
-      });
+
+        return view;
     }
 
-    return view;
-  }
+
+    private void showUserDeletionAlertDialog() {
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+        alert.setTitle("هل انت متأكد انك تريد حذف حسابك؟");
+        alert.setMessage("حذف حسابك سيؤدي الى ضياع كل بياناتك و حذف بيانات التسجيل من الفيسبوك");
+
+        alert.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alert.setPositiveButton("حذف", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
+                final ProgressDialog progressDialog = new ProgressDialog(requireContext());
+                progressDialog.setMessage("جاري حذف البيانات");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+
+                deleteUserInfo(progressDialog);
+
+            }
+        });
+
+        alert.show();
+
+    }
+
+    private void deleteMessagesForUser(ProgressDialog progressDialog) {
+
+        final DatabaseReference messagesRef =
+                FirebaseDatabase.getInstance().getReference().child("Messages");
+
+        String[] identifiers = {"sender", "receiver"};
+
+        for (String id : identifiers) {
+            messagesRef.orderByChild(id).equalTo(currentUser.getUid())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                dataSnapshot.getRef()
+                                        .child("isDeletedFor:" + currentUser.getUid()).setValue(true);
+                            }
+
+                            new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions",
+                                    null, HttpMethod.DELETE,
+                                    new GraphRequest.Callback() {
+                                        @Override
+                                        public void onCompleted(GraphResponse response) {
+                                            boolean isSuccessfull = false;
+
+                                            if (response == null || response.getJSONObject() == null)
+                                                return;
+
+                                            Log.d("ttt", "response: " + response.toString());
+
+                                            try {
+                                                isSuccessfull = response.getJSONObject().getBoolean("success");
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                                Log.d("ttt", "couldn't delete user from facebook: " + e.getMessage());
+                                            }
+
+                                            if (response.getError() != null) {
+                                                Log.d("ttt", "facebook errors: " + response.getError().getErrorMessage());
+                                            }
+
+//                              if(isSuccessfull && response.getError() == null){
+//
+//                                Log.d("ttt","sucessfully revoked permissions");
+//
+//
+//
+//
+//                              }
 
 
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
+                                            currentUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                    if (AccessToken.getCurrentAccessToken() != null) {
+                                                        LoginManager.getInstance().logOut();
+                                                    }
+
+                                                    progressDialog.dismiss();
+                                                    startActivity(new Intent(requireContext(), SigninActivity.class));
+                                                    requireActivity().finish();
+
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("ttt", "failed to delete user form auth: " +
+                                                            e.getMessage());
+                                                }
+                                            });
+
+
+                                        }
+                                    }).executeAsync();
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+        }
+
+    }
+
+    private void deleteUserInfo(ProgressDialog progressDialog) {
+
+        if (WifiUtil.checkWifiConnection(getContext())) {
+
+
+            if (currentUser != null) {
+
+//                      FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//                      if(user!=null){
+//                        Log.d("ttt","current user id: "+user.getUid());
+//                      }
+
+                Log.d("ttt", "CURRENT USER IS NOT NULL");
+
+                Log.d("ttt", "deleted user from auth");
+
+                if (currentImageUrl != null && !currentImageUrl.isEmpty() &&
+                        currentImageUrl.contains("https://firebasestorage.googleapis.com/v0/b/rbenoapplication.appspot.com")) {
+                    FirebaseStorage.getInstance().getReferenceFromUrl(currentImageUrl).delete();
+                }
+
+                final String currentUid = currentUser.getUid();
+
+                Log.d("ttt", "currentUid: " + currentUid);
+
+                userRef.document(currentUid).delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                Log.d("ttt", "deleted user from firbase firestore");
+
+                                promotionRef.whereEqualTo("uid", currentUid)
+                                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot snapshots) {
+
+                                        for (DocumentSnapshot snapshot : snapshots) {
+
+                                            final DocumentReference reference = snapshot.getReference();
+
+                                            reference.update("isDeleted", true)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+
+                                                            Promotion.deletePromoFromDocumentSnapshot(snapshot);
+
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                }).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                        deleteMessagesForUser(progressDialog);
+
+                                    }
+                                });
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("ttt", "failed to delete user form firestore: " +
+                                e.getMessage());
+                    }
+                });
+
+
+            }
+
+
+        }
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
 
 //        swipeRefreshLayout.setRefreshing(false);
-    swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
-    swipeRefreshLayout.setOnRefreshListener(this);
-    swipeRefreshLayout.setRefreshing(true);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setRefreshing(true);
 
 
-    Promotions = new ArrayList<>();
-    ratingBar.setIsIndicator(true);
+        Promotions = new ArrayList<>();
+        ratingBar.setIsIndicator(true);
 
-    if (vistingUserid != null) {
-      getUserData(vistingUserid);
-      getPromos(vistingUserid);
-    } else {
-      getUserData(currentUser.getUid());
-      getPromos(currentUser.getUid());
+        if (vistingUserid != null) {
+            getUserData(vistingUserid);
+            getPromos(vistingUserid);
+        } else {
+            getUserData(currentUser.getUid());
+            getPromos(currentUser.getUid());
+        }
+
     }
 
-  }
-
-  //  @SuppressLint("RestrictedApi")
-  @Override
-  public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-    if (vistingUserid != null) {
-      inflater.inflate(R.menu.user_visting_account, menu);
-    } else {
-      inflater.inflate(R.menu.account_edit_menu, menu);
+    //  @SuppressLint("RestrictedApi")
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        if (vistingUserid != null) {
+            inflater.inflate(R.menu.user_visting_account, menu);
+        } else {
+            inflater.inflate(R.menu.account_edit_menu, menu);
 //      if (menu instanceof MenuBuilder) {
 //        ((MenuBuilder) menu).setOptionalIconsVisible(true);
 //      }
-    }
-    super.onCreateOptionsMenu(menu, inflater);
-  }
-
-  @Override
-  public void onPrepareOptionsMenu(@NonNull Menu menu) {
-    super.onPrepareOptionsMenu(menu);
-    if (status) {
-      menu.getItem(1).setIcon(R.drawable.green_circle);
-    } else {
-      menu.getItem(1).setIcon(R.drawable.red_circle);
-    }
-  }
-
-  @Override
-  public void onRefresh() {
-    if (WifiUtil.checkWifiConnection(getContext())) {
-      if (vistingUserid != null) {
-        getUserData(vistingUserid);
-        getPromos(vistingUserid);
-      } else {
-        getUserData(currentUser.getUid());
-        getPromos(currentUser.getUid());
-      }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
-  }
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (status) {
+            menu.getItem(1).setIcon(R.drawable.green_circle);
+        } else {
+            menu.getItem(1).setIcon(R.drawable.red_circle);
+        }
+    }
 
-  private void getUserData(String id) {
+    @Override
+    public void onRefresh() {
+        if (WifiUtil.checkWifiConnection(getContext())) {
+            if (vistingUserid != null) {
+                getUserData(vistingUserid);
+                getPromos(vistingUserid);
+            } else {
+                getUserData(currentUser.getUid());
+                getPromos(currentUser.getUid());
+            }
+        }
 
-    Task<QuerySnapshot> task = userRef.whereEqualTo("userId", id).get();
-    task.addOnSuccessListener(queryDocumentSnapshots -> {
+    }
 
-      if (queryDocumentSnapshots.isEmpty()) {
-        Toast.makeText(getContext(), R.string.check_internet,
-                Toast.LENGTH_SHORT).show();
-        return;
-      }
+    private void getUserData(String id) {
 
-      final DocumentSnapshot ds = queryDocumentSnapshots.getDocuments().get(0);
-      CurrentUserDocumentId = ds.getId();
-      final String imageUrl = ds.getString("imageurl");
-      final String username = ds.getString("username");
-      final String country = ds.getString("country");
+        Task<QuerySnapshot> task = userRef.whereEqualTo("userId", id).get();
+        task.addOnSuccessListener(queryDocumentSnapshots -> {
 
-      final String countryCode = ds.getString("countryCode");
+            if (queryDocumentSnapshots.isEmpty()) {
+                Toast.makeText(getContext(), R.string.check_internet,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-      countryTv.setText(CountryUtil.getCountryName(countryCode) + " " +
-              EmojiUtil.countryCodeToEmoji(countryCode));
+            final DocumentSnapshot ds = queryDocumentSnapshots.getDocuments().get(0);
+            CurrentUserDocumentId = ds.getId();
+            currentImageUrl = ds.getString("imageurl");
+            final String username = ds.getString("username");
+            final String country = ds.getString("country");
+
+            final String countryCode = ds.getString("countryCode");
+
+            countryTv.setText(CountryUtil.getCountryName(countryCode) + " " +
+                    EmojiUtil.countryCodeToEmoji(countryCode));
 
 //      if(countryCode != null){
 //
@@ -364,127 +598,127 @@ public class UserFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //      }
 
 
-      if (imageUrl != null && !imageUrl.isEmpty()) {
-        Picasso.get().load(imageUrl).fit().into(profilePic);
+            if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
+                Picasso.get().load(currentImageUrl).fit().centerCrop().into(profilePic);
 
-        profilePic.setOnClickListener(v -> FullScreenImagesUtil.showImageFullScreen(getContext(),
-                imageUrl, null));
+                profilePic.setOnClickListener(v -> FullScreenImagesUtil.showImageFullScreen(getContext(),
+                        currentImageUrl, null));
 
-      }
+            }
 
-      if (!id.equals(currentUser.getUid())) {
-        usernameTv.setText(username);
-      }
+            if (!id.equals(currentUser.getUid())) {
+                usernameTv.setText(username);
+            }
 
-      staticusername.setText(username);
+            staticusername.setText(username);
 //      staticusername.post(() -> staticusername.setText("@" + username.toLowerCase().trim()));
-      status = ds.getBoolean("status");
-      if (getContext() != null) {
-        if (status) {
-          if (vistingUserid == null) {
-            toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.green_circle);
-          }
-          setStatus(R.drawable.green_circle, "نشط الأن");
-        } else {
-          if (vistingUserid == null) {
-            toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.red_circle);
+            status = ds.getBoolean("status");
+            if (getContext() != null) {
+                if (status) {
+                    if (vistingUserid == null) {
+                        toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.green_circle);
+                    }
+                    setStatus(R.drawable.green_circle, "نشط الأن");
+                } else {
+                    if (vistingUserid == null) {
+                        toolbar.getMenu().findItem(R.id.status_present).setIcon(R.drawable.red_circle);
 
-          }
-          setStatus(R.drawable.red_circle, "غير نشط الأن");
-        }
-      }
+                    }
+                    setStatus(R.drawable.red_circle, "غير نشط الأن");
+                }
+            }
 
-    });
-  }
-
-  private void getPromos(String id) {
-
-    if (vistingUserid != null) {
-
-      final GridLayoutManager glm = new GridLayoutManager(getContext(), 2) {
-        @Override
-        public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
-          lp.height = (int) (getWidth() * 0.55);
-          return true;
-        }
-
-      };
-
-      glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-        @Override
-        public int getSpanSize(int position) {
-          if (lv.getAdapter().getItemViewType(position) == 2) {
-            return 2;
-          }
-          return 1;
-        }
-      });
-
-      lv.setLayoutManager(glm);
-
-      adapter = new NewestPromosAdapter(Promotions, getContext(),
-              R.layout.newest_promo_item_grid, 3);
-    } else {
-      lv.setLayoutManager(new LinearLayoutManager(getContext(),
-              RecyclerView.VERTICAL, false) {
-        @Override
-        public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
-          lp.height = (int) (getWidth() * 0.292);
-          return true;
-        }
-
-        @Override
-        public void onItemsRemoved(@NonNull RecyclerView recyclerView, int positionStart, int itemCount) {
-          if (itemCount == 0)
-            userPromosTv.setVisibility(View.GONE);
-        }
-      });
-      adapter = new NewestPromosAdapter(Promotions, getContext(), R.layout.my_promo_item_layout, 2);
+        });
     }
+
+    private void getPromos(String id) {
+
+        if (vistingUserid != null) {
+
+            final GridLayoutManager glm = new GridLayoutManager(getContext(), 2) {
+                @Override
+                public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+                    lp.height = (int) (getWidth() * 0.55);
+                    return true;
+                }
+
+            };
+
+            glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (lv.getAdapter().getItemViewType(position) == 2) {
+                        return 2;
+                    }
+                    return 1;
+                }
+            });
+
+            lv.setLayoutManager(glm);
+
+            adapter = new NewestPromosAdapter(Promotions, getContext(),
+                    R.layout.newest_promo_item_grid, 3);
+        } else {
+            lv.setLayoutManager(new LinearLayoutManager(getContext(),
+                    RecyclerView.VERTICAL, false) {
+                @Override
+                public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+                    lp.height = (int) (getWidth() * 0.292);
+                    return true;
+                }
+
+                @Override
+                public void onItemsRemoved(@NonNull RecyclerView recyclerView, int positionStart, int itemCount) {
+                    if (itemCount == 0)
+                        userPromosTv.setVisibility(View.GONE);
+                }
+            });
+            adapter = new NewestPromosAdapter(Promotions, getContext(), R.layout.my_promo_item_layout, 2);
+        }
 
 //    adapter.setHasStableIds(true);
-    lv.setAdapter(adapter);
+        lv.setAdapter(adapter);
 
-    Promotions.clear();
-    final List<Double> ratingsList = new ArrayList<>();
-    Query query =
-            promotionRef.orderBy("publishtime", Query.Direction.DESCENDING)
-                    .whereEqualTo("uid", id)
-                    .whereEqualTo("isBanned", false);
+        Promotions.clear();
+        final List<Double> ratingsList = new ArrayList<>();
+        Query query =
+                promotionRef.orderBy("publishtime", Query.Direction.DESCENDING)
+                        .whereEqualTo("uid", id)
+                        .whereEqualTo("isBanned", false);
 
-    if (vistingUserid != null) {
-      query = query.whereEqualTo("isPaused", false);
-    }
+        if (vistingUserid != null) {
+            query = query.whereEqualTo("isPaused", false);
+        }
 
 //    Query finalQuery = query;
 
-    query.get().addOnSuccessListener(snapshots -> {
-      for (QueryDocumentSnapshot snapshot : snapshots) {
-        final Promotion promotion = snapshot.toObject(Promotion.class);
-        Promotions.add(promotion);
-        if (promotion.getRating() != 0) ratingsList.add(promotion.getRating());
-      }
-    }).addOnCompleteListener(task -> {
-      if (Promotions.size() > 0) {
+        query.get().addOnSuccessListener(snapshots -> {
+            for (QueryDocumentSnapshot snapshot : snapshots) {
+                final Promotion promotion = snapshot.toObject(Promotion.class);
+                Promotions.add(promotion);
+                if (promotion.getRating() != 0) ratingsList.add(promotion.getRating());
+            }
+        }).addOnCompleteListener(task -> {
+            if (Promotions.size() > 0) {
 
-        adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
 
-        ratingSum = 0;
-        for (Double rating : ratingsList) {
-          ratingSum += rating;
-        }
-        if (ratingSum > 0) {
-          final float ratingCalc = (float) (ratingSum / ratingsList.size());
-          ratingBar.setRating(ratingCalc);
-          ratingTextView.setText((ratingCalc * 2) * 10 + "%");
-        }
+                ratingSum = 0;
+                for (Double rating : ratingsList) {
+                    ratingSum += rating;
+                }
+                if (ratingSum > 0) {
+                    final float ratingCalc = (float) (ratingSum / ratingsList.size());
+                    ratingBar.setRating(ratingCalc);
+                    ratingTextView.setText((ratingCalc * 2) * 10 + "%");
+                }
 
-        if (vistingUserid == null) {
-          userPromosTv.setVisibility(View.VISIBLE);
-        }
-      } else {
-        userPromosTv.setVisibility(View.GONE);
-      }
+                if (vistingUserid == null) {
+                    userPromosTv.setVisibility(View.VISIBLE);
+                }
+            } else {
+                userPromosTv.setVisibility(View.GONE);
+            }
 
 //      if (listener == null) {
 //        listener = finalQuery.addSnapshotListener((value, error) -> {
@@ -518,18 +752,18 @@ public class UserFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //      }
 
 
-      swipeRefreshLayout.setRefreshing(false);
-    });
-  }
+            swipeRefreshLayout.setRefreshing(false);
+        });
+    }
 
-  void showSigninDialog() {
-    SigninUtil.getInstance(getContext(), getActivity()).show();
-  }
+    void showSigninDialog() {
+        SigninUtil.getInstance(getContext(), getActivity()).show();
+    }
 
-  void setStatus(int drawable, String statusText) {
-    statusImage.setImageDrawable(ContextCompat.getDrawable(getContext(), drawable));
-    statusTv.setText(statusText);
-  }
+    void setStatus(int drawable, String statusText) {
+        statusImage.setImageDrawable(ContextCompat.getDrawable(getContext(), drawable));
+        statusTv.setText(statusText);
+    }
 
 //  @Override
 //  public void onDestroy() {
@@ -538,38 +772,38 @@ public class UserFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //      listener.remove();
 //  }
 
-  @Override
-  public void onDestroyView() {
-    super.onDestroyView();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
-    if (promotionDeleteReceiver != null)
-      getContext().unregisterReceiver(promotionDeleteReceiver);
+        if (promotionDeleteReceiver != null)
+            getContext().unregisterReceiver(promotionDeleteReceiver);
 
-  }
+    }
 
-  void setupDeletionReceiver() {
+    void setupDeletionReceiver() {
 
-    promotionDeleteReceiver =
-            new PromotionDeleteReceiver() {
-              @Override
+        promotionDeleteReceiver =
+                new PromotionDeleteReceiver() {
+                    @Override
 
-              public void onReceive(Context context, Intent intent) {
-                Log.d("ttt", "received delete");
-
-
-                Promotion.changePromoStatusFromList(Promotions,
-                        intent.getLongExtra("promoId", 0),
-                        intent.getStringExtra("changeType"),
-                        adapter);
-
-              }
-            };
-
-    getContext().registerReceiver(promotionDeleteReceiver,
-            new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
+                    public void onReceive(Context context, Intent intent) {
+                        Log.d("ttt", "received delete");
 
 
-  }
+                        Promotion.changePromoStatusFromList(Promotions,
+                                intent.getLongExtra("promoId", 0),
+                                intent.getStringExtra("changeType"),
+                                adapter);
+
+                    }
+                };
+
+        getContext().registerReceiver(promotionDeleteReceiver,
+                new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
+
+
+    }
 
 
 }

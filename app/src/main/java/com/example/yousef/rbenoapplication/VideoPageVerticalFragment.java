@@ -45,189 +45,189 @@ import java.util.Objects;
 
 public class VideoPageVerticalFragment extends Fragment implements View.OnClickListener {
 
-  private static final int SHARE_CODE = 10, FAV = 1, UN_FAV = 0;
+    private static final int SHARE_CODE = 10, FAV = 1, UN_FAV = 0;
 
-  static final CollectionReference promosRef =
-          FirebaseFirestore.getInstance().collection("promotions"),
-          usersRef = FirebaseFirestore.getInstance().collection("users");
+    static final CollectionReference promosRef =
+            FirebaseFirestore.getInstance().collection("promotions"),
+            usersRef = FirebaseFirestore.getInstance().collection("users");
 
-  final Context context;
-  private final FirebaseUser currentUser =
-          FirebaseAuth.getInstance().getCurrentUser();
-  public PlayerView videoPlayerView;
-  public SimpleExoPlayer newExoPlayer;
+    final Context context;
+    private final FirebaseUser currentUser =
+            FirebaseAuth.getInstance().getCurrentUser();
+    public PlayerView videoPlayerView;
+    public SimpleExoPlayer newExoPlayer;
 
-  private ImageView videoUserImageIv, videoShareIv, videoFavsIv, videoPromoPlayIv;
-  private TextView videoUsernameTv;
-  private TextView videoTitleTv;
-  private TextView videoPriceTv;
-  private TextView videoCategoryTv;
-  private TextView videoViewsTv;
-  private TextView videoFavsTv;
-  private final Promotion promotion;
-  //  private Bitmap sharedBitmap;
-  private File file;
+    private ImageView videoUserImageIv, videoShareIv, videoFavsIv, videoPromoPlayIv;
+    private TextView videoUsernameTv;
+    private TextView videoTitleTv;
+    private TextView videoPriceTv;
+    private TextView videoCategoryTv;
+    private TextView videoViewsTv;
+    private TextView videoFavsTv;
+    private final Promotion promotion;
+    //  private Bitmap sharedBitmap;
+    private File file;
 //  private boolean isDialogFragment;
 //  private boolean isSharingPromo,isResumedFromAd,wasStopped;
 
-  private DocumentReference currentPromoRef, currentUserRef;
+    private DocumentReference currentPromoRef, currentUserRef;
 
-  public VideoPageVerticalFragment(Context context, Promotion promotion) {
-    this.context = context;
-    this.promotion = promotion;
-  }
-
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    if (!promotion.getUid().equals(Objects.requireNonNull(currentUser).getUid()))
-      promosRef.whereEqualTo("promoid", promotion.getPromoid())
-              .get().addOnSuccessListener(snapshots ->
-              snapshots.getDocuments().get(0).getReference()
-                      .update("viewcount", FieldValue.increment(1)));
-
-
-    if (GlobalVariables.getVideoViewedCount() != 0
-            && GlobalVariables.getVideoViewedCount() % 5 == 0) {
-      InterstitialAdUtil.showAd(context);
+    public VideoPageVerticalFragment(Context context, Promotion promotion) {
+        this.context = context;
+        this.promotion = promotion;
     }
 
-  }
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (!promotion.getUid().equals(Objects.requireNonNull(currentUser).getUid()))
+            promosRef.whereEqualTo("promoid", promotion.getPromoid())
+                    .get().addOnSuccessListener(snapshots ->
+                    snapshots.getDocuments().get(0).getReference()
+                            .update("viewcount", FieldValue.increment(1)));
 
 
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-
-    View view = inflater.inflate(R.layout.fragment_video_view_pager_item,
-            container, false);
-
-    TextView videoShowTv = view.findViewById(R.id.videoShowTv);
-
-    videoPlayerView = view.findViewById(R.id.videoPlayerView);
-    videoUserImageIv = view.findViewById(R.id.videoUserImageIv);
-    videoUsernameTv = view.findViewById(R.id.videoUsernameTv);
-    videoTitleTv = view.findViewById(R.id.videoTitleTv);
-    videoPriceTv = view.findViewById(R.id.videoPriceTv);
-    videoCategoryTv = view.findViewById(R.id.videoCategoryTv);
-
-
-    videoViewsTv = view.findViewById(R.id.videoViewsTv);
-    videoFavsTv = view.findViewById(R.id.videoFavsTv);
-    videoShareIv = view.findViewById(R.id.videoShareIv);
-    videoPromoPlayIv = view.findViewById(R.id.videoPromoPlayIv);
-    videoFavsIv = view.findViewById(R.id.videoFavsIv);
-
-
-    final SpannableString s = new SpannableString(videoShowTv.getText());
-    s.setSpan(new UnderlineSpan(), 0, s.length(), 0);
-    videoShowTv.setText(s);
-
-    videoShowTv.setOnClickListener(this);
-
-    return view;
-  }
-
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-
-    videoTitleTv.setText(promotion.getTitle());
-    videoPriceTv.setText(String.format(Locale.getDefault(),
-            "%,d", (long) promotion.getPrice()) + " " + promotion.getCurrency());
-    videoCategoryTv.setText(promotion.getType());
-
-    videoViewsTv.setText(String.valueOf(promotion.getViewcount() + 1));
-    videoFavsTv.setText(String.valueOf(promotion.getFavcount()));
-
-    videoCategoryTv.setOnClickListener(this);
-
-    usersRef.whereEqualTo("userId", promotion.getUid())
-            .get().addOnSuccessListener(snapshots -> {
-
-      final DocumentSnapshot documentSnapshot = snapshots.getDocuments().get(0);
-
-      Picasso.get().load(documentSnapshot.getString("imageurl"))
-              .fit()
-              .into(videoUserImageIv);
-
-      videoUsernameTv.setText(documentSnapshot.getString("username"));
-
-      if (currentUser.isAnonymous()) {
-        videoFavsIv.setOnClickListener(view1 -> SigninUtil.getInstance(getContext(),
-                getActivity()).show());
-
-        videoUserImageIv.setOnClickListener(view12 -> showProfile());
-        videoUsernameTv.setOnClickListener(view1 -> showProfile());
-      } else {
-
-
-        promosRef.whereEqualTo("promoid", promotion.getPromoid()).get()
-                .addOnSuccessListener(snaps -> {
-                  currentPromoRef = snaps.getDocuments().get(0).getReference();
-                  currentPromoRef.update("viewcount", FieldValue.increment(1));
-                });
-
-        if (((List<String>) documentSnapshot.get("usersBlocked")).contains(currentUser.getUid())) {
-
-          videoFavsIv.setOnClickListener(v -> Toast.makeText(getContext(),
-                  "عذرا, لا يمكنك إضافة هذا الإعلان إلى المفضلة!",
-                  Toast.LENGTH_SHORT).show());
-          videoUserImageIv.setOnClickListener(v -> Toast.makeText(getContext(),
-                  "عذرا, لا يمكنك زيارة صفحة هذا المستخدم!", Toast.LENGTH_SHORT).show());
-
-          videoUsernameTv.setOnClickListener(v -> Toast.makeText(getContext(),
-                  "عذرا, لا يمكنك زيارة صفحة هذا المستخدم!", Toast.LENGTH_SHORT).show());
-
-        } else {
-
-          videoFavsIv.setOnClickListener(VideoPageVerticalFragment.this);
-          videoUserImageIv.setOnClickListener(VideoPageVerticalFragment.this);
-          videoUsernameTv.setOnClickListener(VideoPageVerticalFragment.this);
-          videoShareIv.setOnClickListener(VideoPageVerticalFragment.this);
-
+        if (GlobalVariables.getVideoViewedCount() != 0
+                && GlobalVariables.getVideoViewedCount() % 2 == 0) {
+            InterstitialAdUtil.showAd(context);
         }
 
-
-      }
-    });
+    }
 
 
-  }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_video_view_pager_item,
+                container, false);
+
+        TextView videoShowTv = view.findViewById(R.id.videoShowTv);
+
+        videoPlayerView = view.findViewById(R.id.videoPlayerView);
+        videoUserImageIv = view.findViewById(R.id.videoUserImageIv);
+        videoUsernameTv = view.findViewById(R.id.videoUsernameTv);
+        videoTitleTv = view.findViewById(R.id.videoTitleTv);
+        videoPriceTv = view.findViewById(R.id.videoPriceTv);
+        videoCategoryTv = view.findViewById(R.id.videoCategoryTv);
 
 
-  void pauseVideoIfPlaying(boolean hidePlayer) {
+        videoViewsTv = view.findViewById(R.id.videoViewsTv);
+        videoFavsTv = view.findViewById(R.id.videoFavsTv);
+        videoShareIv = view.findViewById(R.id.videoShareIv);
+        videoPromoPlayIv = view.findViewById(R.id.videoPromoPlayIv);
+        videoFavsIv = view.findViewById(R.id.videoFavsIv);
 
 
-    if (newExoPlayer != null) {
+        final SpannableString s = new SpannableString(videoShowTv.getText());
+        s.setSpan(new UnderlineSpan(), 0, s.length(), 0);
+        videoShowTv.setText(s);
 
-      if (hidePlayer) {
-        videoPlayerView.setVisibility(View.INVISIBLE);
-      }
+        videoShowTv.setOnClickListener(this);
 
-      if (newExoPlayer.getPlayWhenReady()) {
-        videoPromoPlayIv.setVisibility(View.VISIBLE);
-        newExoPlayer.setPlayWhenReady(false);
-      }
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        videoTitleTv.setText(promotion.getTitle());
+        videoPriceTv.setText(String.format(Locale.getDefault(),
+                "%,d", (long) promotion.getPrice()) + " " + promotion.getCurrency());
+        videoCategoryTv.setText(promotion.getType());
+
+        videoViewsTv.setText(String.valueOf(promotion.getViewcount() + 1));
+        videoFavsTv.setText(String.valueOf(promotion.getFavcount()));
+
+        videoCategoryTv.setOnClickListener(this);
+
+        usersRef.whereEqualTo("userId", promotion.getUid())
+                .get().addOnSuccessListener(snapshots -> {
+
+            final DocumentSnapshot documentSnapshot = snapshots.getDocuments().get(0);
+
+            Picasso.get().load(documentSnapshot.getString("imageurl"))
+                    .fit()
+                    .into(videoUserImageIv);
+
+            videoUsernameTv.setText(documentSnapshot.getString("username"));
+
+            if (currentUser.isAnonymous()) {
+                videoFavsIv.setOnClickListener(view1 -> SigninUtil.getInstance(getContext(),
+                        getActivity()).show());
+
+                videoUserImageIv.setOnClickListener(view12 -> showProfile());
+                videoUsernameTv.setOnClickListener(view1 -> showProfile());
+            } else {
+
+
+                promosRef.whereEqualTo("promoid", promotion.getPromoid()).get()
+                        .addOnSuccessListener(snaps -> {
+                            currentPromoRef = snaps.getDocuments().get(0).getReference();
+                            currentPromoRef.update("viewcount", FieldValue.increment(1));
+                        });
+
+                if (((List<String>) documentSnapshot.get("usersBlocked")).contains(currentUser.getUid())) {
+
+                    videoFavsIv.setOnClickListener(v -> Toast.makeText(getContext(),
+                            "عذرا, لا يمكنك إضافة هذا الإعلان إلى المفضلة!",
+                            Toast.LENGTH_SHORT).show());
+                    videoUserImageIv.setOnClickListener(v -> Toast.makeText(getContext(),
+                            "عذرا, لا يمكنك زيارة صفحة هذا المستخدم!", Toast.LENGTH_SHORT).show());
+
+                    videoUsernameTv.setOnClickListener(v -> Toast.makeText(getContext(),
+                            "عذرا, لا يمكنك زيارة صفحة هذا المستخدم!", Toast.LENGTH_SHORT).show());
+
+                } else {
+
+                    videoFavsIv.setOnClickListener(VideoPageVerticalFragment.this);
+                    videoUserImageIv.setOnClickListener(VideoPageVerticalFragment.this);
+                    videoUsernameTv.setOnClickListener(VideoPageVerticalFragment.this);
+                    videoShareIv.setOnClickListener(VideoPageVerticalFragment.this);
+
+                }
+
+
+            }
+        });
+
 
     }
-  }
 
-  public void playVideoIfPaused(boolean showPlayer) {
-    if (newExoPlayer != null && !newExoPlayer.getPlayWhenReady()) {
-      if (showPlayer) {
-        videoPlayerView.setVisibility(View.VISIBLE);
-      }
-      videoPromoPlayIv.setVisibility(View.INVISIBLE);
-      newExoPlayer.setPlayWhenReady(true);
+
+    void pauseVideoIfPlaying(boolean hidePlayer) {
+
+
+        if (newExoPlayer != null) {
+
+            if (hidePlayer) {
+                videoPlayerView.setVisibility(View.INVISIBLE);
+            }
+
+            if (newExoPlayer.getPlayWhenReady()) {
+                videoPromoPlayIv.setVisibility(View.VISIBLE);
+                newExoPlayer.setPlayWhenReady(false);
+            }
+
+        }
     }
-  }
 
-  @Override
-  public void onHiddenChanged(boolean hidden) {
-    super.onHiddenChanged(hidden);
+    public void playVideoIfPaused(boolean showPlayer) {
+        if (newExoPlayer != null && !newExoPlayer.getPlayWhenReady()) {
+            if (showPlayer) {
+                videoPlayerView.setVisibility(View.VISIBLE);
+            }
+            videoPromoPlayIv.setVisibility(View.INVISIBLE);
+            newExoPlayer.setPlayWhenReady(true);
+        }
+    }
 
-    Log.d("videoPager", "hidden changed for vertical fragment: " + hidden);
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        Log.d("videoPager", "hidden changed for vertical fragment: " + hidden);
 
 //    if(hidden){
 //
@@ -252,12 +252,12 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //    }
 
 
-  }
+    }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    Log.d("videoPager", "onStart vertical fragment");
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("videoPager", "onStart vertical fragment");
 
 //    newExoPlayer = new SimpleExoPlayer.Builder(getContext())
 //            .build();
@@ -267,53 +267,53 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //    newExoPlayer.setPlayWhenReady(true);
 
 
-  }
+    }
 
-  public void initializeAndPlayVideo() {
-    final DefaultTrackSelector trackSelector = new DefaultTrackSelector(getContext());
+    public void initializeAndPlayVideo() {
+        final DefaultTrackSelector trackSelector = new DefaultTrackSelector(getContext());
 
-    trackSelector.setParameters(
-            trackSelector.buildUponParameters().setMaxVideoSizeSd());
+        trackSelector.setParameters(
+                trackSelector.buildUponParameters().setMaxVideoSizeSd());
 
-    newExoPlayer = new SimpleExoPlayer.Builder(getContext())
-            .setTrackSelector(trackSelector).build();
-
-
-    final MediaSource mediaSource =
-            new ProgressiveMediaSource.Factory(new VideoDataSourceFactory(getContext()))
-                    .createMediaSource(MediaItem.fromUri(promotion.getVideoUrl()));
-
-    newExoPlayer.setMediaSource(mediaSource);
-    newExoPlayer.prepare();
-    newExoPlayer.setPlayWhenReady(true);
-
-    increaseVideoViewCount();
-
-    videoPlayerView.getVideoSurfaceView().setOnClickListener(view -> {
-
-      if (newExoPlayer != null) {
-        if (newExoPlayer.getPlaybackState() == SimpleExoPlayer.STATE_ENDED) {
-
-          newExoPlayer.seekTo(0);
-          newExoPlayer.setPlayWhenReady(true);
-          videoPromoPlayIv.setVisibility(View.INVISIBLE);
-          videoPromoPlayIv.setImageResource(R.drawable.play_arrow_white);
-
-          increaseVideoViewCount();
+        newExoPlayer = new SimpleExoPlayer.Builder(getContext())
+                .setTrackSelector(trackSelector).build();
 
 
-          if (GlobalVariables.getVideoViewedCount() != 0 &&
-                  GlobalVariables.getVideoViewedCount() % 5 == 0) {
-            InterstitialAdUtil.showAd(getContext());
-          }
+        final MediaSource mediaSource =
+                new ProgressiveMediaSource.Factory(new VideoDataSourceFactory(getContext()))
+                        .createMediaSource(MediaItem.fromUri(promotion.getVideoUrl()));
 
-        } else if (newExoPlayer.getPlayWhenReady()) {
-          pauseVideoIfPlaying(false);
-        } else {
-          playVideoIfPaused(false);
-        }
+        newExoPlayer.setMediaSource(mediaSource);
+        newExoPlayer.prepare();
+        newExoPlayer.setPlayWhenReady(true);
 
-      }
+        increaseVideoViewCount();
+
+        videoPlayerView.getVideoSurfaceView().setOnClickListener(view -> {
+
+            if (newExoPlayer != null) {
+                if (newExoPlayer.getPlaybackState() == SimpleExoPlayer.STATE_ENDED) {
+
+                    newExoPlayer.seekTo(0);
+                    newExoPlayer.setPlayWhenReady(true);
+                    videoPromoPlayIv.setVisibility(View.INVISIBLE);
+                    videoPromoPlayIv.setImageResource(R.drawable.play_arrow_white);
+
+                    increaseVideoViewCount();
+
+
+                    if (GlobalVariables.getVideoViewedCount() != 0 &&
+                            GlobalVariables.getVideoViewedCount() % 2 == 0) {
+                        InterstitialAdUtil.showAd(getContext());
+                    }
+
+                } else if (newExoPlayer.getPlayWhenReady()) {
+                    pauseVideoIfPlaying(false);
+                } else {
+                    playVideoIfPaused(false);
+                }
+
+            }
 
 //      Log.d("ttt", "player clicked");
 //      if(newExoPlayer!=null) {
@@ -353,29 +353,29 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //          newExoPlayer.setPlayWhenReady(true);
 //        }
 //      }
-    });
+        });
 
-    newExoPlayer.addListener(new Player.EventListener() {
-      @Override
-      public void onPlaybackStateChanged(int state) {
-        if (state == SimpleExoPlayer.STATE_ENDED) {
-          videoPromoPlayIv.setImageResource(R.drawable.replay_white);
-          videoPromoPlayIv.setVisibility(View.VISIBLE);
-        }
-      }
+        newExoPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onPlaybackStateChanged(int state) {
+                if (state == SimpleExoPlayer.STATE_ENDED) {
+                    videoPromoPlayIv.setImageResource(R.drawable.replay_white);
+                    videoPromoPlayIv.setVisibility(View.VISIBLE);
+                }
+            }
 
-    });
+        });
 
-    videoPlayerView.setPlayer(newExoPlayer);
+        videoPlayerView.setPlayer(newExoPlayer);
 
-  }
+    }
 
 
-  @Override
-  public void onResume() {
-    super.onResume();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-    playVideoIfPaused(false);
+        playVideoIfPaused(false);
 
 //    if(!wasStopped) {
 //      if (getParentFragment() != null) {
@@ -416,16 +416,16 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //      wasStopped = false;
 //    }
 
-    Log.d("videoPager", "resuming vertical fragment");
-  }
+        Log.d("videoPager", "resuming vertical fragment");
+    }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    Log.d("videoPager", "onPause vertical fragment");
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("videoPager", "onPause vertical fragment");
 
 
-    pauseVideoIfPlaying(false);
+        pauseVideoIfPlaying(false);
 
 //    if(getParentFragment() != null){
 //      if (InterstitialAdUtil.isIsAdShowing() || isSharingPromo) {
@@ -454,48 +454,48 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //      pauseVideoIfPlaying(false);
 //
 //    }
-  }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    Log.d("videoPager", "onDestroy vertical fragment");
-    if (newExoPlayer != null) {
-      videoPlayerView.setPlayer(null);
-      newExoPlayer.release();
-      newExoPlayer = null;
-    }
-  }
-
-  public void releasePlayer() {
-
-    if (newExoPlayer != null) {
-
-      videoPromoPlayIv.setVisibility(View.INVISIBLE);
-      videoPromoPlayIv.setImageResource(R.drawable.play_arrow_white);
-      videoPlayerView.setPlayer(null);
-      newExoPlayer.release();
-      newExoPlayer = null;
-
-    }
-  }
-
-  void showProfile() {
-
-    pauseVideoIfPlaying(false);
-
-    final UserFragment fragment = new UserFragment();
-
-    if (!promotion.getUid().equals(currentUser.getUid())) {
-      Bundle bundle = new Bundle();
-      bundle.putString("promouserid", promotion.getUid());
-      fragment.setArguments(bundle);
     }
 
-    ((HomeActivity) getActivity()).addFragmentToHomeContainer(fragment);
-    addObserver(fragment);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("videoPager", "onDestroy vertical fragment");
+        if (newExoPlayer != null) {
+            videoPlayerView.setPlayer(null);
+            newExoPlayer.release();
+            newExoPlayer = null;
+        }
+    }
+
+    public void releasePlayer() {
+
+        if (newExoPlayer != null) {
+
+            videoPromoPlayIv.setVisibility(View.INVISIBLE);
+            videoPromoPlayIv.setImageResource(R.drawable.play_arrow_white);
+            videoPlayerView.setPlayer(null);
+            newExoPlayer.release();
+            newExoPlayer = null;
+
+        }
+    }
+
+    void showProfile() {
+
+        pauseVideoIfPlaying(false);
+
+        final UserFragment fragment = new UserFragment();
+
+        if (!promotion.getUid().equals(currentUser.getUid())) {
+            Bundle bundle = new Bundle();
+            bundle.putString("promouserid", promotion.getUid());
+            fragment.setArguments(bundle);
+        }
+
+        ((HomeActivity) getActivity()).addFragmentToHomeContainer(fragment);
+        addObserver(fragment);
 //    fragment.show(getChildFragmentManager(), "UserFragment");
-  }
+    }
 
 //  void sharePromo() {
 //
@@ -580,148 +580,148 @@ public class VideoPageVerticalFragment extends Fragment implements View.OnClickL
 //    }
 //  }
 
-  void showCategory() {
+    void showCategory() {
 
-    final AllPromosFragment promosFragment = new AllPromosFragment();
-    final Bundle b = new Bundle();
-    b.putString("category", promotion.getType());
-    promosFragment.setArguments(b);
-    ((HomeActivity) getActivity()).addFragmentToHomeContainer(promosFragment);
+        final AllPromosFragment promosFragment = new AllPromosFragment();
+        final Bundle b = new Bundle();
+        b.putString("category", promotion.getType());
+        promosFragment.setArguments(b);
+        ((HomeActivity) getActivity()).addFragmentToHomeContainer(promosFragment);
 
-    addObserver(promosFragment);
-  }
-
-  void addObserver(Fragment fragment) {
-    fragment.getLifecycle().addObserver(new LifecycleEventObserver() {
-      @Override
-      public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-        if (event == Lifecycle.Event.ON_DESTROY) {
-//          if()
-          videoPlayerView.setVisibility(View.VISIBLE);
-//          playVideoIfPaused(true);
-          fragment.getLifecycle().removeObserver(this);
-        } else if (event == Lifecycle.Event.ON_START) {
-          pauseVideoIfPlaying(true);
-        }
-      }
-    });
-  }
-
-  void increaseVideoViewCount() {
-    GlobalVariables.setVideoViewedCount(GlobalVariables.getVideoViewedCount() + 1);
-  }
-
-  void changePromoFav(int type) {
-
-
-    currentPromoRef.update("favcount", FieldValue.increment(type == UN_FAV ? -1 : 1));
-
-    if (currentUserRef != null) {
-      updateFavForUser(type, currentPromoRef);
-    } else {
-      usersRef.whereEqualTo("userId", currentUser.getUid())
-              .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-        @Override
-        public void onSuccess(QuerySnapshot snapshots) {
-          currentUserRef = snapshots.getDocuments().get(0).getReference();
-          updateFavForUser(type, currentUserRef);
-        }
-      });
+        addObserver(promosFragment);
     }
 
+    void addObserver(Fragment fragment) {
+        fragment.getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (event == Lifecycle.Event.ON_DESTROY) {
+//          if()
+                    videoPlayerView.setVisibility(View.VISIBLE);
+//          playVideoIfPaused(true);
+                    fragment.getLifecycle().removeObserver(this);
+                } else if (event == Lifecycle.Event.ON_START) {
+                    pauseVideoIfPlaying(true);
+                }
+            }
+        });
+    }
 
-  }
+    void increaseVideoViewCount() {
+        GlobalVariables.setVideoViewedCount(GlobalVariables.getVideoViewedCount() + 1);
+    }
 
-  void updateFavForUser(int type, DocumentReference documentReference) {
+    void changePromoFav(int type) {
 
-    documentReference.update("favpromosids",
-            type == UN_FAV ?
-                    FieldValue.arrayRemove(promotion.getPromoid()) :
-                    FieldValue.arrayUnion(promotion.getPromoid())
-    )
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-              @Override
-              public void onSuccess(Void aVoid) {
+
+        currentPromoRef.update("favcount", FieldValue.increment(type == UN_FAV ? -1 : 1));
+
+        if (currentUserRef != null) {
+            updateFavForUser(type, currentPromoRef);
+        } else {
+            usersRef.whereEqualTo("userId", currentUser.getUid())
+                    .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot snapshots) {
+                    currentUserRef = snapshots.getDocuments().get(0).getReference();
+                    updateFavForUser(type, currentUserRef);
+                }
+            });
+        }
+
+
+    }
+
+    void updateFavForUser(int type, DocumentReference documentReference) {
+
+        documentReference.update("favpromosids",
+                type == UN_FAV ?
+                        FieldValue.arrayRemove(promotion.getPromoid()) :
+                        FieldValue.arrayUnion(promotion.getPromoid())
+        )
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
 //                if(type == UN_FAV){
 //                  GlobalVariables.getFavPromosIds().remove(promotion.getPromoid());
 //                }else{
 //                  GlobalVariables.getFavPromosIds().add(promotion.getPromoid());
 //                }
 
-                if (getContext() != null) {
+                        if (getContext() != null) {
 
-                  if (type == UN_FAV) {
-                    videoFavsIv.setImageResource(R.drawable.heart_grey_outlined);
+                            if (type == UN_FAV) {
+                                videoFavsIv.setImageResource(R.drawable.heart_grey_outlined);
 
-                    videoFavsTv.setText(String.valueOf(
-                            Integer.parseInt(videoFavsTv.getText().toString()) - 1));
+                                videoFavsTv.setText(String.valueOf(
+                                        Integer.parseInt(videoFavsTv.getText().toString()) - 1));
 
-                    Toast.makeText(getContext(), "تمت الازالة من المفضلة!",
-                            Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "تمت الازالة من المفضلة!",
+                                        Toast.LENGTH_SHORT).show();
 
-                  } else {
+                            } else {
 
-                    videoFavsIv.setImageResource(R.drawable.heart_icon);
+                                videoFavsIv.setImageResource(R.drawable.heart_icon);
 
-                    videoFavsTv.setText(String.valueOf(
-                            Integer.parseInt(videoFavsTv.getText().toString()) + 1));
+                                videoFavsTv.setText(String.valueOf(
+                                        Integer.parseInt(videoFavsTv.getText().toString()) + 1));
 
-                    Toast.makeText(getContext(), "تمت الإضافة من المفضلة!",
-                            Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "تمت الإضافة من المفضلة!",
+                                        Toast.LENGTH_SHORT).show();
 
-                  }
+                            }
 
-                  videoFavsIv.setClickable(true);
-                }
+                            videoFavsIv.setClickable(true);
+                        }
 
-              }
-            }).addOnFailureListener(new OnFailureListener() {
-      @Override
-      public void onFailure(@NonNull Exception e) {
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
-        videoFavsIv.setClickable(true);
+                videoFavsIv.setClickable(true);
 
-        Toast.makeText(getContext(),
-                type == UN_FAV ?
-                        "لقد فشلت الازالة من" :
-                        "لقد فشلت الإضافة إلى" +
-                                "المفضلة ! حاول مرة اخرى",
-                Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),
+                        type == UN_FAV ?
+                                "لقد فشلت الازالة من" :
+                                "لقد فشلت الإضافة إلى" +
+                                        "المفضلة ! حاول مرة اخرى",
+                        Toast.LENGTH_SHORT).show();
 
-      }
-    });
-  }
-
-  void showPromo() {
-
-    final Fragment fragment = new PromotionInfoFragment(promotion);
-
-    ((HomeActivity) getActivity()).addFragmentToHomeContainer(fragment);
-
-    addObserver(fragment);
-
-  }
-
-  @Override
-  public void onClick(View view) {
-    final int id = view.getId();
-    if (WifiUtil.checkWifiConnection(getContext())) {
-      if (id == R.id.videoFavsIv) {
-        videoFavsIv.setClickable(false);
-        changePromoFav(GlobalVariables.getFavPromosIds().contains(promotion.getPromoid())
-                ? UN_FAV : FAV);
-
-      } else if (id == R.id.videoUserImageIv || id == R.id.videoUsernameTv) {
-        showProfile();
-      } else if (id == R.id.videoShareIv) {
-        file = Promotion.sharePromo(promotion, getContext(), file, videoShareIv);
-      } else if (id == R.id.videoCategoryTv) {
-        showCategory();
-      } else if (id == R.id.videoShowTv) {
-        showPromo();
-      }
+            }
+        });
     }
-  }
+
+    void showPromo() {
+
+        final Fragment fragment = new PromotionInfoFragment(promotion);
+
+        ((HomeActivity) getActivity()).addFragmentToHomeContainer(fragment);
+
+        addObserver(fragment);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        final int id = view.getId();
+        if (WifiUtil.checkWifiConnection(getContext())) {
+            if (id == R.id.videoFavsIv) {
+                videoFavsIv.setClickable(false);
+                changePromoFav(GlobalVariables.getFavPromosIds().contains(promotion.getPromoid())
+                        ? UN_FAV : FAV);
+
+            } else if (id == R.id.videoUserImageIv || id == R.id.videoUsernameTv) {
+                showProfile();
+            } else if (id == R.id.videoShareIv) {
+                file = Promotion.sharePromo(promotion, getContext(), file, videoShareIv);
+            } else if (id == R.id.videoCategoryTv) {
+                showCategory();
+            } else if (id == R.id.videoShowTv) {
+                showPromo();
+            }
+        }
+    }
 
 
 }

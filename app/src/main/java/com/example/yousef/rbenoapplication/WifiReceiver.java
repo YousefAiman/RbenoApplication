@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class WifiReceiver extends BroadcastReceiver {
 
-  private static ConnectivityManager connectivityManager;
+    private static ConnectivityManager connectivityManager;
 //  private NotificationManager notificationManager;
 //  private  ConnectivityReceiverListener mConnectivityReceiverListener;
 //  public interface ConnectivityReceiverListener {
@@ -28,26 +28,26 @@ public class WifiReceiver extends BroadcastReceiver {
 //    return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 //  }
 
-  @Override
-  public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
 
-    if (connectivityManager == null)
-      connectivityManager = (ConnectivityManager) context.getApplicationContext()
-              .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null)
+            connectivityManager = (ConnectivityManager) context.getApplicationContext()
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
 
 
-    final NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+        final NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
 
-    if (netInfo != null &&
+        if (netInfo != null &&
 //            netInfo.getType() == ConnectivityManager.TYPE_WIFI
-            netInfo.isConnected()
-    ) {
-      Log.d("ttt", "wifi online");
-      GlobalVariables.setWifiIsOn(true);
-    } else {
-      GlobalVariables.setWifiIsOn(false);
-      Log.d("ttt", "wifi offline");
+                netInfo.isConnected()
+        ) {
+            Log.d("ttt", "wifi online");
+            GlobalVariables.setWifiIsOn(true);
+        } else {
+            GlobalVariables.setWifiIsOn(false);
+            Log.d("ttt", "wifi offline");
+        }
     }
-  }
 
 }

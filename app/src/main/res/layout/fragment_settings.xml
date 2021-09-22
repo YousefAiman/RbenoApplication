@@ -106,6 +106,7 @@
     <include layout="@layout/settings_grey_seperator_layout" />
 
     <LinearLayout
+        android:id="@+id/privacyPolicyLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -140,6 +141,7 @@
     <include layout="@layout/settings_grey_seperator_layout" />
 
     <LinearLayout
+        android:id="@+id/contactUsLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -174,6 +176,7 @@
     <include layout="@layout/settings_grey_seperator_layout" />
 
     <LinearLayout
+        android:id="@+id/aboutAppLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -237,4 +240,20 @@
     </LinearLayout>
 
     <include layout="@layout/settings_grey_seperator_layout" />
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-6990486336142688/1758387074"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
 </LinearLayout>

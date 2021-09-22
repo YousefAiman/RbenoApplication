@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".VideoPageVerticalFragment"
     android:layoutDirection="ltr"
+    android:background="@color/pcBlack"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.exoplayer2.ui.PlayerView
@@ -12,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:use_controller="false"
-        app:resize_mode="fill"
+        app:resize_mode="fit"
         android:orientation="vertical" />
 
     <ImageView

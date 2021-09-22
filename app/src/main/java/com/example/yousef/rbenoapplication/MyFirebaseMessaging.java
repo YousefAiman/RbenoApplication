@@ -31,77 +31,77 @@ import java.util.concurrent.ExecutionException;
 
 public class MyFirebaseMessaging extends FirebaseMessagingService {
 
-  static int notificationNum = 0;
-  private NotificationManager notificationManager;
-  private SharedPreferences sharedPreferences;
+    static int notificationNum = 0;
+    private NotificationManager notificationManager;
+    private SharedPreferences sharedPreferences;
 
-  @Override
-  public void onNewToken(@NonNull String s) {
-    super.onNewToken(s);
-    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+    @Override
+    public void onNewToken(@NonNull String s) {
+        super.onNewToken(s);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
-      String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-      FirebaseFirestore.getInstance().collection("users")
-              .whereEqualTo("userId", currentUid)
-              .get()
-              .addOnSuccessListener(snapshots ->
-                      snapshots.getDocuments().get(0).getReference().update("token", s));
-      Log.d("ttt", "new token: " + s);
+            FirebaseFirestore.getInstance().collection("users")
+                    .whereEqualTo("userId", currentUid)
+                    .get()
+                    .addOnSuccessListener(snapshots ->
+                            snapshots.getDocuments().get(0).getReference().update("token", s));
+            Log.d("ttt", "new token: " + s);
+        }
+
     }
 
-  }
-
-  @Override
-  public void onCreate() {
-    super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
 
-    Log.d("ttt", "mesageing servie create dman");
-  }
-
-  @Override
-  public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-    super.onMessageReceived(remoteMessage);
-    Log.d("ttt", "message received");
-
-    Log.d("ttt", "from: " + remoteMessage.getData().get("user"));
-
-    final String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-    if (remoteMessage.getData().get("user").equals(currentUid)) {
-      Log.d("ttt", "this notification is from me wtf");
-      return;
+        Log.d("ttt", "mesageing servie create dman");
     }
+
+    @Override
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+        Log.d("ttt", "message received");
+
+        Log.d("ttt", "from: " + remoteMessage.getData().get("user"));
+
+        final String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        if (remoteMessage.getData().get("user").equals(currentUid)) {
+            Log.d("ttt", "this notification is from me wtf");
+            return;
+        }
 
 //  if(remoteMessage.getFrom().equals(currentUid))
 
 
 //  if (firebaseUser != null) {
-    if (notificationManager == null) {
-      notificationManager = (NotificationManager)
-              getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-    if (sharedPreferences == null) {
-      sharedPreferences = getSharedPreferences("rbeno", Context.MODE_PRIVATE);
-    }
-    try {
-      if (remoteMessage.getData().get("type").equals("message")) {
-        if (sharedPreferences.contains("currentMessagingUserId")) {
-          final Map<String, String> data = remoteMessage.getData();
+        if (notificationManager == null) {
+            notificationManager = (NotificationManager)
+                    getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+        if (sharedPreferences == null) {
+            sharedPreferences = getSharedPreferences("rbeno", Context.MODE_PRIVATE);
+        }
+        try {
+            if (remoteMessage.getData().get("type").equals("message")) {
+                if (sharedPreferences.contains("currentMessagingUserId")) {
+                    final Map<String, String> data = remoteMessage.getData();
 
-          if (data.get("user")
-                  .equals(sharedPreferences.getString("currentMessagingUserId", "")) &&
-                  Long.parseLong(data.get("promoId")) ==
-                          sharedPreferences.getLong("currentMessagingPromoId", 0)) {
+                    if (data.get("user")
+                            .equals(sharedPreferences.getString("currentMessagingUserId", "")) &&
+                            Long.parseLong(data.get("promoId")) ==
+                                    sharedPreferences.getLong("currentMessagingPromoId", 0)) {
 
-            if (sharedPreferences.contains("isPaused") &&
-                    sharedPreferences.getBoolean("isPaused", false)) {
-              sendNotification(remoteMessage);
-            }
-          } else {
-            sendNotification(remoteMessage);
-          }
+                        if (sharedPreferences.contains("isPaused") &&
+                                sharedPreferences.getBoolean("isPaused", false)) {
+                            sendNotification(remoteMessage);
+                        }
+                    } else {
+                        sendNotification(remoteMessage);
+                    }
 
 //          if (!(data.get("user").equals(sharedPreferences.getString("currentMessagingUserId",
 //                  "")) &&
@@ -117,92 +117,92 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //          } else {
 //            sendNotification(remoteMessage);
 //          }
-        } else {
-          sendNotification(remoteMessage);
+                } else {
+                    sendNotification(remoteMessage);
+                }
+            } else {
+                sendNotification(remoteMessage);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
         }
-      } else {
-        sendNotification(remoteMessage);
-      }
-    } catch (ExecutionException | InterruptedException e) {
-      e.printStackTrace();
-    }
 //        }
-  }
-
-  public void sendNotification(RemoteMessage remoteMessage) throws ExecutionException, InterruptedException {
-
-    Log.d("ttt", "sending notification");
-
-    final Map<String, String> data = remoteMessage.getData();
-//    final String title = data.get("title");
-    final String type = data.get("type");
-
-    Log.d("ttt", "type: " + type);
-    createChannel(type);
-
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, type)
-            .setSmallIcon(R.drawable.rbeno_logo_png)
-            .setContentTitle(data.get("title"))
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-            .setContentText(data.get("body"))
-            .setAutoCancel(true);
-
-    builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-
-    if (data.containsKey("imageUrl")) {
-      builder.setLargeIcon(
-              Glide.with(this)
-                      .asBitmap()
-                      .apply(new RequestOptions().override(100, 100))
-                      .centerCrop()
-                      .load(data.get("imageUrl"))
-                      .submit()
-                      .get());
-    } else {
-      Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.rbeno_logo_png);
-      builder.setLargeIcon(bitmap);
     }
 
+    public void sendNotification(RemoteMessage remoteMessage) throws ExecutionException, InterruptedException {
 
-    builder.setGroup(type);
+        Log.d("ttt", "sending notification");
+
+        final Map<String, String> data = remoteMessage.getData();
+//    final String title = data.get("title");
+        final String type = data.get("type");
+
+        Log.d("ttt", "type: " + type);
+        createChannel(type);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, type)
+                .setSmallIcon(R.drawable.logo_icon_external)
+                .setContentTitle(data.get("title"))
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setContentText(data.get("body"))
+                .setAutoCancel(true);
+
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        if (data.containsKey("imageUrl")) {
+            builder.setLargeIcon(
+                    Glide.with(this)
+                            .asBitmap()
+                            .apply(new RequestOptions().override(100, 100))
+                            .centerCrop()
+                            .load(data.get("imageUrl"))
+                            .submit()
+                            .get());
+        } else {
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo_icon_external);
+            builder.setLargeIcon(bitmap);
+        }
 
 
-    if (GlobalVariables.getMessagesNotificationMap() == null)
-      GlobalVariables.setMessagesNotificationMap(new HashMap<>());
+        builder.setGroup(type);
 
-    final String identifierTitle = data.get("user") + type + data.get("promoId");
 
-    builder.setDeleteIntent(
-            PendingIntent.getBroadcast(this, notificationNum,
-                    new Intent(this, NotificationDeleteListener.class)
-                            .putExtra("notificationIdentifierTitle", identifierTitle)
-                    , PendingIntent.FLAG_UPDATE_CURRENT));
+        if (GlobalVariables.getMessagesNotificationMap() == null)
+            GlobalVariables.setMessagesNotificationMap(new HashMap<>());
 
-    if (type.equals("message")) {
+        final String identifierTitle = data.get("user") + type + data.get("promoId");
+
+        builder.setDeleteIntent(
+                PendingIntent.getBroadcast(this, notificationNum,
+                        new Intent(this, NotificationDeleteListener.class)
+                                .putExtra("notificationIdentifierTitle", identifierTitle)
+                        , PendingIntent.FLAG_UPDATE_CURRENT));
+
+        if (type.equals("message")) {
 
 //      final Intent newIntent = new Intent(this, MessagingActivity.class);
 //      final Intent newIntent = new Intent(
 //              "com.example.yousef.rbenoapplication.notificationClick");
 
-      final Intent newIntent = new Intent(this, NotificationClickReceiver.class);
+            final Intent newIntent = new Intent(this, NotificationClickReceiver.class);
 
 
-      newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //      TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
 
-      final Bundle messagingBundle = new Bundle();
-      messagingBundle.putString("promouserid", data.get("user"));
-      messagingBundle.putLong("intendedpromoid", Long.parseLong(data.get("promoId")));
+            final Bundle messagingBundle = new Bundle();
+            messagingBundle.putString("promouserid", data.get("user"));
+            messagingBundle.putLong("intendedpromoid", Long.parseLong(data.get("promoId")));
 
-      newIntent.putExtra("messagingBundle", messagingBundle);
+            newIntent.putExtra("messagingBundle", messagingBundle);
 
 //      stackBuilder.addNextIntentWithParentStack(newIntent);
 //      newIntent.putExtra("promouserid", data.get("user"));
 //      newIntent.putExtra("intendedpromoid", Long.parseLong(data.get("promoId")));
 //      newIntent.putExtra("senderusername",data.get("username"));
-      Log.d("ttt", "id: " + data.get("promoId") + "-" + data.get("user")
-              + "-" + data.get("username"));
+            Log.d("ttt", "id: " + data.get("promoId") + "-" + data.get("user")
+                    + "-" + data.get("username"));
 
 //      PendingIntent pendingIntent =
 //              stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
@@ -231,40 +231,40 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //      }
 
 
-      PendingIntent pendingIntent = PendingIntent
-              .getBroadcast(this, notificationNum, newIntent,
-                      PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent
+                    .getBroadcast(this, notificationNum, newIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
 
-      builder.setContentIntent(pendingIntent);
+            builder.setContentIntent(pendingIntent);
 
 
 //      final String identifierTitle = "رسالة جديد من: " +
 //      data.get("user")+" بخصوص اعلان #"+data.get("promoId");
-      NotificationManagerCompat manager = NotificationManagerCompat.from(this);
+            NotificationManagerCompat manager = NotificationManagerCompat.from(this);
 
-      if (!GlobalVariables.getMessagesNotificationMap().containsKey(identifierTitle)) {
-        notificationNum++;
+            if (!GlobalVariables.getMessagesNotificationMap().containsKey(identifierTitle)) {
+                notificationNum++;
 //        builder.setNumber(notificationNum);
-        GlobalVariables.getMessagesNotificationMap().put(identifierTitle, notificationNum);
-        Log.d("ttt", "this notification doesn't exist so building");
-        manager.notify(notificationNum, builder.build());
+                GlobalVariables.getMessagesNotificationMap().put(identifierTitle, notificationNum);
+                Log.d("ttt", "this notification doesn't exist so building");
+                manager.notify(notificationNum, builder.build());
 //        notificationManager.notify(notificationNum, builder.build());
-        updateNotificationSent(data.get("user"), data.get("promoId"), type);
+                updateNotificationSent(data.get("user"), data.get("promoId"), type);
 
-        if (Build.VERSION.SDK_INT < 26) {
-          BadgeUtil.incrementBadgeNum(this);
-        }
+                if (Build.VERSION.SDK_INT < 26) {
+                    BadgeUtil.incrementBadgeNum(this);
+                }
 
-      } else {
-        Log.d("ttt", "this notification already exists just updating");
-        manager.notify(GlobalVariables.getMessagesNotificationMap().get(identifierTitle)
-                , builder.build());
+            } else {
+                Log.d("ttt", "this notification already exists just updating");
+                manager.notify(GlobalVariables.getMessagesNotificationMap().get(identifierTitle)
+                        , builder.build());
 //        notificationManager.notify(GlobalVariables.getMessagesNotificationMap()
 //                .get(identifierTitle), builder.build());
 //        notificationManager.notify(GlobalVariables.getMessagesNotificationMap()
 //                .get(identifierTitle), builder.build());
-      }
-    } else {
+            }
+        } else {
 
 //      builder.setDeleteIntent(
 //              PendingIntent.getBroadcast(this, notificationNum,
@@ -273,10 +273,10 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //                      , PendingIntent.FLAG_ONE_SHOT)
 //      );
 
-      if (Build.VERSION.SDK_INT < 26) {
-        BadgeUtil.incrementBadgeNum(this);
-      }
-      notificationNum++;
+            if (Build.VERSION.SDK_INT < 26) {
+                BadgeUtil.incrementBadgeNum(this);
+            }
+            notificationNum++;
 //      builder.setNumber(notificationNum);
 //
 //      String identifierTitle = data.get("user")+type+data.get("promoId");
@@ -288,11 +288,11 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //                              ,PendingIntent.FLAG_UPDATE_CURRENT));
 
 
-      GlobalVariables.getMessagesNotificationMap().put(identifierTitle, notificationNum);
+            GlobalVariables.getMessagesNotificationMap().put(identifierTitle, notificationNum);
 
-      updateNotificationSent(data.get("user"), data.get("promoId"), type);
-      notificationManager.notify(notificationNum, builder.build());
-    }
+            updateNotificationSent(data.get("user"), data.get("promoId"), type);
+            notificationManager.notify(notificationNum, builder.build());
+        }
 
 
 //    if(Build.VERSION.SDK_INT < 26){
@@ -385,33 +385,33 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //      notificationManager.notify(notificationNum,builder.build());
 ////    previousNotifications.add(builder.build())
 //    };
-  }
+    }
 
-  void updateNotificationSent(String user, String promoId, String type) {
+    void updateNotificationSent(String user, String promoId, String type) {
 
-    if (FirebaseAuth.getInstance().getCurrentUser() == null)
-      return;
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
 
 
-    String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-    Log.d("ttt", "current user id: " + currentUid + " user: " + user + " promoid: " + promoId + " type: " + type);
+        Log.d("ttt", "current user id: " + currentUid + " user: " + user + " promoid: " + promoId + " type: " + type);
 
-    FirebaseFirestore.getInstance().collection("notifications")
-            .whereEqualTo("receiverId", currentUid).whereEqualTo("senderId", user)
-            .whereEqualTo("promoId", Long.valueOf(promoId)).whereEqualTo("type", type).get()
-            .addOnSuccessListener(snapshots -> {
-              if (!snapshots.isEmpty()) {
-                Log.d("ttt", "found this notificaiton and updating it to sent");
-                snapshots.getDocuments().get(0).getReference().update("sent", true);
-              }
-            }).addOnFailureListener(new OnFailureListener() {
-      @Override
-      public void onFailure(@NonNull Exception e) {
-        Log.d("ttt", "failed because: " + e.getMessage());
-      }
-    });
-  }
+        FirebaseFirestore.getInstance().collection("notifications")
+                .whereEqualTo("receiverId", currentUid).whereEqualTo("senderId", user)
+                .whereEqualTo("promoId", Long.valueOf(promoId)).whereEqualTo("type", type).get()
+                .addOnSuccessListener(snapshots -> {
+                    if (!snapshots.isEmpty()) {
+                        Log.d("ttt", "found this notificaiton and updating it to sent");
+                        snapshots.getDocuments().get(0).getReference().update("sent", true);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ttt", "failed because: " + e.getMessage());
+            }
+        });
+    }
 
 //  public static void setBadge(Context context, int count) {
 //    String launcherClassName = getLauncherClassName(context);
@@ -442,20 +442,20 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 //    return null;
 //  }
 
-  public void createChannel(String channelId) {
-    if (Build.VERSION.SDK_INT >= 26) {
-      if (notificationManager.getNotificationChannel(channelId) == null) {
-        Log.d("ttt", "didn't find: " + channelId);
-        Log.d("ttt", "creating notificaiton channel");
-        NotificationChannel channel = new NotificationChannel(channelId, channelId + " channel", NotificationManager.IMPORTANCE_HIGH);
-        channel.setShowBadge(true);
-        channel.setDescription("notifications");
-        channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
-        channel.enableVibration(true);
-        notificationManager.createNotificationChannel(channel);
-      }
+    public void createChannel(String channelId) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                Log.d("ttt", "didn't find: " + channelId);
+                Log.d("ttt", "creating notificaiton channel");
+                NotificationChannel channel = new NotificationChannel(channelId, channelId + " channel", NotificationManager.IMPORTANCE_HIGH);
+                channel.setShowBadge(true);
+                channel.setDescription("notifications");
+                channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), null);
+                channel.enableVibration(true);
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
     }
-  }
 
 
 //   public static class NotificationClickReceiver extends BroadcastReceiver {

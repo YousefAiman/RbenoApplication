@@ -34,7 +34,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,6 +61,8 @@
                 android:layout_marginTop="12dp"
                 android:scrollbars="none"
                 android:layoutDirection="rtl"
+                android:layout_gravity="center_horizontal"
+
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageTv">
@@ -69,7 +71,6 @@
                     android:id="@+id/scrollview"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <androidx.cardview.widget.CardView
@@ -269,6 +270,7 @@
                     app:cardCornerRadius="@dimen/_12sdp">
 
 
+
                     <ImageView
                         android:id="@+id/videoPromoImage"
                         android:layout_width="match_parent"
@@ -299,6 +301,18 @@
                         android:layout_marginTop="3dp"
                         android:layout_margin="4dp"
                         android:fontFamily="@font/a_google" />
+
+                    <ImageView
+                        android:id="@+id/videoPlayIv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/play_circle"
+                        android:scaleType="center"
+                        android:padding="10dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/play_arrow_white" />
+
 
                 </androidx.cardview.widget.CardView>
 
@@ -760,34 +774,21 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/phoneCheckBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:button="@drawable/checkbox_back"
-                    android:fontFamily="@font/a_google"
-                    android:paddingEnd="8dp"
-                    android:paddingStart="8dp"
-                    android:text="اخفاء رقم الهاتف"
-                    android:textColor="#929292"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <EditText
                     android:id="@+id/priceEd"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintWidth_percent="0.5"
                     android:background="@drawable/promotion_editetext_back"
+                    app:layout_constraintWidth_percent="0.4"
                     android:inputType="number"
                     android:maxLength="10"
+                    android:nextFocusDown="@id/descEd"
                     android:paddingStart="12dp"
                     android:paddingTop="9dp"
                     android:paddingEnd="12dp"
-                    android:nextFocusDown="@id/descEd"
                     android:paddingBottom="6dp"
+                    android:layout_marginStart="15dp"
                     android:textColor="@color/textGreyColor"
                     android:textColorHint="#929292"
                     android:textSize="12sp"
@@ -795,7 +796,24 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <Spinner
+                    android:id="@+id/currencySpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_custom_layout"
+                    android:dropDownWidth="match_parent"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginEnd="15dp"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/priceEd"
+                    app:layout_constraintEnd_toStartOf="@+id/priceEd"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/priceEd" />
+
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -856,6 +874,21 @@
                     android:paddingBottom="6dp"
                     android:textSize="12sp" />
             </LinearLayout>
+
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/phoneCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/checkbox_back"
+                android:layout_marginTop="12dp"
+                android:layoutDirection="rtl"
+                android:layout_marginStart="12dp"
+                android:paddingHorizontal="8dp"
+                android:fontFamily="@font/a_google"
+                android:text="اخفاء رقم الهاتف"
+                android:textColor="#929292"
+                android:textSize="12sp" />
 
             <android.widget.Button
                 android:id="@+id/addPromoBtn"

@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.4"
-            app:srcCompat="@drawable/rbeno_logo_png" />
+            app:srcCompat="@drawable/logo_icon_external" />
 
         <android.widget.Button
             android:id="@+id/signintoAccountBtn"

@@ -3,6 +3,7 @@ package com.example.yousef.rbenoapplication;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,38 +17,46 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-  private static final int
-          REQUEST_CHECK_SETTINGS = 100,
-          REQUEST_LOCATION_PERMISSION = 10;
+    private static final int
+            REQUEST_CHECK_SETTINGS = 100,
+            REQUEST_LOCATION_PERMISSION_TO_SLIDER = 11,
+            REQUEST_LOCATION_PERMISSION_TO_HOME = 12;
 
-  private LocationRequester locationRequester;
+    private LocationRequester locationRequester;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    private static final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
 
-    if (WifiUtil.isConnectedToInternet(this)) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-      if (getIntent().hasExtra("messagingBundle")) {
-        startMessagingActivity();
-      } else {
-        startHomeActivity();
-      }
 
-    } else {
+        MobileAds.initialize(this, initializationStatus -> directUserToAppropriateActivity());
 
-      startConnectionActivity();
+        FirebaseFirestore.getInstance().collection("users")
+                .get().addOnSuccessListener(snapshots -> {
 
-    }
+            for (DocumentSnapshot snapshot : snapshots) {
+                final String username = snapshot.getString("username");
+
+                final String lowerCaseTrimmedUsername = username.toLowerCase().trim().replaceAll("\\s", "");
+                snapshot.getReference().update("staticusername", "@" + lowerCaseTrimmedUsername,
+                        "usernameForSearch", lowerCaseTrimmedUsername);
+
+            }
+
+        });
 
 //    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //
@@ -99,7 +108,82 @@ public class MainActivity extends AppCompatActivity {
 //      }
 //
 //    }
-  }
+    }
+
+    private void directUserToAppropriateActivity() {
+
+        if (WifiUtil.isConnectedToInternet(this)) {
+
+            final SharedPreferences sharedPreferences =
+                    getSharedPreferences("rbeno", Context.MODE_PRIVATE);
+
+            if (!sharedPreferences.contains("notFirstTime")) {
+
+                Log.d("ttt", "doesn't contain first time");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+
+                    Log.d("ttt", "requesting location persmission");
+
+                    requestPermissions(permissions, REQUEST_LOCATION_PERMISSION_TO_SLIDER);
+
+                } else {
+
+
+                    new Handler().postDelayed(() -> {
+
+                        locationRequester = new LocationRequester(
+                                MainActivity.this,
+                                MainActivity.this,
+                                SliderActivity.class);
+
+                        locationRequester.geCountryFromLocation();
+                    }, 1000);
+
+                }
+
+
+            } else if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+
+                if (getIntent().hasExtra("messagingBundle")) {
+                    startMessagingActivity();
+                } else {
+                    startHomeActivity();
+                }
+
+
+            } else {
+
+                Log.d("ttt", "contains first time");
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+
+                    Log.d("ttt", "requesting location persmission");
+
+                    requestPermissions(permissions, REQUEST_LOCATION_PERMISSION_TO_HOME);
+
+                } else {
+
+                    new Handler().postDelayed(() -> FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(authResult -> intilizeLocationRequester(HomeActivity.class)).addOnFailureListener(e -> {
+
+                        Toast.makeText(MainActivity.this,
+                                "حصلت مشكلة اثناء محاولة الدخول الى التطبيق!", Toast.LENGTH_SHORT).show();
+                        finish();
+
+                    }), 500);
+                }
+
+            }
+        } else {
+
+            startConnectionActivity();
+
+        }
+
+    }
+
 //    public boolean isLoggedIn() {
 //        AccessToken accessToken = AccessToken.getCurrentAccessToken();
 //        return accessToken != null && !accessToken.isExpired();
@@ -109,187 +193,217 @@ public class MainActivity extends AppCompatActivity {
 //  }
 
 
-  private void startMessagingActivity() {
-    new Handler().postDelayed(() -> {
+    private void startMessagingActivity() {
+        new Handler().postDelayed(() -> {
 
-      startActivity(new Intent(MainActivity.this, MessagingRealTimeActivity.class)
-              .putExtra("messagingBundle",
-                      getIntent().getBundleExtra("messagingBundle")));
+            startActivity(new Intent(MainActivity.this, MessagingRealTimeActivity.class)
+                    .putExtra("messagingBundle",
+                            getIntent().getBundleExtra("messagingBundle")));
 
-      finish();
-    }, 500);
-  }
+            finish();
+        }, 500);
+    }
 
-  private void startConnectionActivity() {
-    new Handler().postDelayed(() -> {
-      startActivityForResult(new Intent(MainActivity.this, ConnectionActivity.class),
-              ConnectionActivity.CONNECTION_RESULT);
-    }, 800);
-  }
+    private void startConnectionActivity() {
+        new Handler().postDelayed(() -> {
+            startActivityForResult(new Intent(MainActivity.this, ConnectionActivity.class),
+                    ConnectionActivity.CONNECTION_RESULT);
+        }, 800);
+    }
 
-  private void startHomeActivity() {
+    private void startHomeActivity() {
 
-    GlobalVariables.setAppIsRunning(true);
+        GlobalVariables.setAppIsRunning(true);
 
-    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    if (user != null) {
-      if (!user.isAnonymous()) {
+        if (user != null) {
+            if (!user.isAnonymous()) {
 
-        startService(new Intent(this, MyFirebaseMessaging.class));
+                startService(new Intent(this, MyFirebaseMessaging.class));
 
-        FirebaseFirestore.getInstance().collection("users")
-                .whereEqualTo("userId", user.getUid())
-                .get().addOnSuccessListener(snapshots -> {
-          final DocumentSnapshot documentSnapshot = snapshots.getDocuments().get(0);
-          if (documentSnapshot.contains("remembered")
-                  && documentSnapshot.getBoolean("remembered")) {
+                FirebaseFirestore.getInstance().collection("users")
+                        .document(user.getUid())
+                        .get().addOnSuccessListener(snapshot -> {
+
+
+                    if (snapshot.contains("remembered")
+                            && snapshot.getBoolean("remembered")) {
+
+                        GlobalVariables.setBlockedUsers((List<String>) snapshot.get("usersBlocked"));
+                        GlobalVariables.setCurrentToken(snapshot.getString("token"));
 
 //            startService(new Intent(MainActivity.this,MyFirebaseMessaging.class));
 
-            getApplicationContext().getPackageManager().setComponentEnabledSetting(
-                    new ComponentName(this.getApplicationContext(), MyFirebaseMessaging.class),
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
+                        getApplicationContext().getPackageManager().setComponentEnabledSetting(
+                                new ComponentName(this.getApplicationContext(), MyFirebaseMessaging.class),
+                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                                PackageManager.DONT_KILL_APP);
 
 //            FirebaseMessaging.getInstance().subscribeToTopic(user.getUid());
 //            updateToken(FirebaseInstanceId.getInstance()., documentSnapshot.getId());
 
-            locationRequester = new LocationRequester(MainActivity.this, this,
-                    HomeActivity.class);
-            locationRequester.geCountryFromLocation();
+                        intilizeLocationRequester(HomeActivity.class);
 
 //            startActivity(new Intent(MainActivity.this, HomeActivity.class));
 //            finish();
-          } else {
-            new Handler().postDelayed(() -> {
-              startActivity(new Intent(MainActivity.this, SigninActivity.class)
-                      .putExtra("email", user.getEmail()));
-              finish();
-            }, 500);
-          }
-        }).addOnFailureListener(new OnFailureListener() {
-          @Override
-          public void onFailure(@NonNull Exception e) {
-            startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
-            finish();
-          }
-        });
-      } else {
+                    } else {
+                        new Handler().postDelayed(() -> {
+                            startActivity(new Intent(MainActivity.this, SigninActivity.class)
+                                    .putExtra("email", user.getEmail()));
+                            finish();
+                        }, 500);
+                    }
+                }).addOnFailureListener(e -> {
 
-        final SharedPreferences sharedPreferences = getSharedPreferences("rbeno", MODE_PRIVATE);
-        if (sharedPreferences.contains("countryCode")) {
+                    FirebaseAuth.getInstance().signOut();
 
-          GlobalVariables.getInstance().setCountryCode(sharedPreferences.getString("countryCode", ""));
+                    startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
+                    finish();
+                });
+            } else {
 
-          new Handler().postDelayed(() -> {
-            startActivity(new Intent(MainActivity.this, HomeActivity.class));
-            finish();
-          }, 500);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
 
+                    requestPermissions(permissions, REQUEST_LOCATION_PERMISSION_TO_HOME);
+
+                } else {
+                    intilizeLocationRequester(HomeActivity.class);
+                }
+
+//                final SharedPreferences sharedPreferences = getSharedPreferences("rbeno", MODE_PRIVATE);
+//                if (sharedPreferences.contains("countryCode")) {
+//
+//                    GlobalVariables.getInstance().setCountryCode(sharedPreferences.getString("countryCode", ""));
+//
+//                    new Handler().postDelayed(() -> {
+//                        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+//                        finish();
+//                    }, 500);
+//
+//                } else {
+//
+//
+//
+//                    new Handler().postDelayed(() -> {
+//                        startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
+//                        finish();
+//                    }, 500);
+//                }
+
+            }
         } else {
-          new Handler().postDelayed(() -> {
-            startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
-            finish();
-          }, 500);
+
+
+            final SharedPreferences sharedPreferences = getSharedPreferences("rbeno", MODE_PRIVATE);
+            if (sharedPreferences.contains("countryCode")) {
+
+                GlobalVariables.getInstance().setCountryCode(sharedPreferences.getString("countryCode", ""));
+
+                FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(authResult -> {
+                    startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                    finish();
+                });
+            } else {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+
+                    Log.d("ttt", "requesting location persmission");
+
+                    requestPermissions(permissions, REQUEST_LOCATION_PERMISSION_TO_HOME);
+
+                } else {
+                    intilizeLocationRequester(HomeActivity.class);
+                }
+
+            }
         }
 
-      }
-    } else {
+    }
 
+    void intilizeLocationRequester(Class<?> targetActivity) {
+        Log.d("ttt", "location requester");
+        locationRequester = new LocationRequester(MainActivity.this, this, targetActivity);
+        locationRequester.geCountryFromLocation();
+    }
 
-      final SharedPreferences sharedPreferences = getSharedPreferences("rbeno", MODE_PRIVATE);
-      if (sharedPreferences.contains("countryCode")) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
 
-        GlobalVariables.getInstance().setCountryCode(sharedPreferences.getString("countryCode", ""));
+        if (requestCode == REQUEST_LOCATION_PERMISSION_TO_HOME ||
+                requestCode == REQUEST_LOCATION_PERMISSION_TO_SLIDER) {
 
-        FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(authResult -> {
-          startActivity(new Intent(MainActivity.this, HomeActivity.class));
-          finish();
-        });
-      } else {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-        final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+                switch (requestCode) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+                    case REQUEST_LOCATION_PERMISSION_TO_HOME:
+                        intilizeLocationRequester(HomeActivity.class);
+                        break;
 
-          Log.d("ttt", "requesting location persmission");
+                    case REQUEST_LOCATION_PERMISSION_TO_SLIDER:
+                        intilizeLocationRequester(SliderActivity.class);
+                        break;
 
-          requestPermissions(permissions, REQUEST_LOCATION_PERMISSION);
+                }
 
-        } else {
-          intilizeLocationRequester();
+            } else {
+                Toast.makeText(this,
+                        "هذا التطبيق يحتاج الى الوصول الى موقعك بهدف اظهار اعلانات من دولتك",
+                        Toast.LENGTH_LONG).show();
+
+                new Handler().postDelayed(() -> finish(), 1500);
+            }
         }
 
-      }
     }
 
-  }
-
-  void intilizeLocationRequester() {
-    Log.d("ttt", "location requester");
-    locationRequester = new LocationRequester(MainActivity.this, this);
-    locationRequester.geCountryFromLocation();
-  }
-
-  @Override
-  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                         @NonNull int[] grantResults) {
-
-    if (requestCode == REQUEST_LOCATION_PERMISSION) {
-      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        intilizeLocationRequester();
-      } else {
-        Toast.makeText(this,
-                "هذا التطبيق يحتاج الى الوصول الى موقعك بهدف اظهار اعلانات من دولتك",
-                Toast.LENGTH_LONG).show();
-      }
-    }
-
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == REQUEST_CHECK_SETTINGS) {
-      if (resultCode == Activity.RESULT_CANCELED) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            if (resultCode == Activity.RESULT_CANCELED) {
 //        locationRequester.mRequestingLocationUpdates = false;
-        Log.d("ttt", "RESULT_CANCELED");
+                Log.d("ttt", "RESULT_CANCELED");
 
-      } else {
+            } else {
 
 //        LocationRequester.getNewCountry(this);
 
-        Log.d("ttt", "result ok man");
-        locationRequester.getLastKnownLocation();
+                Log.d("ttt", "result ok man");
+//                locationRequester.getLastKnownLocation();
+                directUserToAppropriateActivity();
+            }
+        } else if (resultCode == ConnectionActivity.CONNECTION_RESULT) {
 
-      }
-    } else if (resultCode == ConnectionActivity.CONNECTION_RESULT) {
+            directUserToAppropriateActivity();
 
-      if (getIntent().hasExtra("messagingBundle")) {
-        startMessagingActivity();
-      } else {
-        startHomeActivity();
-      }
+//            if (getIntent().hasExtra("messagingBundle")) {
+//                startMessagingActivity();
+//            } else {
+//                startHomeActivity();
+//            }
 
+        }
     }
-  }
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    if (locationRequester != null) {
-      locationRequester.resumeLocationUpdates();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (locationRequester != null) {
+            locationRequester.resumeLocationUpdates();
+        }
     }
-  }
 
-  @Override
-  protected void onPause() {
-    super.onPause();
-    if (locationRequester != null) {
-      locationRequester.stopLocationUpdates();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (locationRequester != null) {
+            locationRequester.stopLocationUpdates();
+        }
     }
-  }
 
 }

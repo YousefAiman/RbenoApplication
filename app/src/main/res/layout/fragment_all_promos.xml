@@ -52,9 +52,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginVertical="5dp"
                     android:visibility="gone"
-                    android:layout_marginBottom="5dp"
                     app:adSize="BANNER"
                     app:adUnitId="ca-app-pub-6990486336142688/6272347151" />
 

@@ -6,13 +6,13 @@ import android.content.Intent;
 
 public class PromotionDeleteReceiver extends BroadcastReceiver {
 
-  @Override
-  public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
 
 
 //    Log.d("ttt","promo deleted: "+intent.getLongExtra("promoId",0));
 
-  }
+    }
 
 
 }

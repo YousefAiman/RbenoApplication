@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
+    tools:context=".VideoFullScreenFragment">
+
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/custom_video_controller_no_next" />
+
+    <ImageView
+        android:id="@+id/videoCloseIv"
+        android:layout_width="50dp"
+        android:layout_gravity="top|end"
+        android:scaleType="center"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/play_circle"
+        android:layout_height="50dp"
+        app:tint="#fff"
+        app:srcCompat="@drawable/close_icon" />
+
+
+</FrameLayout>

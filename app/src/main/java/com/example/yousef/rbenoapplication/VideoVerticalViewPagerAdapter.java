@@ -12,46 +12,44 @@ import java.util.ArrayList;
 
 public class VideoVerticalViewPagerAdapter extends FragmentStateAdapter {
 
-  private final ArrayList<Promotion> videoPromotionsItems;
-  private final Context context;
-  private final Fragment fragment;
+    private final ArrayList<Promotion> videoPromotionsItems;
+    private final Context context;
+    private final Fragment fragment;
 
-  public VideoVerticalViewPagerAdapter(@NonNull Fragment fragment,
-                                       ArrayList<Promotion> videoPromotionsItems) {
-    super(fragment);
-    this.fragment = fragment;
-    context = fragment.getContext();
-    this.videoPromotionsItems = videoPromotionsItems;
-
-
-  }
+    public VideoVerticalViewPagerAdapter(@NonNull Fragment fragment,
+                                         ArrayList<Promotion> videoPromotionsItems) {
+        super(fragment);
+        this.fragment = fragment;
+        context = fragment.getContext();
+        this.videoPromotionsItems = videoPromotionsItems;
+    }
 
 
-  @NonNull
-  @Override
-  public Fragment createFragment(int position) {
-    Log.d("videoPager", "created vertical fragment at: " + position);
-    return new VideoPageVerticalFragment(context,
-            videoPromotionsItems.get(position));
-  }
+    @NonNull
+    @Override
+    public Fragment createFragment(int position) {
+        Log.d("videoPager", "created vertical fragment at: " + position);
+        return new VideoPageVerticalFragment(context,
+                videoPromotionsItems.get(position));
+    }
 
-  @Override
-  public int getItemCount() {
-    return videoPromotionsItems.size();
-  }
-
-
-  @Override
-  public void onViewDetachedFromWindow(@NonNull FragmentViewHolder holder) {
-    super.onViewDetachedFromWindow(holder);
+    @Override
+    public int getItemCount() {
+        return videoPromotionsItems.size();
+    }
 
 
-    VideoPageVerticalFragment detachedFragment =
-            (VideoPageVerticalFragment) fragment.getChildFragmentManager()
-                    .findFragmentByTag("f" + holder.getAdapterPosition());
-
-    detachedFragment.releasePlayer();
+    @Override
+    public void onViewDetachedFromWindow(@NonNull FragmentViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
 
 
-  }
+        VideoPageVerticalFragment detachedFragment =
+                (VideoPageVerticalFragment) fragment.getChildFragmentManager()
+                        .findFragmentByTag("f" + holder.getAdapterPosition());
+
+        detachedFragment.releasePlayer();
+
+
+    }
 }

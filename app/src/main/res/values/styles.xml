@@ -54,8 +54,5 @@
         <item name="android:windowAnimationStyle">@style/Theme.AppCompat.Dialog</item>
     </style>
 
-    <!--    <style name="SpinnerTheme" parent="android:Widget.Spinner">-->
-    <!--        <item name="android:background">@drawable/spinner_custom_layout</item>-->
-    <!--    </style>-->
 
 </resources>

@@ -38,128 +38,128 @@ import java.util.Objects;
 
 public class SavedMessagesFragment extends Fragment {
 
-  private final static int PAGINATION = 5;
-  private final List<UserMessage> userMessages = new ArrayList<>();
-  private final String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-  private RecyclerView chatsRv;
-  private TextView noMessagesTv, moreMessagesTv;
-  private MessagingUserAdapter adapter;
-  private int type;
+    private final static int PAGINATION = 5;
+    private final List<UserMessage> userMessages = new ArrayList<>();
+    private final String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private RecyclerView chatsRv;
+    private TextView noMessagesTv, moreMessagesTv;
+    private MessagingUserAdapter adapter;
+    private int type;
 //  private DocumentSnapshot lastSnapShot;
 
-  private final CollectionReference userRef =
-          FirebaseFirestore.getInstance().collection("users");
+    private final CollectionReference userRef =
+            FirebaseFirestore.getInstance().collection("users");
 
-  private String messagingUserId;
+    private String messagingUserId;
 
-  //  private List<String> savedMessagesKeys;
-  private Query childQuery;
-
-
-  private Map<DatabaseReference, ChildEventListener> childEventListeners;
-  private Map<DatabaseReference, ValueEventListener> valueEventListeners;
-  private List<DataSnapshot> snapshots;
-
-  public SavedMessagesFragment() {
-
-  }
-
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    type = getArguments().getInt("type");
-  }
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_pager_messages, container, false);
-    chatsRv = view.findViewById(R.id.chattingUserRv);
-    chatsRv.setNestedScrollingEnabled(false);
-    noMessagesTv = view.findViewById(R.id.noMessagesTv);
-    moreMessagesTv = view.findViewById(R.id.moreMessagesTv);
-    final AdView adView = view.findViewById(R.id.adView);
-    adView.loadAd(new AdRequest.Builder().build());
-    adView.setAdListener(new AdListener() {
-      @Override
-      public void onAdLoaded() {
-        adView.setVisibility(View.VISIBLE);
-      }
-    });
-
-    final LinearLayoutManager llm = new LinearLayoutManager(getContext(),
-            RecyclerView.VERTICAL, false) {
-      @Override
-      public void onItemsRemoved(@NonNull RecyclerView recyclerView,
-                                 int positionStart, int itemCount) {
-        super.onItemsRemoved(recyclerView, positionStart, itemCount);
-
-        Log.d("savedMessages", "on item removed: " + getItemCount());
-
-        if (getItemCount() == 0 && noMessagesTv.getVisibility() == View.GONE) {
-          noMessagesTv.setVisibility(View.VISIBLE);
-          chatsRv.setVisibility(View.INVISIBLE);
-        }
-
-      }
-
-      @Override
-      public void onItemsAdded(@NonNull RecyclerView recyclerView,
-                               int positionStart, int itemCount) {
-        super.onItemsAdded(recyclerView, positionStart, itemCount);
-
-        if (noMessagesTv.getVisibility() == View.VISIBLE) {
-          noMessagesTv.setVisibility(View.GONE);
-          chatsRv.setVisibility(View.VISIBLE);
-        }
-
-      }
-    };
-
-    chatsRv.setLayoutManager(llm);
-
-    return view;
-  }
-
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-
-    adapter = new MessagingUserAdapter(getContext(), userMessages);
-    chatsRv.setAdapter(adapter);
-
-    getRealTimeMessagingUsers();
-
-  }
+    //  private List<String> savedMessagesKeys;
+    private Query childQuery;
 
 
-  void getRealTimeMessagingUsers() {
+    private Map<DatabaseReference, ChildEventListener> childEventListeners;
+    private Map<DatabaseReference, ValueEventListener> valueEventListeners;
+    private List<DataSnapshot> snapshots;
 
-    String queryType;
+    public SavedMessagesFragment() {
 
-    if (type == 0) {
-      queryType = "sender";
-      messagingUserId = "receiver";
-      noMessagesTv.setText("لا يوجد أي رسائل مرسلة حاليا");
-    } else {
-      queryType = "receiver";
-      messagingUserId = "sender";
-      noMessagesTv.setText("لا يوجد أي رسائل واردة حاليا");
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        type = getArguments().getInt("type");
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_pager_messages, container, false);
+        chatsRv = view.findViewById(R.id.chattingUserRv);
+        chatsRv.setNestedScrollingEnabled(false);
+        noMessagesTv = view.findViewById(R.id.noMessagesTv);
+        moreMessagesTv = view.findViewById(R.id.moreMessagesTv);
+        final AdView adView = view.findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                adView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        final LinearLayoutManager llm = new LinearLayoutManager(getContext(),
+                RecyclerView.VERTICAL, false) {
+            @Override
+            public void onItemsRemoved(@NonNull RecyclerView recyclerView,
+                                       int positionStart, int itemCount) {
+                super.onItemsRemoved(recyclerView, positionStart, itemCount);
+
+                Log.d("savedMessages", "on item removed: " + getItemCount());
+
+                if (getItemCount() == 0 && noMessagesTv.getVisibility() == View.GONE) {
+                    noMessagesTv.setVisibility(View.VISIBLE);
+                    chatsRv.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onItemsAdded(@NonNull RecyclerView recyclerView,
+                                     int positionStart, int itemCount) {
+                super.onItemsAdded(recyclerView, positionStart, itemCount);
+
+                if (noMessagesTv.getVisibility() == View.VISIBLE) {
+                    noMessagesTv.setVisibility(View.GONE);
+                    chatsRv.setVisibility(View.VISIBLE);
+                }
+
+            }
+        };
+
+        chatsRv.setLayoutManager(llm);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        adapter = new MessagingUserAdapter(getContext(), userMessages);
+        chatsRv.setAdapter(adapter);
+
+        getRealTimeMessagingUsers();
+
+    }
+
+
+    void getRealTimeMessagingUsers() {
+
+        String queryType;
+
+        if (type == 0) {
+            queryType = "sender";
+            messagingUserId = "receiver";
+            noMessagesTv.setText("لا يوجد أي رسائل مرسلة حاليا");
+        } else {
+            queryType = "receiver";
+            messagingUserId = "sender";
+            noMessagesTv.setText("لا يوجد أي رسائل واردة حاليا");
+        }
 
 //    savedMessagesKeys = new ArrayList<>();
 
-    childQuery = FirebaseDatabase.getInstance().getReference().child("Messages")
-            .orderByChild(queryType).equalTo(currentUserUid);
+        childQuery = FirebaseDatabase.getInstance().getReference().child("Messages")
+                .orderByChild(queryType).equalTo(currentUserUid);
 
-    valueEventListeners = new HashMap<>();
-    childEventListeners = new HashMap<>();
+        valueEventListeners = new HashMap<>();
+        childEventListeners = new HashMap<>();
 
-    childQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-      @Override
-      public void onDataChange(@NonNull DataSnapshot snapshot) {
+        childQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        valueEventListeners.put(childQuery.getRef(), this);
+                valueEventListeners.put(childQuery.getRef(), this);
 //        snapshot.getRef()
 //                .orderByChild("messages/time")
 //                .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -193,57 +193,57 @@ public class SavedMessagesFragment extends Fragment {
 //                  }
 //                });
 
-        if (snapshot.getChildrenCount() > PAGINATION) {
-          snapshots = Lists.newArrayList(snapshot.getChildren());
+                if (snapshot.getChildrenCount() > PAGINATION) {
+                    snapshots = Lists.newArrayList(snapshot.getChildren());
 
-          for (DataSnapshot dataSnapshot : snapshots) {
-            if (dataSnapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
-              snapshots.remove(dataSnapshot);
-            }
-          }
+                    for (DataSnapshot dataSnapshot : snapshots) {
+                        if (dataSnapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
+                            snapshots.remove(dataSnapshot);
+                        }
+                    }
 
-          if (snapshots.size() == 0) {
-            noMessagesTv.setVisibility(View.VISIBLE);
-            chatsRv.setVisibility(View.INVISIBLE);
-          }
+                    if (snapshots.size() == 0) {
+                        noMessagesTv.setVisibility(View.VISIBLE);
+                        chatsRv.setVisibility(View.INVISIBLE);
+                    }
 
-          Collections.sort(snapshots, (snapshot1, snapshot2)
-                  -> Long.compare(getTime(snapshot2), getTime(snapshot1)));
+                    Collections.sort(snapshots, (snapshot1, snapshot2)
+                            -> Long.compare(getTime(snapshot2), getTime(snapshot1)));
 
-          getNextPage();
+                    getNextPage();
 
-          final ChildEventListener childEventListener =
-                  new PaginationChildEventListener(snapshots.size());
+                    final ChildEventListener childEventListener =
+                            new PaginationChildEventListener(snapshots.size());
 
-          childQuery.addChildEventListener(childEventListener);
+                    childQuery.addChildEventListener(childEventListener);
 
-          childEventListeners.put(childQuery.getRef(), childEventListener);
+                    childEventListeners.put(childQuery.getRef(), childEventListener);
 
 //          Map<DataSnapshot,Long> orderedSnapshots = new HashMap<>();
 //          for(DataSnapshot dataSnapshot:snapshots){
 //            orderedSnapshots.put(dataSnapshot,getTime(dataSnapshot));
 //          }
 
-          Log.d("savedMessages", "getting next page");
-        } else if (snapshot.getChildrenCount() > 0) {
+                    Log.d("savedMessages", "getting next page");
+                } else if (snapshot.getChildrenCount() > 0) {
 
-          final List<DataSnapshot> snapshots = Lists.newArrayList(snapshot.getChildren());
-
-
-          for (DataSnapshot dataSnapshot : snapshots) {
-            if (dataSnapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
-              snapshots.remove(dataSnapshot);
-            }
-          }
+                    final List<DataSnapshot> snapshots = Lists.newArrayList(snapshot.getChildren());
 
 
-          if (snapshots.size() == 0) {
-            noMessagesTv.setVisibility(View.VISIBLE);
-            chatsRv.setVisibility(View.INVISIBLE);
-          }
+                    for (DataSnapshot dataSnapshot : snapshots) {
+                        if (dataSnapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
+                            snapshots.remove(dataSnapshot);
+                        }
+                    }
 
-          Collections.sort(snapshots, (snapshot1, snapshot2)
-                  -> Long.compare(getTime(snapshot2), getTime(snapshot1)));
+
+                    if (snapshots.size() == 0) {
+                        noMessagesTv.setVisibility(View.VISIBLE);
+                        chatsRv.setVisibility(View.INVISIBLE);
+                    }
+
+                    Collections.sort(snapshots, (snapshot1, snapshot2)
+                            -> Long.compare(getTime(snapshot2), getTime(snapshot1)));
 
 //          new Thread(new Runnable() {
 //            @Override
@@ -263,27 +263,27 @@ public class SavedMessagesFragment extends Fragment {
 //          Collections.sort(snapshots, (snapshot1, snapshot2)
 //                  -> Long.compare(getTime(snapshot1,Thread.currentThread()), getTime(snapshot2)));
 //
-          for (DataSnapshot child : snapshots) {
-            addSavedMessageFromDataSnapshot(child, true);
-          }
+                    for (DataSnapshot child : snapshots) {
+                        addSavedMessageFromDataSnapshot(child, true);
+                    }
 
-          final ChildEventListener childEventListener =
-                  new InitialChildEventListener(snapshots.size());
+                    final ChildEventListener childEventListener =
+                            new InitialChildEventListener(snapshots.size());
 
-          childQuery.addChildEventListener(childEventListener);
+                    childQuery.addChildEventListener(childEventListener);
 
-          childEventListeners.put(childQuery.getRef(), childEventListener);
-        } else {
+                    childEventListeners.put(childQuery.getRef(), childEventListener);
+                } else {
 
-          noMessagesTv.setVisibility(View.VISIBLE);
-          chatsRv.setVisibility(View.INVISIBLE);
+                    noMessagesTv.setVisibility(View.VISIBLE);
+                    chatsRv.setVisibility(View.INVISIBLE);
 
-          final ChildEventListener childEventListener = new InitialChildEventListener(0);
-          childQuery.addChildEventListener(childEventListener);
+                    final ChildEventListener childEventListener = new InitialChildEventListener(0);
+                    childQuery.addChildEventListener(childEventListener);
 
-          childEventListeners.put(childQuery.getRef(), childEventListener);
+                    childEventListeners.put(childQuery.getRef(), childEventListener);
 
-        }
+                }
 
 //        FirebaseDatabase.getInstance().getReference()
 //                .child("Messages")
@@ -291,13 +291,13 @@ public class SavedMessagesFragment extends Fragment {
 //                .equalTo(currentUserUid)
 
 
-      }
+            }
 
-      @Override
-      public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-      }
-    });
+            }
+        });
 //
 //    childQuery.orderByKey()
 ////                .endAt(snapshots.get(snapshots.size()-1).getKey())
@@ -331,33 +331,33 @@ public class SavedMessagesFragment extends Fragment {
 //              }
 //            });
 
-  }
+    }
 
-  long getTime(DataSnapshot snapshot) {
+    long getTime(DataSnapshot snapshot) {
 
-    final DataSnapshot databaseReference = snapshot.child("messages")
-            .child(String.valueOf(snapshot.child("messages").getChildrenCount() - 1))
-            .child("time");
+        final DataSnapshot databaseReference = snapshot.child("messages")
+                .child(String.valueOf(snapshot.child("messages").getChildrenCount() - 1))
+                .child("time");
 
-    return databaseReference.exists() ? databaseReference.getValue(Long.class) : 0;
-  }
-
-
-  void addSavedMessageFromDataSnapshot(DataSnapshot child, boolean isInitial) {
-
-    final UserMessage userMessage = new UserMessage();
-    userMessage.setChattingPromoId(child.child("intendedpromoid").getValue(Long.class));
-    userMessage.setLastMessageRead(
-            child.child(currentUserUid + ":LastSeenMessage").getValue(Long.class));
+        return databaseReference.exists() ? databaseReference.getValue(Long.class) : 0;
+    }
 
 
-    userMessage.setMessagingUserId(child.child(messagingUserId).getValue(String.class));
+    void addSavedMessageFromDataSnapshot(DataSnapshot child, boolean isInitial) {
 
-    final DataSnapshot messageChild =
-            child.child("messages").child(String.valueOf(
-                    child.child("messages").getChildrenCount() - 1));
+        final UserMessage userMessage = new UserMessage();
+        userMessage.setChattingPromoId(child.child("intendedpromoid").getValue(Long.class));
+        userMessage.setLastMessageRead(
+                child.child(currentUserUid + ":LastSeenMessage").getValue(Long.class));
 
-    userMessage.setChattingLatestMessageMap(messageChild.getValue(MessageMap.class));
+
+        userMessage.setMessagingUserId(child.child(messagingUserId).getValue(String.class));
+
+        final DataSnapshot messageChild =
+                child.child("messages").child(String.valueOf(
+                        child.child("messages").getChildrenCount() - 1));
+
+        userMessage.setChattingLatestMessageMap(messageChild.getValue(MessageMap.class));
 
 //    userMessage.setChattingLatestMessageMap(new MessageMap(
 //            messageChild.child("content").getValue(String.class),
@@ -368,24 +368,24 @@ public class SavedMessagesFragment extends Fragment {
 //
 
 
-    userMessage.setMessagesCount(Integer.parseInt(messageChild.getKey()) + 1);
+        userMessage.setMessagesCount(Integer.parseInt(messageChild.getKey()) + 1);
 
-    Log.d("savedMessages", "message count: " + userMessage.getMessagesCount());
+        Log.d("savedMessages", "message count: " + userMessage.getMessagesCount());
 
-    addMessagesAdditionAndUpdateListener(child, userMessage, messageChild,
-            userMessage.getMessagesCount());
+        addMessagesAdditionAndUpdateListener(child, userMessage, messageChild,
+                userMessage.getMessagesCount());
 
-    userRef.whereEqualTo("userId", userMessage.getMessagingUserId())
-            .get().addOnSuccessListener(snaps -> {
-      final DocumentSnapshot userSnap = snaps.getDocuments().get(0);
-      userMessage.setChattingUsername(userSnap.getString("username"));
-      userMessage.setChattingUserImage(userSnap.getString("imageurl"));
+        userRef.whereEqualTo("userId", userMessage.getMessagingUserId())
+                .get().addOnSuccessListener(snaps -> {
+            final DocumentSnapshot userSnap = snaps.getDocuments().get(0);
+            userMessage.setChattingUsername(userSnap.getString("username"));
+            userMessage.setChattingUserImage(userSnap.getString("imageurl"));
 
 
-      if (isInitial) {
+            if (isInitial) {
 
-        userMessages.add(userMessage);
-        adapter.notifyItemInserted(userMessages.size());
+                userMessages.add(userMessage);
+                adapter.notifyItemInserted(userMessages.size());
 //        if(userMessages.size() > 1){
 //
 //          Log.d("savedMessages","sorting");
@@ -400,49 +400,49 @@ public class SavedMessagesFragment extends Fragment {
 //          adapter.notifyItemInserted(0);
 //        }
 
-        if (snapshots != null && !snapshots.isEmpty()) {
-          snapshots.remove(child);
-        }
-      } else {
-        userMessages.add(0, userMessage);
-        adapter.notifyItemInserted(0);
-      }
+                if (snapshots != null && !snapshots.isEmpty()) {
+                    snapshots.remove(child);
+                }
+            } else {
+                userMessages.add(0, userMessage);
+                adapter.notifyItemInserted(0);
+            }
 
-      addLastSeenListener(child, userMessage);
+            addLastSeenListener(child, userMessage);
 
-      addDeletionListener(child, userMessage);
+            addDeletionListener(child, userMessage);
 
-    });
+        });
 
-  }
-
-
-  void addMessagesAdditionAndUpdateListener(DataSnapshot child,
-                                            UserMessage userMessage,
-                                            DataSnapshot messageChild,
-                                            long startAt) {
-
-    final DatabaseReference databaseReference = child.child("messages").getRef();
-
-    ChildEventListener childEventListener;
-
-    Log.d("savedMessages", "listenting from: " + String.valueOf(startAt));
-
-    databaseReference.orderByKey().startAt(String.valueOf(startAt))
-            .addChildEventListener(childEventListener = new ChildEventListener() {
-              @Override
-              public void onChildAdded(@NonNull DataSnapshot snapshot,
-                                       @Nullable String previousChildName) {
-
-                Log.d("savedMessages", "message added");
-
-                if ((Long.parseLong(Objects.requireNonNull(snapshot.getKey())) + 1)
-                        > userMessage.getMessagesCount()) {
-
-                  Log.d("savedMessages", "message added after last");
+    }
 
 
-                  userMessage.setChattingLatestMessageMap(snapshot.getValue(MessageMap.class));
+    void addMessagesAdditionAndUpdateListener(DataSnapshot child,
+                                              UserMessage userMessage,
+                                              DataSnapshot messageChild,
+                                              long startAt) {
+
+        final DatabaseReference databaseReference = child.child("messages").getRef();
+
+        ChildEventListener childEventListener;
+
+        Log.d("savedMessages", "listenting from: " + startAt);
+
+        databaseReference.orderByKey().startAt(String.valueOf(startAt))
+                .addChildEventListener(childEventListener = new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot snapshot,
+                                             @Nullable String previousChildName) {
+
+                        Log.d("savedMessages", "message added");
+
+                        if ((Long.parseLong(Objects.requireNonNull(snapshot.getKey())) + 1)
+                                > userMessage.getMessagesCount()) {
+
+                            Log.d("savedMessages", "message added after last");
+
+
+                            userMessage.setChattingLatestMessageMap(snapshot.getValue(MessageMap.class));
 //                  userMessage.setChattingLatestMessageMap(new MessageMap(
 //                          snapshot.child("content").getValue(String.class),
 //                          snapshot.child("deleted").getValue(Boolean.class),
@@ -451,41 +451,41 @@ public class SavedMessagesFragment extends Fragment {
 //                  ));
 
 
-                  userMessage.setMessagesCount(userMessage.getMessagesCount() + 1);
+                            userMessage.setMessagesCount(userMessage.getMessagesCount() + 1);
 
-                  final int index = userMessages.indexOf(userMessage);
+                            final int index = userMessages.indexOf(userMessage);
 
-                  adapter.notifyItemChanged(index);
+                            adapter.notifyItemChanged(index);
 
-                  if (index > 0) {
-                    Collections.swap(userMessages, index, 0);
-                    adapter.notifyItemMoved(index, 0);
+                            if (index > 0) {
+                                Collections.swap(userMessages, index, 0);
+                                adapter.notifyItemMoved(index, 0);
 //                    adapter.notifyItemMoved(0,index);
-                  }
+                            }
 
-                }
+                        }
 
 //                databaseReference.removeEventListener(this);
 //
 //                addMessagesAdditionAndUpdateListener(child,userMessage,messageChild
 //                        ,userMessage.getMessagesCount());
 
-                Log.d("savedMessages", "listenting from: " +
-                        (Integer.parseInt(snapshot.getKey()) + 1));
+                        Log.d("savedMessages", "listenting from: " +
+                                (Integer.parseInt(snapshot.getKey()) + 1));
 
-              }
+                    }
 
-              @Override
-              public void onChildChanged(@NonNull DataSnapshot snapshot,
-                                         @Nullable String previousChildName) {
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot snapshot,
+                                               @Nullable String previousChildName) {
 
-                Log.d("savedMessages", "message changed: " + snapshot.getKey());
-                if (snapshot.exists() &&
-                        (Long.parseLong(Objects.requireNonNull(snapshot.getKey())) + 1)
-                                == userMessage.getMessagesCount()) {
+                        Log.d("savedMessages", "message changed: " + snapshot.getKey());
+                        if (snapshot.exists() &&
+                                (Long.parseLong(Objects.requireNonNull(snapshot.getKey())) + 1)
+                                        == userMessage.getMessagesCount()) {
 
 
-                  final MessageMap messageMap = snapshot.getValue(MessageMap.class);
+                            final MessageMap messageMap = snapshot.getValue(MessageMap.class);
 
 //                  MessageMap messageMap= new MessageMap(
 //                          snapshot.child("content").getValue(String.class),
@@ -495,155 +495,155 @@ public class SavedMessagesFragment extends Fragment {
 //                  );
 
 
-                  if (messageMap == null)
-                    return;
+                            if (messageMap == null)
+                                return;
 
 
 //                  if(userMessage.getChattingLatestMessageMap().getContent()
 //                          .equals(messageMap.getContent())
 //                          && messageMap.getTime() == messageMap.getTime()){
 
-                  Log.d("savedMessages", "onChildChanged: " +
-                          userMessage.getChattingLatestMessageMap().getContent());
+                            Log.d("savedMessages", "onChildChanged: " +
+                                    userMessage.getChattingLatestMessageMap().getContent());
 
 
-                  userMessage.getChattingLatestMessageMap().setDeleted(true);
-                  adapter.notifyItemChanged(userMessages.indexOf(userMessage));
+                            userMessage.getChattingLatestMessageMap().setDeleted(true);
+                            adapter.notifyItemChanged(userMessages.indexOf(userMessage));
 
 //                  }
-                }
+                        }
 
-              }
+                    }
 
-              @Override
-              public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-              }
+                    }
 
-              @Override
-              public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-              }
+                    }
 
-              @Override
-              public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-              }
-            });
-
-
-    childEventListeners.put(databaseReference, childEventListener);
-
-  }
-
-  void addDeletionListener(DataSnapshot child, UserMessage userMessage) {
-
-    final DatabaseReference databaseReference =
-            child.child("isDeletedFor:" +
-//                    (type == 0?"sender":"receiver")
-                            currentUserUid
-            ).getRef();
-
-    ValueEventListener valueEventListener;
-    databaseReference.addValueEventListener(valueEventListener = new ValueEventListener() {
-      @Override
-      public void onDataChange(@NonNull DataSnapshot snapshot) {
-        if (snapshot.getValue(Boolean.class)) {
-
-          final DatabaseReference lastSeenRef =
-                  child.child(currentUserUid + ":LastSeenMessage").getRef();
-
-          if (valueEventListeners.containsKey(lastSeenRef)) {
-            lastSeenRef.removeEventListener(valueEventListeners.get(lastSeenRef));
-          } else {
-            Log.d("savedMessages", "this last seen listener doesn't exist");
-          }
-
-          final DatabaseReference messagesRef = child.child("messages").getRef();
-          if (childEventListeners.containsKey(messagesRef)) {
-            messagesRef.removeEventListener(childEventListeners.get(messagesRef));
-          } else {
-            Log.d("savedMessages", "this child messages listener doesn't exist");
-          }
+                    }
+                });
 
 
-          valueEventListeners.remove(databaseReference);
-          databaseReference.removeEventListener(this);
+        childEventListeners.put(databaseReference, childEventListener);
 
-          final int index = userMessages.indexOf(userMessage);
-          userMessages.remove(index);
-          adapter.notifyItemRemoved(index);
-        }
-      }
-
-      @Override
-      public void onCancelled(@NonNull DatabaseError error) {
-
-      }
-    });
-    valueEventListeners.put(databaseReference, valueEventListener);
-
-  }
-
-  void addLastSeenListener(DataSnapshot child, UserMessage userMessage) {
-
-    final DatabaseReference lastSeenRef =
-            child.child(currentUserUid + ":LastSeenMessage").getRef();
-
-    ValueEventListener valueEventListener;
-    lastSeenRef
-//            .orderByValue().startAt(userMessage.getLastMessageRead()+1)
-            .addValueEventListener(valueEventListener = new ValueEventListener() {
-              @Override
-              public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("savedMessages", "last seen changed to: " +
-                        snapshot.getValue(Long.class));
-                if (snapshot.exists()) {
-                  userMessage.setLastMessageRead(snapshot.getValue(Long.class));
-                  adapter.notifyItemChanged(userMessages.indexOf(userMessage));
-                }
-              }
-
-              @Override
-              public void onCancelled(@NonNull DatabaseError error) {
-              }
-            });
-
-    valueEventListeners.put(lastSeenRef, valueEventListener);
-
-  }
-
-
-  void getNextPage() {
-
-    if (snapshots.size() > PAGINATION) {
-
-      for (int i = 0; i < PAGINATION; i++) {
-        addSavedMessageFromDataSnapshot(snapshots.get(i), true);
-      }
-
-      if (moreMessagesTv.getVisibility() == View.GONE) {
-        moreMessagesTv.setVisibility(View.VISIBLE);
-        moreMessagesTv.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            Log.d("savedMessages", "snapshots: " + snapshots.size());
-            getNextPage();
-          }
-        });
-      }
-
-    } else {
-
-      moreMessagesTv.setVisibility(View.GONE);
-      moreMessagesTv.setOnClickListener(null);
-
-      for (DataSnapshot child : snapshots) {
-        addSavedMessageFromDataSnapshot(child, true);
-      }
     }
 
-  }
+    void addDeletionListener(DataSnapshot child, UserMessage userMessage) {
+
+        final DatabaseReference databaseReference =
+                child.child("isDeletedFor:" +
+//                    (type == 0?"sender":"receiver")
+                                currentUserUid
+                ).getRef();
+
+        ValueEventListener valueEventListener;
+        databaseReference.addValueEventListener(valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue(Boolean.class)) {
+
+                    final DatabaseReference lastSeenRef =
+                            child.child(currentUserUid + ":LastSeenMessage").getRef();
+
+                    if (valueEventListeners.containsKey(lastSeenRef)) {
+                        lastSeenRef.removeEventListener(valueEventListeners.get(lastSeenRef));
+                    } else {
+                        Log.d("savedMessages", "this last seen listener doesn't exist");
+                    }
+
+                    final DatabaseReference messagesRef = child.child("messages").getRef();
+                    if (childEventListeners.containsKey(messagesRef)) {
+                        messagesRef.removeEventListener(childEventListeners.get(messagesRef));
+                    } else {
+                        Log.d("savedMessages", "this child messages listener doesn't exist");
+                    }
+
+
+                    valueEventListeners.remove(databaseReference);
+                    databaseReference.removeEventListener(this);
+
+                    final int index = userMessages.indexOf(userMessage);
+                    userMessages.remove(index);
+                    adapter.notifyItemRemoved(index);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        valueEventListeners.put(databaseReference, valueEventListener);
+
+    }
+
+    void addLastSeenListener(DataSnapshot child, UserMessage userMessage) {
+
+        final DatabaseReference lastSeenRef =
+                child.child(currentUserUid + ":LastSeenMessage").getRef();
+
+        ValueEventListener valueEventListener;
+        lastSeenRef
+//            .orderByValue().startAt(userMessage.getLastMessageRead()+1)
+                .addValueEventListener(valueEventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.d("savedMessages", "last seen changed to: " +
+                                snapshot.getValue(Long.class));
+                        if (snapshot.exists()) {
+                            userMessage.setLastMessageRead(snapshot.getValue(Long.class));
+                            adapter.notifyItemChanged(userMessages.indexOf(userMessage));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+
+        valueEventListeners.put(lastSeenRef, valueEventListener);
+
+    }
+
+
+    void getNextPage() {
+
+        if (snapshots.size() > PAGINATION) {
+
+            for (int i = 0; i < PAGINATION; i++) {
+                addSavedMessageFromDataSnapshot(snapshots.get(i), true);
+            }
+
+            if (moreMessagesTv.getVisibility() == View.GONE) {
+                moreMessagesTv.setVisibility(View.VISIBLE);
+                moreMessagesTv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d("savedMessages", "snapshots: " + snapshots.size());
+                        getNextPage();
+                    }
+                });
+            }
+
+        } else {
+
+            moreMessagesTv.setVisibility(View.GONE);
+            moreMessagesTv.setOnClickListener(null);
+
+            for (DataSnapshot child : snapshots) {
+                addSavedMessageFromDataSnapshot(child, true);
+            }
+        }
+
+    }
 
 //  void updateSavedMessage(DataSnapshot snapshot,String queryType){
 //
@@ -764,141 +764,141 @@ public class SavedMessagesFragment extends Fragment {
 //  }
 
 
-  class PaginationChildEventListener implements ChildEventListener {
+    class PaginationChildEventListener implements ChildEventListener {
 
-    int count;
+        int count;
 
-    PaginationChildEventListener(int count) {
-      this.count = count;
+        PaginationChildEventListener(int count) {
+            this.count = count;
 
-    }
-
-    @Override
-    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-      Log.d("savedMessages", "onChildAdded: " + snapshot.getKey() +
-              " previousChildName: " + previousChildName);
-
-      if (count != 0) {
-
-        count--;
-
-      } else {
-        if (!snapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
-          addSavedMessageFromDataSnapshot(snapshot, false);
-          Log.d("savedMessages", "added after initial hehe");
-        } else {
-          Log.d("savedMessages", "some guy tried adding to a delted sht");
         }
-      }
-    }
 
-    @Override
-    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-      for (DataSnapshot dataSnapshot : snapshots) {
-        if (dataSnapshot.getKey().equals(snapshot.getKey())) {
-          Log.d("savedMessages", "exists but not added");
-          if (snapshot.child("messages").getChildrenCount()
-                  > dataSnapshot.child("messages").getChildrenCount()) {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            Log.d("savedMessages", "onChildAdded: " + snapshot.getKey() +
+                    " previousChildName: " + previousChildName);
 
-            Log.d("savedMessages", "added a message to not added");
+            if (count != 0) {
 
-            snapshots.remove(dataSnapshot);
-            if (snapshots.size() == 0) {
-              moreMessagesTv.setVisibility(View.GONE);
-              moreMessagesTv.setOnClickListener(null);
+                count--;
+
+            } else {
+                if (!snapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
+                    addSavedMessageFromDataSnapshot(snapshot, false);
+                    Log.d("savedMessages", "added after initial hehe");
+                } else {
+                    Log.d("savedMessages", "some guy tried adding to a delted sht");
+                }
             }
-            addSavedMessageFromDataSnapshot(dataSnapshot, false);
-
-          }
-          break;
         }
 
-        Log.d("savedMessages", "onChildChanged: " + snapshot.getKey());
-      }
-    }
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            for (DataSnapshot dataSnapshot : snapshots) {
+                if (dataSnapshot.getKey().equals(snapshot.getKey())) {
+                    Log.d("savedMessages", "exists but not added");
+                    if (snapshot.child("messages").getChildrenCount()
+                            > dataSnapshot.child("messages").getChildrenCount()) {
 
-    @Override
-    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                        Log.d("savedMessages", "added a message to not added");
 
-    }
+                        snapshots.remove(dataSnapshot);
+                        if (snapshots.size() == 0) {
+                            moreMessagesTv.setVisibility(View.GONE);
+                            moreMessagesTv.setOnClickListener(null);
+                        }
+                        addSavedMessageFromDataSnapshot(dataSnapshot, false);
 
-    @Override
-    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    }
+                    break;
+                }
 
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError error) {
-
-    }
-  }
-
-
-  class InitialChildEventListener implements ChildEventListener {
-    int count;
-
-    InitialChildEventListener(int count) {
-      this.count = count;
-    }
-
-    @Override
-    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-      Log.d("savedMessages", "initial onChildAdded: " + snapshot.getKey() +
-              " previousChildName: " + previousChildName);
-      if (count != 0) {
-        count--;
-      } else {
-
-        if (!snapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
-          addSavedMessageFromDataSnapshot(snapshot, false);
-          Log.d("savedMessages", "added after initial hehe");
-        } else {
-          Log.d("savedMessages", "some guy tried adding to a delted sht");
+                Log.d("savedMessages", "onChildChanged: " + snapshot.getKey());
+            }
         }
-      }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
     }
+
+
+    class InitialChildEventListener implements ChildEventListener {
+        int count;
+
+        InitialChildEventListener(int count) {
+            this.count = count;
+        }
+
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            Log.d("savedMessages", "initial onChildAdded: " + snapshot.getKey() +
+                    " previousChildName: " + previousChildName);
+            if (count != 0) {
+                count--;
+            } else {
+
+                if (!snapshot.child("isDeletedFor:" + currentUserUid).getValue(Boolean.class)) {
+                    addSavedMessageFromDataSnapshot(snapshot, false);
+                    Log.d("savedMessages", "added after initial hehe");
+                } else {
+                    Log.d("savedMessages", "some guy tried adding to a delted sht");
+                }
+            }
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+
+            Log.d("savedMessages", "onChildChanged: " + snapshot.getKey());
+        }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    }
+
 
     @Override
-    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+    public void onDestroy() {
+        super.onDestroy();
 
+        if (childEventListeners != null && !childEventListeners.isEmpty()) {
 
-      Log.d("savedMessages", "onChildChanged: " + snapshot.getKey());
+            for (DatabaseReference reference : childEventListeners.keySet()) {
+                reference.removeEventListener(Objects.requireNonNull(childEventListeners.get(reference)));
+            }
+        }
+
+        if (valueEventListeners != null && !valueEventListeners.isEmpty()) {
+
+            for (DatabaseReference reference : valueEventListeners.keySet()) {
+                reference.removeEventListener(Objects.requireNonNull(valueEventListeners.get(reference)));
+            }
+        }
     }
-
-    @Override
-    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-    }
-
-    @Override
-    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-    }
-
-    @Override
-    public void onCancelled(@NonNull DatabaseError error) {
-
-    }
-  }
-
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-
-    if (childEventListeners != null && !childEventListeners.isEmpty()) {
-
-      for (DatabaseReference reference : childEventListeners.keySet()) {
-        reference.removeEventListener(Objects.requireNonNull(childEventListeners.get(reference)));
-      }
-    }
-
-    if (valueEventListeners != null && !valueEventListeners.isEmpty()) {
-
-      for (DatabaseReference reference : valueEventListeners.keySet()) {
-        reference.removeEventListener(Objects.requireNonNull(valueEventListeners.get(reference)));
-      }
-    }
-  }
 
 }

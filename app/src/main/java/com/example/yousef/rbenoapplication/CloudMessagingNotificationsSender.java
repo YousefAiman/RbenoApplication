@@ -28,7 +28,8 @@ public class CloudMessagingNotificationsSender {
 
                 final String token = documents.getDocuments().get(0).getString("token");
 
-                if (GlobalVariables.getCurrentToken().equals(token))
+                if (GlobalVariables.getCurrentToken() == null ||
+                        GlobalVariables.getCurrentToken().equals(token))
                     return;
 
                 Log.d("ttt", "sending to token: " + token);

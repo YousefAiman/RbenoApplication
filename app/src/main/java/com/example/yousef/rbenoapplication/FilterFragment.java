@@ -15,6 +15,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 
 public class FilterFragment extends Fragment {
@@ -50,6 +54,16 @@ public class FilterFragment extends Fragment {
 //    ViewGroup viewGroup = (ViewGroup) view;
         ((Toolbar) view.findViewById(R.id.filterToolBar)).setNavigationOnClickListener(view1 ->
                 getActivity().onBackPressed());
+
+        final AdView adView = view.findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                adView.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         textGreyColor = getResources().getColor(R.color.textGreyColor);
         textWhiteColor = getResources().getColor(R.color.white);
@@ -201,15 +215,15 @@ public class FilterFragment extends Fragment {
 
                     switch (finalI) {
                         case 1:
-                            type = "text";
+                            type = Promotion.TEXT_TYPE;
 //              addTypeToList("text");
                             break;
                         case 2:
-                            type = "image";
+                            type = Promotion.IMAGE_TYPE;
 //              addTypeToList("image");
                             break;
                         case 3:
-                            type = "video";
+                            type = Promotion.VIDEO_TYPE;
 //              addTypeToList("video");
                             break;
                     }
@@ -279,14 +293,14 @@ public class FilterFragment extends Fragment {
                     );
                     imageView.setBackgroundResource(R.drawable.red_circle_back);
 
-                    if (textView.getText().toString().equals("هواتف")) {
-                        categories.add("موبيلات");
-                        return;
-                    }
-                    if (textView.getText().toString().equals("الكترونيات")) {
-                        categories.add("اليكترونيات");
-                        return;
-                    }
+//                    if (textView.getText().toString().equals("هواتف")) {
+//                        categories.add("موبيلات");
+//                        return;
+//                    }
+//                    if (textView.getText().toString().equals("الكترونيات")) {
+//                        categories.add("اليكترونيات");
+//                        return;
+//                    }
                     if (textView.getText().toString().equals("الكل")) {
                         for (int j = 0; j < categoryTextViews.length; j++) {
                             TextView textView1 = categoryTextViews[j];
@@ -330,15 +344,15 @@ public class FilterFragment extends Fragment {
                     imageView.setBackgroundResource(R.drawable.grey_circle_back);
 
 
-                    if (textView.getText().toString().equals("هواتف")) {
-                        categories.remove("موبيلات");
-                        return;
-                    }
-
-                    if (textView.getText().toString().equals("الكترونيات")) {
-                        categories.remove("اليكترونيات");
-                        return;
-                    }
+//                    if (textView.getText().toString().equals("هواتف")) {
+//                        categories.remove("هواتف");
+//                        return;
+//                    }
+//
+//                    if (textView.getText().toString().equals("الكترونيات")) {
+//                        categories.remove("اليكترونيات");
+//                        return;
+//                    }
 
 
                     categories.remove(textView.getText().toString());

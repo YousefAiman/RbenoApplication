@@ -18,6 +18,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -75,23 +78,23 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
 
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d("ttt", "newest onAttach");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("ttt", "newest onResume");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d("ttt", "newest onDetach");
-    }
+//    @Override
+//    public void onAttach(@NonNull Context context) {
+//        super.onAttach(context);
+//        Log.d("ttt", "newest onAttach");
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        Log.d("ttt", "newest onResume");
+//    }
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        Log.d("ttt", "newest onDetach");
+//    }
 
 
     @Override
@@ -108,8 +111,62 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
         newestPromosRv1 = view.findViewById(R.id.newestPromosRv1);
         mostViewedRv = view.findViewById(R.id.mostViewedRv);
 
+
+//        mostViewedRv.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//
+//
+//                final int action = e.getAction();
+//
+//                if (action == MotionEvent.ACTION_MOVE) {
+//                    Log.d("ttt", "ACTION_MOVE");
+//                }
+//
+//
+//
+//
+//                if(rv.canScrollHorizontally(RecyclerView.FOCUS_FORWARD)){
+//                    if(action == MotionEvent.ACTION_MOVE){
+//                        rv.getParent().requestDisallowInterceptTouchEvent(true);
+//                    }
+//
+//                    return false;
+//                }else{
+//
+//                    if(action == MotionEvent.ACTION_MOVE){
+//                        rv.getParent().requestDisallowInterceptTouchEvent(false);
+//                    }
+//
+////                    rv.removeOnItemTouchListener(this);
+//                    return true;
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//
+//            }
+//        });
+
+
+        final AdView adView = view.findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                adView.setVisibility(View.VISIBLE);
+            }
+        });
+
         videosRv.setNestedScrollingEnabled(false);
-        mostViewedRv.setNestedScrollingEnabled(false);
+//        mostViewedRv.setNestedScrollingEnabled(true);
 
         newestPromosRv1.setAdapter(newestPromosAdapter1);
         videosRv.setAdapter(videosAdapter);
@@ -154,11 +211,50 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
         mostViewedLlm.setSmoothScrollbarEnabled(false);
         mostViewedRv.setLayoutManager(mostViewedLlm);
 
+        newestPromosRv1.setAdapter(newestPromosAdapter1);
+
 
         view.findViewById(R.id.allNewestPromosTv).setOnClickListener(v ->
                 startAllNewestPromos(1));
         view.findViewById(R.id.allMostViewedPromosTv).setOnClickListener(v ->
                 startAllNewestPromos(2));
+
+//        mostViewedRv.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+//            int lastX = 0;
+//            @Override
+//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//                switch (e.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        lastX = (int) e.getX();
+//                        break;
+//                    case MotionEvent.ACTION_MOVE:
+//                        boolean isScrollingRight = e.getX() < lastX;
+//                        if ((isScrollingRight && mostViewedLlm.findLastCompletelyVisibleItemPosition() ==
+//                                mostViewedAdapter.getItemCount() - 1) ||
+//                                (!isScrollingRight && mostViewedLlm.findFirstCompletelyVisibleItemPosition() == 0)) {
+//                            parentViewPager.setUserInputEnabled(true);
+//                        } else {
+//                            parentViewPager.setUserInputEnabled(false);
+//                        }
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        lastX = 0;
+//                        parentViewPager.setUserInputEnabled(true);
+//                        break;
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//
+//            }
+//        });
+
 
         return view;
     }
@@ -169,6 +265,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
 
         Log.d("ttt", "newest onViewCreated");
 
+        Log.d("ttt", "country code: " + GlobalVariables.getInstance().getCountryCode());
         getAllVideos();
 
     }
@@ -191,6 +288,14 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
             mostViewedPromos.clear();
             mostViewedAdapter.notifyDataSetChanged();
 
+            newestPromos1.clear();
+
+            for (int i = 0; i < 8; i++) {
+                newestPromos1.add(new Promotion());
+            }
+
+//            mostViewedAdapter.notifyDataSetChanged();
+
             getAllVideos();
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -201,7 +306,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
 
         Query query = promosRef
                 .orderBy("publishtime", Query.Direction.DESCENDING)
-                .whereEqualTo("promoType", "video")
+                .whereEqualTo("promoType", Promotion.VIDEO_TYPE)
                 .whereEqualTo("isBanned", false)
                 .whereEqualTo("isPaused", false)
                 .limit(videoQueryLimit);
@@ -210,7 +315,6 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
             query = query.whereEqualTo("country",
                     GlobalVariables.getInstance().getCountryCode().toUpperCase());
         }
-
 
 //    if (!GlobalVariables.getBlockedUsers().isEmpty()) {
 //
@@ -232,13 +336,15 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
 //
 //    }
 //    query = query.orderBy("publishtime", Query.Direction.DESCENDING).limit(videoQueryLimit);
-
         query.get().addOnSuccessListener(snapshots -> {
             final List<DocumentSnapshot> documentSnapshots = snapshots.getDocuments();
             if (documentSnapshots.size() > 0) {
 
                 if (GlobalVariables.getBlockedUsers().isEmpty()) {
+//                    for(int i=0;i<8;i++){
                     videoPromotionsAllVideo.addAll(snapshots.toObjects(Promotion.class));
+//                    }
+
                 } else {
 
                     final List<DocumentSnapshot> snaps = snapshots.getDocuments();
@@ -250,12 +356,15 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                 }
 
             } else {
+
                 videosRv.setVisibility(View.GONE);
+                requireView().findViewById(R.id.viewLine1).setVisibility(View.GONE);
             }
         }).addOnCompleteListener(task -> {
 
             if (videoPromotionsAllVideo.size() > 0) {
                 videosRv.setVisibility(View.VISIBLE);
+                requireView().findViewById(R.id.viewLine1).setVisibility(View.VISIBLE);
                 videosAdapter.notifyDataSetChanged();
             }
 
@@ -291,10 +400,14 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
         query = query.orderBy("publishtime", Query.Direction.DESCENDING).limit(8);
 
 //    Query finalQuery = query;
-        AtomicInteger addedCount = new AtomicInteger();
+        final AtomicInteger addedCount = new AtomicInteger();
+//        final boolean[] wasEmpty = new boolean[1];
+
         query.get().addOnSuccessListener(snapshots -> {
 
             if (snapshots.size() > 0) {
+
+//                if(isInitial){
 
                 final List<DocumentSnapshot> snaps = snapshots.getDocuments();
 
@@ -305,30 +418,102 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                     }
                     addedCount.set(snaps.size());
 
+//                        if(wasEmpty[0] = newestPromos1.isEmpty()){
+//
+//                            newestPromos1.addAll(snapshots.toObjects(Promotion.class));
+//
+//                            addedCount.set(snapshots.size());
+//
+//                        }else{
+//
+//                            final List<DocumentSnapshot> snaps = snapshots.getDocuments();
+//
+//                            for (int i = 0; i < snaps.size(); i++) {
+//                                newestPromos1.set(i, snaps.get(i).toObject(Promotion.class));
+//                            }
+//                            addedCount.set(snaps.size());
+//                        }
+
                 } else {
 
                     int index = 0;
                     for (int i = 0; i < snaps.size(); i++) {
                         if (!GlobalVariables.getBlockedUsers().contains(snaps.get(i).getString("uid"))) {
-                            index++;
+
                             newestPromos1.set(index, snaps.get(i).toObject(Promotion.class));
+
+//                                    if(newestPromos1.size() > i){
+//                                        newestPromos1.set(index, snaps.get(i).toObject(Promotion.class));
+//                                    }else{
+//
+//                                    }
+                            index++;
                         }
                     }
+                    addedCount.set(index);
 
-                    addedCount.set(index + 1);
+//                        if(wasEmpty[0] = newestPromos1.isEmpty()){
+//
+//                            newestPromos1.addAll(snapshots.toObjects(Promotion.class));
+//
+//                            addedCount.set(snapshots.size());
+//
+//                        }else{
+//
+//                            int index = 0;
+//                            for (int i = 0; i < snaps.size(); i++) {
+//                                if (!GlobalVariables.getBlockedUsers().contains(snaps.get(i).getString("uid"))) {
+//
+//                                    newestPromos1.set(index, snaps.get(i).toObject(Promotion.class));
+//
+////                                    if(newestPromos1.size() > i){
+////                                        newestPromos1.set(index, snaps.get(i).toObject(Promotion.class));
+////                                    }else{
+////
+////                                    }
+//                                    index++;
+//                                }
+//                            }
+//                            addedCount.set(index);
+//                        }
+
                 }
+//                }else{
+//
+//                    if (GlobalVariables.getBlockedUsers().isEmpty()) {
+//                        newestPromos1.addAll(snapshots.toObjects(Promotion.class));
+//                        addedCount.set(snapshots.size());
+//                    } else {
+//
+//                        for (DocumentSnapshot snap : snapshots.getDocuments()) {
+//                            if (GlobalVariables.getBlockedUsers().contains(snap.getString("uid"))) {
+//                                continue;
+//                            }
+//                            newestPromos1.add(snap.toObject(Promotion.class));
+//                            addedCount.getAndIncrement();
+//                        }
+//                    }
+//
+//                }
+
 
             } else {
-                newestPromosRv1.setVisibility(View.GONE);
+                newestPromos1.clear();
+//                newestPromosAdapter1.notifyDataSetChanged();
             }
-
         }).addOnCompleteListener(task -> {
 
             if (newestPromos1.size() > 0) {
 
-                newestPromosRv1.setAdapter(newestPromosAdapter1);
+//                if(isInitial){
+//                    if(wasEmpty[0]){
+//
+//                        newestPromosAdapter1.notifyDataSetChanged();
+//
+//                    }else {
 
                 if (addedCount.get() < 8) {
+
 
                     Log.d("ttt", "addedCount.get(): " + addedCount.get());
                     newestPromosAdapter1.notifyItemRangeChanged(0, addedCount.get());
@@ -350,11 +535,39 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                     newestPromosAdapter1.notifyItemRangeChanged(0, newestPromos1.size());
 
                 }
+                Log.d("ttt", "not empyu");
 
-                newestPromosRv1.setVisibility(View.VISIBLE);
+//                    }
+
+//                }else if (addedCount.get() > 0) {
+//
+//                        newestPromosAdapter1.notifyItemRangeInserted(
+//                                newestPromos1.size() - addedCount.get(),
+//                                addedCount.get());
+//
+//                }
+
+                if (newestPromosRv1.getVisibility() == View.GONE) {
+                    newestPromosRv1.setVisibility(View.VISIBLE);
+                    requireView().findViewById(R.id.newestLl).setVisibility(View.VISIBLE);
+                    requireView().findViewById(R.id.viewLine2).setVisibility(View.VISIBLE);
+                }
+
 //        newestPromosAdapter1.notifyItemRangeChanged(0,8);
 //        newestPromosAdapter1.notifyDataSetChanged();
+            } else if (newestPromosRv1.getVisibility() == View.VISIBLE) {
+                Log.d("ttt", "empty");
+
+                newestPromosRv1.setVisibility(View.GONE);
+                requireView().findViewById(R.id.newestLl).setVisibility(View.GONE);
+                requireView().findViewById(R.id.viewLine2).setVisibility(View.GONE);
+
             }
+
+//            if(addedCount.get() == 0){
+//
+//            }
+
 
             getMostViewedPromos();
         });
@@ -362,7 +575,6 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
     }
 
     void getMostViewedPromos() {
-
 
         Query query = promosRef
                 .whereEqualTo("isBanned", false)
@@ -390,17 +602,28 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                     mostViewedPromos.addAll(snapshots.toObjects(Promotion.class));
                 }
 
-            } else {
-                mostViewedRv.setVisibility(View.GONE);
             }
         }).addOnCompleteListener(task -> {
 
             if (mostViewedPromos.size() > 0) {
                 mostViewedRv.setVisibility(View.VISIBLE);
                 mostViewedAdapter.notifyDataSetChanged();
-                swipeRefreshLayout.setRefreshing(false);
+
+                requireView().findViewById(R.id.mostViewedLl).setVisibility(View.VISIBLE);
+
+            } else {
+                mostViewedRv.setVisibility(View.GONE);
+                requireView().findViewById(R.id.mostViewedLl).setVisibility(View.GONE);
             }
 
+            if (videoPromotionsAllVideo.isEmpty() && newestPromos1.isEmpty() &&
+                    mostViewedPromos.isEmpty()) {
+                requireView().findViewById(R.id.noPromosTv).setVisibility(View.VISIBLE);
+            } else {
+                requireView().findViewById(R.id.noPromosTv).setVisibility(View.GONE);
+            }
+
+            swipeRefreshLayout.setRefreshing(false);
         });
 
 
@@ -416,7 +639,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
         }
 
         if (GlobalVariables.getVideoViewedCount() != 0 &&
-                GlobalVariables.getVideoViewedCount() % 5 == 0) {
+                GlobalVariables.getVideoViewedCount() % 2 == 0) {
             InterstitialAdUtil.showAd(getContext());
         }
 
@@ -446,7 +669,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
         b.putInt("type", type);
         dialogFragment.setArguments(b);
 
-        ((HomeActivity) getActivity()).addFragmentToHomeContainer(dialogFragment);
+        ((HomeActivity) requireActivity()).addFragmentToHomeContainer(dialogFragment);
 
 //    dialogFragment.show(getChildFragmentManager(), "AllPromosFragment");
     }
@@ -454,7 +677,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        getContext().unregisterReceiver(promotionDeleteReceiver);
+        requireContext().unregisterReceiver(promotionDeleteReceiver);
     }
 
     @Override
@@ -501,6 +724,30 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                         Promotion.changePromoStatusFromList(mostViewedPromos, id, changeType,
                                 mostViewedAdapter);
 
+
+                        if (videoPromotionsAllVideo.isEmpty() && newestPromos1.isEmpty() &&
+                                mostViewedPromos.isEmpty()) {
+                            requireView().findViewById(R.id.noPromosTv).setVisibility(View.VISIBLE);
+                        } else {
+                            requireView().findViewById(R.id.noPromosTv).setVisibility(View.GONE);
+                        }
+
+
+                        if (videoPromotionsAllVideo.isEmpty()) {
+                            videosRv.setVisibility(View.GONE);
+                            requireView().findViewById(R.id.viewLine1).setVisibility(View.GONE);
+                        }
+
+                        if (newestPromos1.isEmpty()) {
+                            newestPromosRv1.setVisibility(View.GONE);
+                            requireView().findViewById(R.id.newestLl).setVisibility(View.GONE);
+                            requireView().findViewById(R.id.viewLine2).setVisibility(View.GONE);
+                        }
+
+                        if (mostViewedPromos.isEmpty()) {
+                            mostViewedRv.setVisibility(View.GONE);
+                            requireView().findViewById(R.id.mostViewedLl).setVisibility(View.GONE);
+                        }
 //
 //                checkAndDeletePromoFromList(newestPromos1,id);
 //
@@ -511,7 +758,7 @@ public class NewestPromosFragment extends androidx.fragment.app.Fragment impleme
                 };
 
 
-        getContext().registerReceiver(promotionDeleteReceiver,
+        requireContext().registerReceiver(promotionDeleteReceiver,
                 new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
 
     }

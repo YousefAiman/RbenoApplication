@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
@@ -73,7 +74,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -158,6 +158,10 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
 
         //Back navigation
         toolbar.setNavigationOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
+
+        ((TextView) view.findViewById(R.id.countryToolbarTv)).setText(
+                CountryUtil.getCountryName(GlobalVariables.getInstance().getCountryCode()));
+
 
         //Loading AdView
         adView.loadAd(new AdRequest.Builder().build());
@@ -279,7 +283,8 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
     void startMessagingActivity() {
         Intent messagingIntent = new Intent(getContext(), MessagingRealTimeActivity.class);
         messagingIntent.putExtra("promouserid", p.getUid());
-        messagingIntent.putExtra("promodocumentid", viewedDocumentID);
+        messagingIntent.putExtra("promoid", p.getPromoid());
+//        messagingIntent.putExtra("promodocumentid", viewedDocumentID);
         messagingIntent.putExtra("intendedpromoid", p.getPromoid());
         startActivity(messagingIntent);
     }
@@ -511,10 +516,16 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
                         .whereNotEqualTo("promoid", p.getPromoid());
 
 
-        if (p.getType().equals("كمبيوتر و لاب توب") || p.getType().equals("اليكترونيات")) {
+        if (GlobalVariables.getInstance().getCountryCode() != null) {
+            relatedQuery = relatedQuery.whereEqualTo("country",
+                    GlobalVariables.getInstance().getCountryCode().toUpperCase());
+        }
+
+
+        if (p.getType().equals("كمبيوتر و لاب توب") || p.getType().equals("الكترونيات")) {
 
             relatedQuery = relatedQuery
-                    .whereIn("type", Arrays.asList("كمبيوتر و لاب توب", "اليكترونيات"));
+                    .whereIn("type", Arrays.asList("كمبيوتر و لاب توب", "الكترونيات"));
         } else {
 
             relatedQuery = relatedQuery
@@ -608,6 +619,31 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
                     Promotion.deletePromo(getContext(), p);
                 } else if (item.getItemId() == R.id.pause_item) {
                     Promotion.pauseOrUnPausePromo(getContext(), p, toolbar.getMenu(), viewedDocumentID);
+                } else if (item.getItemId() == R.id.edit_item) {
+
+//                    promotionRef.document(String.valueOf(p.getPromoid()))
+//                            .update("isPaused",true).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+
+                    final Intent intent = new Intent(requireContext(), PromotionActivity.class)
+                            .putExtra("EditablePromotion", p);
+
+                    final String phoneNum = requireActivity()
+                            .getSharedPreferences("rbeno", Context.MODE_PRIVATE)
+                            .getString("phoneNumber", null);
+
+                    if (phoneNum != null && !phoneNum.isEmpty()) {
+                        intent.putExtra("phoneNumber", phoneNum);
+                    }
+                    startActivityForResult(intent, 2);
+
+                    requireActivity().onBackPressed();
+
+//                        }
+//                    });
+
+
                 }
             }
 
@@ -660,17 +696,17 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
 
     void checkPromoTypeAndCreateVideoOrImagePager(View view) {
 
-        if (!p.getPromoType().equals("text")) {
+        if (!p.getPromoType().equals(Promotion.TEXT_TYPE)) {
 
             final ConstraintLayout imageAndVideoConstraint =
                     view.findViewById(R.id.imageAndVideoConstraint);
             imageAndVideoConstraint.setVisibility(View.VISIBLE);
 
-            if (p.getPromoType().equals("video")) {
+            if (p.getPromoType().equals(Promotion.VIDEO_TYPE)) {
 
                 GlobalVariables.setVideoViewedCount(GlobalVariables.getVideoViewedCount() + 1);
                 if (GlobalVariables.getVideoViewedCount() != 0
-                        && GlobalVariables.getVideoViewedCount() % 5 == 0) {
+                        && GlobalVariables.getVideoViewedCount() % 2 == 0) {
 //          ((HomeActivity) getActivity()).showRewardVideo();
                     InterstitialAdUtil.showAd(getContext());
                 }
@@ -754,59 +790,79 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
         exoPlayer.prepare();
         exoPlayer.setPlayWhenReady(true);
 
-        promoVideoPlayer.findViewById(R.id.exo_rew).setOnClickListener(v -> {
-            if (exoPlayer.getCurrentPosition() < 3000) {
-                exoPlayer.seekTo(0);
-            } else {
-                exoPlayer.seekTo(exoPlayer.getCurrentPosition() - 3000);
+//        promoVideoPlayer.findViewById(R.id.exo_rew).setOnClickListener(v -> {
+//            if (exoPlayer.getCurrentPosition() < 3000) {
+//                exoPlayer.seekTo(0);
+//            } else {
+//                exoPlayer.seekTo(exoPlayer.getCurrentPosition() - 3000);
+//            }
+//        });
+//
+//        promoVideoPlayer.findViewById(R.id.exo_ffwd).setOnClickListener(v -> {
+//            if (exoPlayer.getCurrentPosition() < exoPlayer.getDuration() - 3000) {
+//                exoPlayer.seekTo(exoPlayer.getCurrentPosition() + 3000);
+//            } else {
+//                exoPlayer.seekTo(exoPlayer.getDuration());
+//            }
+//        });
+
+//        final long[] firstClickTime = {0};
+
+        promoVideoPlayer.getVideoSurfaceView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                if ((System.currentTimeMillis() - firstClickTime[0]) < 500) {
+//                    showFullScreenVideo();
+//                }
+                showFullScreenVideo();
+//                firstClickTime[0] = System.currentTimeMillis();
             }
         });
 
-        promoVideoPlayer.findViewById(R.id.exo_ffwd).setOnClickListener(v -> {
-            if (exoPlayer.getCurrentPosition() < exoPlayer.getDuration() - 3000) {
-                exoPlayer.seekTo(exoPlayer.getCurrentPosition() + 3000);
-            } else {
-                exoPlayer.seekTo(exoPlayer.getDuration());
-            }
-        });
-
-        promoVideoPlayer.findViewById(R.id.exoplayer_fullscreen_icon).setOnClickListener(v -> {
-
-            final FullScreenVideoFragment fragment =
-                    new FullScreenVideoFragment(getContext(), p, exoPlayer.getCurrentPosition());
-
-            fragment.getLifecycle().addObserver((LifecycleEventObserver) (ON_DESTROYED, event) -> {
-
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    Log.d("promoFragments", "video fragment ON_DESTROY");
-
-                    if (exoPlayer != null) {
-                        promoVideoPlayer.setVisibility(View.VISIBLE);
-                        exoPlayer.seekTo(fragment.lastPosition);
-                        exoPlayer.setPlayWhenReady(true);
-                    }
-
-                    ((HomeActivity) Objects.requireNonNull(getActivity()))
-                            .lockDrawer(DrawerLayout.LOCK_MODE_UNLOCKED);
-                }
-
-            });
-
-            if (exoPlayer != null) {
-                promoVideoPlayer.setVisibility(View.INVISIBLE);
-                exoPlayer.setPlayWhenReady(false);
-            }
-
-            ((HomeActivity) Objects.requireNonNull(getActivity()))
-                    .lockDrawer(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-//      promoVideoPlayer.setVisibility(View.INVISIBLE);
-            ((HomeActivity) Objects.requireNonNull(getActivity())).addFragmentToHomeContainer(fragment);
-//      fragment.show(getChildFragmentManager(), "videoPagerVertical");
-//        dialogFragment.show(getChildFragmentManager(), "fullScreen");
-        });
+//        promoVideoPlayer.findViewById(R.id.exoplayer_fullscreen_icon).setOnClickListener(v -> {
+//            showFullScreenVideo();
+//        });
 
         promoVideoPlayer.setPlayer(exoPlayer);
+    }
+
+
+    private void showFullScreenVideo() {
+
+        final FullScreenVideoFragment fragment =
+                new FullScreenVideoFragment(getContext(), p, exoPlayer.getCurrentPosition());
+
+        fragment.getLifecycle().addObserver((LifecycleEventObserver) (ON_DESTROYED, event) -> {
+
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                Log.d("promoFragments", "video fragment ON_DESTROY");
+
+                if (exoPlayer != null) {
+                    promoVideoPlayer.setVisibility(View.VISIBLE);
+                    exoPlayer.seekTo(fragment.lastPosition);
+                    exoPlayer.setPlayWhenReady(true);
+                }
+
+                ((HomeActivity) Objects.requireNonNull(getActivity()))
+                        .lockDrawer(DrawerLayout.LOCK_MODE_UNLOCKED);
+            }
+
+        });
+
+        if (exoPlayer != null) {
+            promoVideoPlayer.setVisibility(View.INVISIBLE);
+            exoPlayer.setPlayWhenReady(false);
+        }
+
+        ((HomeActivity) Objects.requireNonNull(getActivity()))
+                .lockDrawer(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+//      promoVideoPlayer.setVisibility(View.INVISIBLE);
+        ((HomeActivity) Objects.requireNonNull(getActivity())).addFragmentToHomeContainer(fragment);
+//      fragment.show(getChildFragmentManager(), "videoPagerVertical");
+//        dialogFragment.show(getChildFragmentManager(), "fullScreen");
+
     }
 
     void createImagePager() {
@@ -898,11 +954,11 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
         promotionPublish.setText(new SimpleDateFormat("MM/dd/yyyy",
                 Locale.getDefault()).format(p.getPublishtime() * 1000));
 
-        if (p.getType().equals("اليكترونيات")) {
-            promotionCategoryTv.setText("القسم: الكترونيات");
-        } else {
-            promotionCategoryTv.setText("القسم: " + p.getType());
-        }
+//        if (p.getType().equals("اليكترونيات")) {
+//            promotionCategoryTv.setText("القسم: الكترونيات");
+//        } else {
+        promotionCategoryTv.setText("القسم: " + p.getType());
+//        }
 
         SpannableString s = new SpannableString(promotionCategoryTv.getText());
         s.setSpan(new UnderlineSpan(), 0, s.length(), 0);
@@ -910,27 +966,52 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
 
         promotionCategoryTv.setOnClickListener(this);
 
-        Currency currency = null;
+        final String priceFormatted = String.format(Locale.getDefault(), "%,d", (long) p.getPrice());
 
-        if (p.getCurrency() != null) {
-            try {
-                currency = Currency.getInstance(p.getCurrency());
-            } catch (IllegalArgumentException e) {
-                Log.d("currency", "code shit");
-            }
-        }
+        promotionCurrencyTv.setText(Html.fromHtml(
+                "<font color='#991914'> " + priceFormatted + "</font>" + " " + CurrencyUtil.getArabicSymbol(p.getCurrency())));
 
-        String displayName = null;
 
-        if (currency == null)
-            return;
+//        Currency currency = null;
+//
+//        if (p.getCurrency() != null) {
+//            try {
+//                currency = Currency.getInstance(p.getCurrency());
+//            } catch (IllegalArgumentException e) {
+//                Log.d("currency", "code shit");
+//            }
+//        }
+//
+//        String displayName;
+//
+////        final Currency arabicCurrency = Currency.getInstance(new Locale("ar","SA"));
+//
+//        final String price = String.format(Locale.getDefault(), "%,d", ((long) p.getPrice()));
+//
+//        if (currency != null) {
+//            try {
+//                Log.d("currency", "arabic display: " + currency.getDisplayName(new Locale("ar")));
+//                displayName = currency.getSymbol(new Locale("ar"));
+//
+//            } catch (IllegalArgumentException e) {
+//                Log.d("currency", "arabic display exeption");
+//                displayName = p.getCurrency();
+//            }
+//
+//
+//            if(!displayName.isEmpty() && displayName.charAt(displayName.length() - 2) == '.'){
+//                Log.d("ttt","should remove last dot");
+//                displayName = displayName.substring(0,displayName.length() - 2);
+//
+//            }
+//
+//        } else {
+//            displayName = p.getCurrency();
+//        }
+//
+//        promotionCurrencyTv.setText(Html.fromHtml(price + " "
+//                + "<font color='#991914'> " + displayName + "</font>"));
 
-        try {
-            Log.d("currency", "arabic display: " + currency.getDisplayName(new Locale("ar")));
-            displayName = currency.getDisplayName(new Locale("ar"));
-        } catch (IllegalArgumentException e) {
-            Log.d("currency", "arabic display exeption");
-        }
 //
 //    try{
 //      Log.d("currency","english display: "+currency.getDisplayName(new Locale("en")));
@@ -967,17 +1048,17 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
 //      Log.d("currency","sympol exeption");
 //    }
 
-        if (displayName != null) {
-            promotionCurrencyTv.setText(displayName);
-        } else {
-            promotionCurrencyTv.setText(p.getCurrency());
-        }
 
-        promotionPrice.setText(String.format(Locale.getDefault(),
-                "%,d", ((long) p.getPrice())));
+//        promotionPrice.setText(String.format(Locale.getDefault(),
+//                "%,d", ((long) p.getPrice())));
 
-        String locationName = CountryUtil.getCountryName(p.getCountryCode()) + " " +
-                EmojiUtil.countryCodeToEmoji(p.getCountryCode());
+
+        Log.d("ttt", "(p.getCountry(): " + (p.getCountry()));
+        Log.d("ttt", "getCountryName: " + CountryUtil.getCountryName(p.getCountry()));
+        Log.d("ttt", "countryCodeToEmoji: " + EmojiUtil.countryCodeToEmoji(p.getCountry()));
+
+        String locationName = CountryUtil.getCountryName(p.getCountry()) + " " +
+                EmojiUtil.countryCodeToEmoji(p.getCountry());
 
         Log.d("ttt", "p.getCityName(): " + p.getCityName());
         if (p.getCityName() != null) {
@@ -1310,7 +1391,7 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
 
                 final Button phoneNumBtn = contactLayoutView.findViewById(R.id.phoneNumBtn);
 
-                if (userPhoneNumber != null && !userPhoneNumber.isEmpty()) {
+                if (!p.isHidePhone() && userPhoneNumber != null && !userPhoneNumber.isEmpty()) {
 
                     phoneNumBtn.setText("رقم الهاتف: " + userPhoneNumber);
                     phoneNumBtn.setOnClickListener(new View.OnClickListener() {
@@ -1396,4 +1477,24 @@ public class PromotionInfoFragment extends Fragment implements View.OnClickListe
     }
 
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        Log.d("ttt", "onActivityResult");
+
+        if (requestCode == 2 && resultCode == 3 && data != null && data.hasExtra("editedPromo")) {
+
+//            final Fragment fragment = new PromotionInfoFragment((Promotion) data.getSerializableExtra("editedPromo"));
+//
+//            if(requireActivity() instanceof HomeActivity){
+//                ((HomeActivity) requireActivity()).removeAndReplaceFragment(fragment);
+//            }else if(requireActivity() instanceof MessagingRealTimeActivity){
+//                ((MessagingRealTimeActivity) requireActivity()).removeAndReplaceFragment(fragment);
+//
+//            }
+
+            Log.d("ttt", "returned from edited");
+        }
+
+    }
 }

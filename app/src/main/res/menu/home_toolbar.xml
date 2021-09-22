@@ -8,9 +8,9 @@
         android:title="البحث"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/filter_item"
-        android:icon="@drawable/filter_icon"
-        android:title="الفلترة"
-        app:showAsAction="ifRoom" />
+    <!--    <item-->
+    <!--        android:id="@+id/filter_item"-->
+    <!--        android:icon="@drawable/filter_icon"-->
+    <!--        android:title="الفلترة"-->
+    <!--        app:showAsAction="ifRoom" />-->
 </menu>

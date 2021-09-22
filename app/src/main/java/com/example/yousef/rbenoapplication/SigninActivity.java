@@ -291,6 +291,13 @@ public class SigninActivity extends AppCompatActivity {
                 final FirebaseUser facebookUser = auth.getCurrentUser();
                 userRef.document(facebookUser.getUid()).get().addOnCompleteListener(task12 -> {
                     if (!task12.getResult().exists()) {
+
+                        String photoUrl = null;
+
+                        if (facebookUser.getPhotoUrl() != null) {
+                            photoUrl = facebookUser.getPhotoUrl().toString() + "?height=500";
+                        }
+
                         String email = "";
                         if (object.has("email")) {
                             try {
@@ -299,9 +306,9 @@ public class SigninActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-                        addUserToFirestore(email, facebookUser.getDisplayName(),
-                                facebookUser.getPhotoUrl().toString(),
+                        addUserToFirestore(email, facebookUser.getDisplayName(), photoUrl,
                                 facebookUser.getUid());
+
                     } else {
                         updateUserInfoAndStartActivity(userRef.document(facebookUser.getUid()));
                     }
@@ -514,10 +521,29 @@ public class SigninActivity extends AppCompatActivity {
         userInfo.put("email", email);
         userInfo.put("username", username);
         userInfo.put("userId", userId);
-        userInfo.put("staticusername", "@" + username.toLowerCase().trim());
+        final String lowerCaseTrimmedUsername = username.toLowerCase().trim().replaceAll("\\s", "");
+        userInfo.put("staticusername", "@" + lowerCaseTrimmedUsername);
+        userInfo.put("usernameForSearch", lowerCaseTrimmedUsername);
         userInfo.put("favpromosids", new ArrayList<>());
         userInfo.put("status", true);
         userInfo.put("remembered", true);
+
+        final HashMap<String, Integer> promoTypesPublished = new HashMap<>();
+        promoTypesPublished.put(Promotion.TEXT_TYPE, 0);
+        promoTypesPublished.put(Promotion.IMAGE_TYPE, 0);
+        promoTypesPublished.put(Promotion.VIDEO_TYPE, 0);
+
+
+        userInfo.put("promoTypesPublished", promoTypesPublished);
+
+        final HashMap<String, Integer> promoTypesLimit = new HashMap<>();
+        promoTypesLimit.put(Promotion.TEXT_TYPE, -1);
+        promoTypesLimit.put(Promotion.IMAGE_TYPE, 5);
+        promoTypesLimit.put(Promotion.VIDEO_TYPE, 1);
+
+
+        userInfo.put("promoTypesLimit", promoTypesLimit);
+
 
         final SharedPreferences sharedPreferences
                 = getSharedPreferences("rbeno", Context.MODE_PRIVATE);

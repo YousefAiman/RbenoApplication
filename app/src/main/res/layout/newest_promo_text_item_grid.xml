@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/a_google"
             android:layout_marginStart="8dp"
-            android:textDirection="ltr"
+            android:textDirection="rtl"
             android:layout_marginBottom="2dp"
             android:textColor="#fff"
             android:textSize="12sp"

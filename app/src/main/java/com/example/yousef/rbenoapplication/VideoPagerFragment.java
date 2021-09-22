@@ -21,91 +21,91 @@ import java.util.Objects;
 
 public class VideoPagerFragment extends Fragment {
 
-  private ViewPager2 videoViewPager;
-  private VideoVerticalViewPagerAdapter adapter;
-  private ArrayList<Promotion> promotions;
-  private PromotionDeleteReceiver promotionDeleteReceiver;
+    private ViewPager2 videoViewPager;
+    private VideoVerticalViewPagerAdapter adapter;
+    private ArrayList<Promotion> promotions;
+    private PromotionDeleteReceiver promotionDeleteReceiver;
 
-  public VideoPagerFragment() {
-  }
+    public VideoPagerFragment() {
+    }
 
-  public VideoPagerFragment(ArrayList<Promotion> promotions) {
-    this.promotions = promotions;
-  }
+    public VideoPagerFragment(ArrayList<Promotion> promotions) {
+        this.promotions = promotions;
+    }
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    adapter = new VideoVerticalViewPagerAdapter(this, promotions);
-
-
-  }
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_video_pager, container, false);
-
-    setupDeletionReceiver();
-
-    ((HomeActivity) Objects.requireNonNull(getActivity()))
-            .lockDrawer(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-    view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-
-    videoViewPager = view.findViewById(R.id.videoViewPager);
-    final ImageView videoCloseIv = view.findViewById(R.id.videoCloseIv);
-
-    videoCloseIv.setOnClickListener(v -> getActivity().onBackPressed());
-
-    return view;
-  }
-
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    videoViewPager.setAdapter(adapter);
-
-    videoViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-      @Override
-      public void onPageSelected(int position) {
-        super.onPageSelected(position);
-
-        VideoPageVerticalFragment fragment = (VideoPageVerticalFragment) getChildFragmentManager()
-                .findFragmentByTag("f" + position);
-
-        fragment.initializeAndPlayVideo();
-
-      }
-    });
-
-  }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new VideoVerticalViewPagerAdapter(this, promotions);
 
 
-  @Override
-  public void onDetach() {
-    super.onDetach();
-    Log.d("videoPager", "video pager fragment onDetach");
-  }
+    }
 
-  @Override
-  public void onResume() {
-    super.onResume();
-    Log.d("videoPager", "video pager fragment onResume");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_video_pager, container, false);
+
+        setupDeletionReceiver();
+
+        ((HomeActivity) Objects.requireNonNull(getActivity()))
+                .lockDrawer(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+        videoViewPager = view.findViewById(R.id.videoViewPager);
+        final ImageView videoCloseIv = view.findViewById(R.id.videoCloseIv);
+
+        videoCloseIv.setOnClickListener(v -> getActivity().onBackPressed());
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        videoViewPager.setAdapter(adapter);
+
+        videoViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
+                VideoPageVerticalFragment fragment = (VideoPageVerticalFragment) getChildFragmentManager()
+                        .findFragmentByTag("f" + position);
+
+                fragment.initializeAndPlayVideo();
+
+            }
+        });
+
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("videoPager", "video pager fragment onDetach");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("videoPager", "video pager fragment onResume");
 
 //    final VideoPageVerticalFragment frag = getCurrentFragment();
 //    if(frag!=null){
 //      frag.isResumedFromAd = true;
 //    }
 
-  }
+    }
 
 
-  @Override
-  public void onPause() {
-    super.onPause();
+    @Override
+    public void onPause() {
+        super.onPause();
 
-    Log.d("videoPager", "video pager fragment onPause");
+        Log.d("videoPager", "video pager fragment onPause");
 
 //    final VideoPageVerticalFragment myFragment =
 //            (VideoPageVerticalFragment) getActivity().getSupportFragmentManager()
@@ -126,12 +126,12 @@ public class VideoPagerFragment extends Fragment {
 //      myFragment.newExoPlayer = null;
 //    }
 
-  }
+    }
 
-  @Override
-  public void onHiddenChanged(boolean hidden) {
-    super.onHiddenChanged(hidden);
-    Log.d("videoPager", "video pager fragment onHiddenChanged");
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.d("videoPager", "video pager fragment onHiddenChanged");
 
 //    VideoPageVerticalFragment fragment = getCurrentFragment();
 //
@@ -165,7 +165,7 @@ public class VideoPagerFragment extends Fragment {
 ////      }
 //      }
 //    }
-  }
+    }
 
 //  VideoPageVerticalFragment getCurrentFragment(){
 //
@@ -175,10 +175,10 @@ public class VideoPagerFragment extends Fragment {
 //  }
 
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    Log.d("videoPager", "onDestroy the parent");
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("videoPager", "onDestroy the parent");
 
 
 //    final VideoPageVerticalFragment myFragment =
@@ -203,7 +203,7 @@ public class VideoPagerFragment extends Fragment {
 //    }
 
 
-  }
+    }
 
 //  @Override
 //  public void onDetach() {
@@ -233,14 +233,14 @@ public class VideoPagerFragment extends Fragment {
 //    videoViewPager.setAdapter(null);
 //  }
 
-  @Override
-  public void onDestroyView() {
-    super.onDestroyView();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
-    Log.d("videoPager", "onDestroyView parent fragment");
+        Log.d("videoPager", "onDestroyView parent fragment");
 
-    ((HomeActivity) Objects.requireNonNull(getActivity()))
-            .lockDrawer(DrawerLayout.LOCK_MODE_UNLOCKED);
+        ((HomeActivity) Objects.requireNonNull(getActivity()))
+                .lockDrawer(DrawerLayout.LOCK_MODE_UNLOCKED);
 
 //    final VideoPageVerticalFragment myFragment =
 //            (VideoPageVerticalFragment) getActivity().getSupportFragmentManager()
@@ -259,44 +259,44 @@ public class VideoPagerFragment extends Fragment {
 //      myFragment.newExoPlayer = null;
 //    }
 
-    if (promotionDeleteReceiver != null)
-      getContext().unregisterReceiver(promotionDeleteReceiver);
+        if (promotionDeleteReceiver != null)
+            getContext().unregisterReceiver(promotionDeleteReceiver);
 
-  }
-
-  void setupDeletionReceiver() {
-
-    promotionDeleteReceiver =
-            new PromotionDeleteReceiver() {
-              @Override
-
-              public void onReceive(Context context, Intent intent) {
-                checkAndDeletePromoFromList(promotions,
-                        intent.getLongExtra("promoId", 0));
-              }
-            };
-
-
-    getContext().registerReceiver(promotionDeleteReceiver,
-            new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
-
-
-  }
-
-  void checkAndDeletePromoFromList(ArrayList<Promotion> promos, long id) {
-
-    if (promos != null && !promos.isEmpty()) {
-      for (Promotion promo : promos) {
-        if (promo.getPromoid() == id) {
-          final int index = promos.indexOf(promo);
-          promos.remove(promo);
-          adapter.notifyItemRemoved(index);
-          break;
-        }
-      }
     }
 
-  }
+    void setupDeletionReceiver() {
+
+        promotionDeleteReceiver =
+                new PromotionDeleteReceiver() {
+                    @Override
+
+                    public void onReceive(Context context, Intent intent) {
+                        checkAndDeletePromoFromList(promotions,
+                                intent.getLongExtra("promoId", 0));
+                    }
+                };
+
+
+        getContext().registerReceiver(promotionDeleteReceiver,
+                new IntentFilter(BuildConfig.APPLICATION_ID + ".promoDelete"));
+
+
+    }
+
+    void checkAndDeletePromoFromList(ArrayList<Promotion> promos, long id) {
+
+        if (promos != null && !promos.isEmpty()) {
+            for (Promotion promo : promos) {
+                if (promo.getPromoid() == id) {
+                    final int index = promos.indexOf(promo);
+                    promos.remove(promo);
+                    adapter.notifyItemRemoved(index);
+                    break;
+                }
+            }
+        }
+
+    }
 
 
 }

@@ -38,9 +38,10 @@ public class PromotionViewPager extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
 
-        View view = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.promo_pager_layout, null);
+        View view = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.promo_pager_layout, null);
         final ImageView imageView = view.findViewById(R.id.pagerImageView);
-        picasso.load(images.get(position)).fit().centerInside().into(imageView);
+        picasso.load(images.get(position)).fit().centerCrop().into(imageView);
 
         view.setOnClickListener(v -> FullScreenImagesUtil.showImageFullScreen(context,
                 images.get(position), null));

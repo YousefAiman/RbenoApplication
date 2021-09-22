@@ -16,6 +16,10 @@
                 android:id="@+id/pause_item"
                 android:title="تشغيل الاعلان" />
 
+            <item
+                android:id="@+id/edit_item"
+                android:title="تعديل الاعلان" />
+
         </menu>
 
     </item>

@@ -10,7 +10,7 @@ import android.util.Log;
 public class NotificationClickReceiver extends BroadcastReceiver {
 
 
-  private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
 //  public static boolean isRegistered = false;
 //  private static NotificationClickReceiver receiver = null;
 
@@ -28,8 +28,8 @@ public class NotificationClickReceiver extends BroadcastReceiver {
 //    return(receiver);
 //  }
 
-  @Override
-  public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
 
 //    try {
 //     LocalBroadcastManager.getInstance(context)
@@ -43,59 +43,59 @@ public class NotificationClickReceiver extends BroadcastReceiver {
 //      isRegistered = false;
 //    }
 
-    if (intent.hasExtra("messagingBundle")) {
+        if (intent.hasExtra("messagingBundle")) {
 
-      if (GlobalVariables.isAppIsRunning()) {
+            if (GlobalVariables.isAppIsRunning()) {
 
-        if (sharedPreferences == null) {
-          sharedPreferences = context.getSharedPreferences("rbeno", Context.MODE_PRIVATE);
-        }
+                if (sharedPreferences == null) {
+                    sharedPreferences = context.getSharedPreferences("rbeno", Context.MODE_PRIVATE);
+                }
 
-        Intent intent1 = new Intent(context, MessagingRealTimeActivity.class)
-                .putExtra("messagingBundle",
-                        intent.getBundleExtra("messagingBundle"));
+                Intent intent1 = new Intent(context, MessagingRealTimeActivity.class)
+                        .putExtra("messagingBundle",
+                                intent.getBundleExtra("messagingBundle"));
 
-        if (sharedPreferences.contains("currentMessagingUserId")) {
+                if (sharedPreferences.contains("currentMessagingUserId")) {
 //          intent1.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-          final Bundle messagingBundle = intent.getBundleExtra("messagingBundle");
-          if (messagingBundle.getString("promouserid")
-                  .equals(sharedPreferences.getString("currentMessagingUserId", "")) &&
-                  messagingBundle.getLong("intendedpromoid") ==
-                          sharedPreferences.getLong("currentMessagingPromoId", 0)) {
-            Log.d("ttt", "this messaging activity is already open man");
+                    final Bundle messagingBundle = intent.getBundleExtra("messagingBundle");
+                    if (messagingBundle.getString("promouserid")
+                            .equals(sharedPreferences.getString("currentMessagingUserId", "")) &&
+                            messagingBundle.getLong("intendedpromoid") ==
+                                    sharedPreferences.getLong("currentMessagingPromoId", 0)) {
+                        Log.d("ttt", "this messaging activity is already open man");
 //          intent1.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent1.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent1.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 //          Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
 //          intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //          intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //          intent1.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-          } else {
-            Log.d("ttt", "current messaging is not this");
-            intent1.setFlags(
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                            Intent.FLAG_ACTIVITY_NEW_TASK);
-          }
-        } else {
-          Log.d("ttt", "no current messaging in shared");
-          intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    } else {
+                        Log.d("ttt", "current messaging is not this");
+                        intent1.setFlags(
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                    }
+                } else {
+                    Log.d("ttt", "no current messaging in shared");
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+
+                context.startActivity(intent1);
+                Log.d("ttt", "clicked notificaiton while app is running");
+            } else {
+
+                context.startActivity(new Intent(context, MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .putExtra("messagingBundle",
+                                intent.getBundleExtra("messagingBundle")));
+
+                Log.d("ttt", "clicked notificaiton while app isn't running");
+            }
+
+
         }
 
-        context.startActivity(intent1);
-        Log.d("ttt", "clicked notificaiton while app is running");
-      } else {
-
-        context.startActivity(new Intent(context, MainActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra("messagingBundle",
-                        intent.getBundleExtra("messagingBundle")));
-
-        Log.d("ttt", "clicked notificaiton while app isn't running");
-      }
-
-
     }
-
-  }
 
 //  public static void registerReceiver(Context context){
 //    if(isRegistered){

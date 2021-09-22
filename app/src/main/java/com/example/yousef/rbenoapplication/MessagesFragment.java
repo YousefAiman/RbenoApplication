@@ -17,7 +17,8 @@ import androidx.viewpager.widget.ViewPager;
 
 public class MessagesFragment extends Fragment {
     private ViewPager messagesViewPager;
-    private TextView receivedTv, sentTv, moreMessagesTv;
+    private TextView receivedTv;
+    private TextView sentTv;
 
     public MessagesFragment() {
     }
@@ -29,8 +30,6 @@ public class MessagesFragment extends Fragment {
         messagesViewPager = view.findViewById(R.id.messagesViewPager);
         receivedTv = view.findViewById(R.id.receivedTv);
         sentTv = view.findViewById(R.id.sentTv);
-        moreMessagesTv = view.findViewById(R.id.moreMessagesTv);
-//    arrowIv = view.findViewById(R.id.arrowIv);
         ((Toolbar) view.findViewById(R.id.messagesToolBar)).setNavigationOnClickListener(view1 ->
                 ((HomeActivity) getActivity()).showDrawer());
         return view;

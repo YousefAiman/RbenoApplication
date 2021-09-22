@@ -20,6 +20,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -41,257 +42,265 @@ import java.util.Locale;
 
 public class LocationRequester {
 
-  private static final int REQUEST_CHECK_SETTINGS = 100;
-  private final Context context;
-  private final Activity activity;
-  Boolean mRequestingLocationUpdates;
-  private FusedLocationProviderClient fusedLocationClient;
-  private LocationRequest locationRequest;
-  private LocationCallback locationCallback;
-  private int activityBtnClicked;
-  private ProgressDialog progressDialog;
-  private int retries = 0;
-  private Class<?> destinationActivity;
+    private static final int REQUEST_CHECK_SETTINGS = 100;
+    private final Context context;
+    private final Activity activity;
+    Boolean mRequestingLocationUpdates;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private int activityBtnClicked;
+    private ProgressDialog progressDialog;
+    private int retries = 0;
+    private Class<?> destinationActivity;
 
-  public LocationRequester(Context context, Activity activity) {
-    this.activity = activity;
-    this.context = context;
-  }
+    public LocationRequester(Context context, Activity activity) {
+        this.activity = activity;
+        this.context = context;
+    }
 
-  public LocationRequester(Context context, Activity activity, Class<?> destinationActivity) {
-    this.activity = activity;
-    this.context = context;
-    this.destinationActivity = destinationActivity;
+    public LocationRequester(Context context, Activity activity, Class<?> destinationActivity) {
+        this.activity = activity;
+        this.context = context;
+        this.destinationActivity = destinationActivity;
 
 //    progressDialog = new ProgressDialog(context);
 //    progressDialog.setMessage("جاري التحميل...");
 //    progressDialog.setCancelable(false);
 //    progressDialog.show();
 
-  }
-
-  public LocationRequester(Context context, Activity activity, int activityBtnClicked) {
-    this.activity = activity;
-    this.context = context;
-    this.activityBtnClicked = activityBtnClicked;
-
-    progressDialog = new ProgressDialog(context);
-    progressDialog.setCancelable(false);
-    progressDialog.show();
-  }
-
-  @SuppressLint("MissingPermission")
-  void geCountryFromLocation() {
-
-    Log.d("ttt", "getting last known location");
-
-    if (fusedLocationClient != null && locationCallback != null) {
-
-      fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback,
-              Looper.myLooper());
-
-      return;
     }
 
-    locationRequest = LocationRequest.create().
-            setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
-            .setInterval(10000).setFastestInterval(5000);
+    public LocationRequester(Context context, Activity activity, int activityBtnClicked) {
+        this.activity = activity;
+        this.context = context;
+        this.activityBtnClicked = activityBtnClicked;
 
-    final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest);
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
 
-    LocationServices.getSettingsClient(activity)
-            .checkLocationSettings(builder.build())
-            .addOnSuccessListener(locationSettingsResponse -> {
-              Log.d("ttt", "location is enabled");
+    @SuppressLint("MissingPermission")
+    void geCountryFromLocation() {
 
-              getLastKnownLocation();
+        Log.d("ttt", "getting last known location");
 
-            }).addOnFailureListener(e -> {
-      if (e instanceof ResolvableApiException) {
-        Log.d("ttt", "location is not enabled");
-        try {
-          final ResolvableApiException resolvable = (ResolvableApiException) e;
-          resolvable.startResolutionForResult(activity,
-                  REQUEST_CHECK_SETTINGS);
+        if (fusedLocationClient != null && locationCallback != null) {
 
-        } catch (IntentSender.SendIntentException sendEx) {
-          // Ignore the error.
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback,
+                    Looper.myLooper());
+
+            return;
         }
-      }
-    });
 
-  }
+        locationRequest = LocationRequest.create().
+                setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setInterval(10000).setFastestInterval(5000);
 
-  @SuppressLint("MissingPermission")
-  void getLastKnownLocation() {
+        final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
 
-    Log.d("ttt", "getting last known location");
-    fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
+        LocationServices.getSettingsClient(activity)
+                .checkLocationSettings(builder.build())
+                .addOnSuccessListener(locationSettingsResponse -> {
+                    Log.d("ttt", "location is enabled");
 
-    fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(new OnSuccessListener<Location>() {
-              @Override
-              public void onSuccess(Location location) {
-                if (location == null) {
+                    getLastKnownLocation();
 
-                  Log.d("ttt", "last location is null");
+                }).addOnFailureListener(e -> {
+            if (e instanceof ResolvableApiException) {
+                Log.d("ttt", "location is not enabled");
+                try {
+                    final ResolvableApiException resolvable = (ResolvableApiException) e;
+                    resolvable.startResolutionForResult(activity,
+                            REQUEST_CHECK_SETTINGS);
 
-                  mRequestingLocationUpdates = true;
+                } catch (IntentSender.SendIntentException sendEx) {
+                    // Ignore the error.
+                }
+            }
+        });
 
-                  fusedLocationClient.requestLocationUpdates(locationRequest,
-                          locationCallback = addLocationCallback(),
-                          Looper.getMainLooper());
+    }
 
-                } else {
+    @SuppressLint("MissingPermission")
+    void getLastKnownLocation() {
 
-                  getCountryInfoFromLocation(location);
+        Log.d("ttt", "getting last known location");
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
 
-                  Log.d("ttt", "last known location: " + location);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location == null) {
 
+                            Log.d("ttt", "last location is null");
+
+                            mRequestingLocationUpdates = true;
+
+                            fusedLocationClient.requestLocationUpdates(locationRequest,
+                                    locationCallback = addLocationCallback(),
+                                    Looper.getMainLooper());
+
+                        } else {
+
+                            getCountryInfoFromLocation(location);
+
+                            Log.d("ttt", "last known location: " + location);
+
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                fusedLocationClient.requestLocationUpdates(locationRequest,
+                        locationCallback = addLocationCallback(),
+                        Looper.getMainLooper());
+
+                Log.d("ttt", "last known failed: " + e.getMessage());
+            }
+        });
+
+    }
+
+    @SuppressLint("MissingPermission")
+    void resumeLocationUpdates() {
+
+        if (mRequestingLocationUpdates != null && !mRequestingLocationUpdates
+                && locationCallback != null && fusedLocationClient != null) {
+            mRequestingLocationUpdates = true;
+
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                    locationCallback = addLocationCallback(),
+                    Looper.getMainLooper());
+        }
+
+    }
+
+    void stopLocationUpdates() {
+        Log.d("ttt", "stopping location updates");
+        if (mRequestingLocationUpdates != null && mRequestingLocationUpdates) {
+            if (locationCallback != null && fusedLocationClient != null) {
+                mRequestingLocationUpdates = false;
+                dismissProgressDialog();
+                fusedLocationClient.removeLocationUpdates(locationCallback);
+            }
+        }
+    }
+
+
+    void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    LocationCallback addLocationCallback() {
+
+        return new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+
+                Log.d("ttt", "onLocationResult");
+
+                if (locationResult == null) {
+                    Log.d("ttt", "onLocationResult locationResult is null");
+                    return;
                 }
 
-              }
-            }).addOnFailureListener(new OnFailureListener() {
-      @Override
-      public void onFailure(@NonNull Exception e) {
+                for (Location location : locationResult.getLocations()) {
 
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback = addLocationCallback(),
-                Looper.getMainLooper());
+                    if (location != null) {
 
-        Log.d("ttt", "last known failed: " + e.getMessage());
-      }
-    });
+                        Log.d("ttt", "location result is not null");
 
-  }
+                        stopLocationUpdates();
+                        getCountryInfoFromLocation(location);
 
-  @SuppressLint("MissingPermission")
-  void resumeLocationUpdates() {
+                        break;
+                    }
+                }
 
-    if (mRequestingLocationUpdates != null && !mRequestingLocationUpdates
-            && locationCallback != null && fusedLocationClient != null) {
-      mRequestingLocationUpdates = true;
+            }
 
-      fusedLocationClient.requestLocationUpdates(locationRequest,
-              locationCallback = addLocationCallback(),
-              Looper.getMainLooper());
+            @Override
+            public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
+                super.onLocationAvailability(locationAvailability);
+                Log.d("ttt", "locationAvailability: " + locationAvailability.toString());
+            }
+        };
+
     }
 
-  }
+    public static void main(String[] args) {
 
-  void stopLocationUpdates() {
-    Log.d("ttt", "stopping location updates");
-    if (mRequestingLocationUpdates != null && mRequestingLocationUpdates) {
-      if (locationCallback != null && fusedLocationClient != null) {
-        mRequestingLocationUpdates = false;
-        dismissProgressDialog();
-        fusedLocationClient.removeLocationUpdates(locationCallback);
-      }
+        Currency currency = Currency.getInstance(Locale.getDefault());
+        System.out.println("currency Code: " + currency.getCurrencyCode());
+        System.out.println("currency getDisplayName: " + currency.getDisplayName());
+        System.out.println("currency getSymbol: " + currency.getSymbol());
+
     }
-  }
 
 
-  void dismissProgressDialog() {
-    if (progressDialog != null && progressDialog.isShowing()) {
-      progressDialog.dismiss();
-    }
-  }
+    void getCountryInfoFromLocation(Location location) {
+        final Geocoder geocoder = new Geocoder(context, new Locale("ar"));
 
-  LocationCallback addLocationCallback() {
+        try {
+            final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 1);
 
-    return new LocationCallback() {
-      @Override
-      public void onLocationResult(LocationResult locationResult) {
+            if (!addresses.isEmpty() && addresses.get(0).getCountryName() != null) {
 
-        Log.d("ttt", "onLocationResult");
+                final Address a = addresses.get(0);
 
-        if (locationResult == null) {
-          Log.d("ttt", "onLocationResult locationResult is null");
-          return;
-        }
+                Log.d("ttt", "address to string: " + a.toString());
 
-        for (Location location : locationResult.getLocations()) {
-          Log.d("ttt", "location result is not null");
+                final String cityName = a.getLocality();
 
-          if (location != null) {
+                final String country = a.getCountryName();
+                final String countryCode = a.getCountryCode();
 
+                String currency = Currency.getInstance(new Locale("en", countryCode))
+                        .getCurrencyCode();
+
+                if (currency.contains(".")) {
+                    if (currency.substring(currency.length() - 2, currency.length() - 1)
+                            .equals(".")) {
+                        currency = currency.substring(0, currency.length() - 2);
+                    }
+                }
+
+                Log.d("ttt", "currency: " + currency);
+                updateFirebaseAndSharedPreferences(countryCode.toUpperCase(), cityName, country, currency);
+
+                Log.d("ttt", "from geocoder: " + country + countryCode.toLowerCase() + currency);
+
+                if (destinationActivity != null) {
+
+                    context.startActivity(new Intent(context, destinationActivity));
+                    activity.finish();
+
+                } else {
+                    startTargetActivity();
+                }
+
+
+            } else {
+                Log.d("ttt", "no address so fetching from api");
+
+                fetchFromApi(location.getLatitude(), location.getLongitude());
+            }
+        } catch (IOException e) {
             stopLocationUpdates();
-            getCountryInfoFromLocation(location);
-
-            break;
-          }
+            fetchFromApi(location.getLatitude(), location.getLongitude());
+            Log.d("ttt", "geocoder error:" + e.getLocalizedMessage());
         }
 
-      }
-
-    };
-
-  }
-
-  public static void main(String[] args) {
-
-    Currency currency = Currency.getInstance(Locale.getDefault());
-    System.out.println("currency Code: " + currency.getCurrencyCode());
-    System.out.println("currency getDisplayName: " + currency.getDisplayName());
-    System.out.println("currency getSymbol: " + currency.getSymbol());
-
-  }
-
-
-  void getCountryInfoFromLocation(Location location) {
-    final Geocoder geocoder = new Geocoder(context, new Locale("ar"));
-
-    try {
-      final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),
-              location.getLongitude(), 1);
-
-      if (!addresses.isEmpty() && addresses.get(0).getCountryName() != null) {
-
-        final Address a = addresses.get(0);
-
-        Log.d("ttt", "address to string: " + a.toString());
-
-        final String cityName = a.getLocality();
-
-        final String country = a.getCountryName();
-        final String countryCode = a.getCountryCode();
-
-        String currency = Currency.getInstance(new Locale("en", countryCode))
-                .getCurrencyCode();
-
-        if (currency.contains(".")) {
-          if (currency.substring(currency.length() - 2, currency.length() - 1)
-                  .equals(".")) {
-            currency = currency.substring(0, currency.length() - 2);
-          }
-        }
-
-        Log.d("ttt", "currency: " + currency);
-        updateFirebaseAndSharedPreferences(countryCode.toUpperCase(), cityName, country, currency);
-
-        Log.d("ttt", "from geocoder: " + country + countryCode.toLowerCase() + currency);
-
-        if (destinationActivity != null) {
-
-          context.startActivity(new Intent(context, destinationActivity));
-          activity.finish();
-
-        } else {
-          startTargetActivity();
-        }
-
-
-      } else {
-        fetchFromApi(location.getLatitude(), location.getLongitude());
-      }
-    } catch (IOException e) {
-      stopLocationUpdates();
-      fetchFromApi(location.getLatitude(), location.getLongitude());
-      Log.d("ttt", "geocoder error:" + e.getLocalizedMessage());
     }
-
-  }
 //  void init() {
 //
 //    mRequestingLocationUpdates = true;
@@ -333,141 +342,147 @@ public class LocationRequester {
 ////    requestPermissions();
 //  }
 
-  void startTargetActivity() {
+    void startTargetActivity() {
 
-    if (activityBtnClicked == 0) {
+        if (activityBtnClicked == 0) {
 
-      FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(authResult -> {
-        context.startActivity(new Intent(context, HomeActivity.class));
-        activity.finish();
-      });
-
-    } else {
-
-      dismissProgressDialog();
-
-      startActivity(activityBtnClicked);
-    }
-  }
-
-  private void fetchFromApi(double latitude, double longitude) {
-
-    final String url =
-            "https://api.opencagedata.com/geocode/v1/json?key=078648c6ff684a8e851e63cbb1c8f6d8&q="
-                    + latitude + "+" + longitude + "&pretty=1&no_annotations=1";
-
-    final RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null, response -> {
-      try {
-        if (response.getJSONObject("status").getString("message")
-                .equalsIgnoreCase("ok")) {
-
-          final JSONObject address = response.getJSONArray("results")
-                  .getJSONObject(0).getJSONObject("components");
-
-          Log.d("ttt", "address: " + address.toString());
-          final String country = address.getString("country");
-          final String countryCode = address.getString("country_code");
-
-          String cityName = null;
-          if (address.has("city")) {
-            cityName = address.getString("city");
-          } else if (address.has("region")) {
-            cityName = address.getString("region");
-          }
-
-          Log.d("ttt", "country:+ " + country);
-          Log.d("ttt", "code:+ " + countryCode);
-
-          String currency = Currency.getInstance(new Locale("en", countryCode))
-                  .getCurrencyCode();
-
-          if (currency.contains(".")) {
-            if (currency.substring(currency.length() - 2, currency.length() - 1).equals(".")) {
-              currency = currency.substring(0, currency.length() - 2);
-            }
-          }
-
-          Log.d("ttt", "currency: " + currency);
-          updateFirebaseAndSharedPreferences(countryCode.toUpperCase(), cityName, country, currency);
-
-          Log.d("ttt", "from api: " + country + countryCode + currency);
-
-          if (destinationActivity != null) {
-
-            context.startActivity(new Intent(context, destinationActivity));
-            activity.finish();
-
-          } else {
-            startTargetActivity();
-          }
+            FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener(authResult -> {
+                context.startActivity(new Intent(context, HomeActivity.class));
+                activity.finish();
+            });
 
         } else {
-          Log.d("ttt", "error here man 3: " +
-                  response.getJSONObject("status").getString("message"));
+
+            dismissProgressDialog();
+
+            startActivity(activityBtnClicked);
         }
-      } catch (JSONException e) {
-        Log.d("ttt", "error here man 1: " + e.getMessage());
-        e.printStackTrace();
-      }
-    }, error -> {
-
-      if (retries < 3) {
-        retries++;
-
-        fetchFromApi(latitude, longitude);
-      } else {
-        Toast.makeText(context, "حصلت مشكلة! حاول اعادة تشغيل التطبيق"
-                , Toast.LENGTH_SHORT).show();
-        ((Activity) context).finish();
-      }
-
-      Log.d("ttt", "error here man 2: " + error.getMessage());
-    });
-    queue.add(jsonObjectRequest);
-    queue.start();
-  }
-
-
-  void startActivity(int path) {
-
-    context.startActivity(new Intent(context,
-            path == 1 ? SigninActivity.class : RegisterActivity.class));
-
-    activity.finish();
-  }
-
-
-  private void updateFirebaseAndSharedPreferences(String countryCode, String cityName,
-                                                  String country, String currency) {
-    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-    GlobalVariables.getInstance().setCountryCode(countryCode);
-
-    if (user != null) {
-      FirebaseFirestore.getInstance().collection("users").
-              document(user.getUid())
-              .update("countryCode", countryCode,
-                      "cityName", cityName)
-              .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                  Log.d("ttt", "updating success");
-                }
-              }).addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          Log.d("ttt", "updating onFailure: " + e.getMessage());
-        }
-      });
     }
 
-    activity.getSharedPreferences("rbeno", Context.MODE_PRIVATE).edit()
-            .putString("country", country)
-            .putString("currency", currency)
-            .putString("countryCode", countryCode)
-            .putString("cityName", cityName).apply();
-  }
+    private void fetchFromApi(double latitude, double longitude) {
+
+        final String url =
+                "https://api.opencagedata.com/geocode/v1/json?key=078648c6ff684a8e851e63cbb1c8f6d8&q="
+                        + latitude + "+" + longitude + "&pretty=1&no_annotations=1";
+
+        final RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(url, null, response -> {
+            try {
+                if (response.getJSONObject("status").getString("message")
+                        .equalsIgnoreCase("ok")) {
+
+                    final JSONObject address = response.getJSONArray("results")
+                            .getJSONObject(0).getJSONObject("components");
+
+                    Log.d("ttt", "address: " + address.toString());
+                    final String country = address.getString("country");
+                    final String countryCode = address.getString("country_code");
+
+                    String cityName = null;
+
+                    if (address.has("village")) {
+                        cityName = address.getString("village");
+                    } else if (address.has("region")) {
+                        cityName = address.getString("region");
+                    } else if (address.has("city")) {
+                        cityName = address.getString("city");
+                    } else if (address.has("county")) {
+                        cityName = address.getString("county");
+                    }
+
+
+                    Log.d("ttt", "country:+ " + country);
+                    Log.d("ttt", "code:+ " + countryCode);
+
+                    String currency = Currency.getInstance(new Locale("en", countryCode))
+                            .getCurrencyCode();
+
+                    if (currency.contains(".")) {
+                        if (currency.substring(currency.length() - 2, currency.length() - 1).equals(".")) {
+                            currency = currency.substring(0, currency.length() - 2);
+                        }
+                    }
+
+                    Log.d("ttt", "currency: " + currency);
+                    updateFirebaseAndSharedPreferences(countryCode.toUpperCase(), cityName, country, currency);
+
+                    Log.d("ttt", "from api: " + country + countryCode + currency);
+
+                    if (destinationActivity != null) {
+
+                        context.startActivity(new Intent(context, destinationActivity));
+                        activity.finish();
+
+                    } else {
+                        startTargetActivity();
+                    }
+
+                } else {
+                    Log.d("ttt", "error here man 3: " +
+                            response.getJSONObject("status").getString("message"));
+                }
+            } catch (JSONException e) {
+                Log.d("ttt", "error here man 1: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }, error -> {
+
+            if (retries < 3) {
+                retries++;
+
+                fetchFromApi(latitude, longitude);
+            } else {
+                Toast.makeText(context, "حصلت مشكلة! حاول اعادة تشغيل التطبيق"
+                        , Toast.LENGTH_SHORT).show();
+                ((Activity) context).finish();
+            }
+
+            Log.d("ttt", "error here man 2: " + error.getMessage());
+        });
+        queue.add(jsonObjectRequest);
+//        queue.start();
+    }
+
+
+    void startActivity(int path) {
+
+        context.startActivity(new Intent(context,
+                path == 1 ? SigninActivity.class : RegisterActivity.class));
+
+        activity.finish();
+    }
+
+
+    private void updateFirebaseAndSharedPreferences(String countryCode, String cityName,
+                                                    String country, String currency) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        GlobalVariables.getInstance().setCountryCode(countryCode);
+
+        if (user != null) {
+            FirebaseFirestore.getInstance().collection("users").
+                    document(user.getUid())
+                    .update("countryCode", countryCode,
+                            "cityName", cityName)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("ttt", "updating success");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d("ttt", "updating onFailure: " + e.getMessage());
+                }
+            });
+        }
+
+        activity.getSharedPreferences("rbeno", Context.MODE_PRIVATE).edit()
+                .putString("country", country)
+                .putString("currency", currency)
+                .putString("countryCode", countryCode)
+                .putString("cityName", cityName).apply();
+    }
 
 }
 

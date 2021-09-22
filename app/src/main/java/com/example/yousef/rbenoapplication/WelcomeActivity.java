@@ -32,6 +32,7 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
+
         final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
 
         final Button signinBtn = findViewById(R.id.signinBtn);
@@ -114,13 +115,13 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-    void startActivity(int path) {
-
-        startActivity(new Intent(this,
-                path == 1 ? SigninActivity.class : RegisterActivity.class));
-
-        finish();
-    }
+//    void startActivity(int path) {
+//
+//        startActivity(new Intent(this,
+//                path == 1 ? SigninActivity.class : RegisterActivity.class));
+//
+//        finish();
+//    }
 //  @Override
 //  public void onBackPressed() {
 //    moveTaskToBack(true);

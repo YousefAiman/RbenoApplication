@@ -7,4 +7,10 @@
     <item
         android:id="@+id/pause_item"
         android:title="إيقاف الاعلان" />
+
+    <item
+        android:id="@+id/edit_item"
+        android:title="تعديل الاعلان" />
+
+
 </menu>

@@ -24,7 +24,18 @@ public class SigninUtil {
         Dialog dialog = new Dialog(context);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setContentView(R.layout.signin_alert_layout);
-        dialog.findViewById(R.id.alert_close).setOnClickListener(v -> dialog.cancel());
+        dialog.findViewById(R.id.alert_signup).setOnClickListener(v -> {
+
+            FirebaseAuth.getInstance().signOut();
+
+            dialog.dismiss();
+            context.startActivity(new Intent(context, RegisterActivity.class));
+
+            if (activity != null) {
+                activity.finish();
+            }
+
+        });
         dialog.findViewById(R.id.alert_signin).setOnClickListener(v -> {
 
             FirebaseAuth.getInstance().signOut();

@@ -15,76 +15,78 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 public class InterstitialAdUtil {
 
-  private static InterstitialAd mInterstitialAd = null;
-  private static boolean isAdShowing;
+    private static InterstitialAd mInterstitialAd = null;
+    private static boolean isAdShowing;
 
-  private InterstitialAdUtil() {
-  }
+    private InterstitialAdUtil() {
+    }
 
-  public static InterstitialAd getInstance(Context context) {
+    public static InterstitialAd getInstance(Context context) {
 
-    Log.d("videoPager", "getInstance called");
-    if (mInterstitialAd == null) {
-      Log.d("videoPager", "mInterstitialAd null so creating");
+        Log.d("videoPager", "getInstance called");
+        if (mInterstitialAd == null) {
+            Log.d("videoPager", "mInterstitialAd null so creating");
 
-      loadAd(context);
+            loadAd(context);
 
+            if (mInterstitialAd != null) {
 
-      mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-        @Override
-        public void onAdDismissedFullScreenContent() {
-          Log.d("videoPager", "mInterstitialAd ad closed");
-          setIsShowing(false);
+                mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                    @Override
+                    public void onAdDismissedFullScreenContent() {
+                        Log.d("videoPager", "mInterstitialAd ad closed");
+                        setIsShowing(false);
 
-          loadAd(context);
+                        loadAd(context);
+
+                    }
+
+                    @Override
+                    public void onAdShowedFullScreenContent() {
+                        mInterstitialAd = null;
+                        setIsShowing(true);
+                    }
+                });
+            }
+
 
         }
 
-        @Override
-        public void onAdShowedFullScreenContent() {
-          mInterstitialAd = null;
-          setIsShowing(true);
-        }
-      });
+        return (mInterstitialAd);
+    }
+
+    private static void loadAd(Context context) {
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(context,
+                "ca-app-pub-6990486336142688/9237240622",
+                adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        mInterstitialAd = interstitialAd;
+
+                        super.onAdLoaded(interstitialAd);
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        mInterstitialAd = null;
+                    }
+                });
 
 
     }
 
-    return (mInterstitialAd);
-  }
+    private static boolean isIsAdShowing() {
+        return InterstitialAdUtil.isAdShowing;
+    }
 
-  private static void loadAd(Context context) {
-
-    AdRequest adRequest = new AdRequest.Builder().build();
-
-    InterstitialAd.load(context,
-            "ca-app-pub-3940256099942544/1033173712",
-            adRequest,
-            new InterstitialAdLoadCallback() {
-              @Override
-              public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                mInterstitialAd = interstitialAd;
-
-                super.onAdLoaded(interstitialAd);
-              }
-
-              @Override
-              public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                super.onAdFailedToLoad(loadAdError);
-                mInterstitialAd = null;
-              }
-            });
-
-
-  }
-
-  public static boolean isIsAdShowing() {
-    return InterstitialAdUtil.isAdShowing;
-  }
-
-  static void setIsShowing(boolean isShowing) {
-    InterstitialAdUtil.isAdShowing = isShowing;
-  }
+    private static void setIsShowing(boolean isShowing) {
+        InterstitialAdUtil.isAdShowing = isShowing;
+    }
 //
 //  static class CloseListener extends AdListener{
 //    @Override
@@ -104,14 +106,16 @@ public class InterstitialAdUtil {
 //    }
 //  }
 
-  static void showAd(Context context) {
-    Log.d("videoPager", "showAd called");
-    if (mInterstitialAd == null) {
-      Log.d("videoPager", "creating ad before showing");
-      getInstance(context);
-    }
+    static void showAd(Context context) {
+        Log.d("videoPager", "showAd called");
+        if (mInterstitialAd == null) {
+            Log.d("videoPager", "creating ad before showing");
+            getInstance(context);
+        }
 
-    new Handler().post(() -> mInterstitialAd.show((Activity) context));
+        if (mInterstitialAd != null) {
+            new Handler().post(() -> mInterstitialAd.show((Activity) context));
+        }
 
 //    if (mInterstitialAd.isLoaded()) {
 //      Log.d("videoPager","mInterstitialAd.isLoaded so showing");
@@ -145,6 +149,6 @@ public class InterstitialAdUtil {
 //        }
 //      });
 //    }
-  }
+    }
 
 }

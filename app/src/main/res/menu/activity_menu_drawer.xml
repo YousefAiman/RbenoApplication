@@ -10,13 +10,13 @@
             android:id="@+id/my_ads"
             android:icon="@drawable/promotion_icon"
             android:title="اعلاناتي" />
-        <!--    <item-->
-        <!--        android:id="@+id/my_messages"-->
-        <!--        android:icon="@drawable/bubble_grey"-->
-        <!--        android:title="الرسائل"-->
-        <!--        android:actionLayout="@layout/menu_counter"-->
-        <!--        app:actionViewClass="android.widget.TextView"-->
-        <!--        />-->
+        <!--            <item-->
+        <!--                android:id="@+id/my_messages"-->
+        <!--                android:icon="@drawable/bubble_grey"-->
+        <!--                android:title="الرسائل"-->
+        <!--                android:actionLayout="@layout/menu_counter"-->
+        <!--                app:actionViewClass="android.widget.TextView"-->
+        <!--                />-->
         <!--    <item-->
         <!--        android:id="@+id/my_notifications"-->
         <!--        android:icon="@drawable/alarm_icon"-->

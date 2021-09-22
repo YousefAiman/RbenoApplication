@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -95,74 +98,83 @@ public class CategoryPromotionsFragment extends Fragment
 
     }
 
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-      View view = inflater.inflate(R.layout.fragment_category_promotions, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_category_promotions, container, false);
 
-      setupDeletionReceiver();
+        setupDeletionReceiver();
 
-      newestPromosRv = view.findViewById(R.id.newestPromosRv);
-      videosRv = view.findViewById(R.id.videosRv);
+        newestPromosRv = view.findViewById(R.id.newestPromosRv);
+        videosRv = view.findViewById(R.id.videosRv);
 
-      swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-      noCarPromosTv = view.findViewById(R.id.noPromosTv);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        noCarPromosTv = view.findViewById(R.id.noPromosTv);
 
-      swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
-      scrollview = view.findViewById(R.id.scrollview);
-      scrollview.setNestedScrollingEnabled(true);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.red));
+        scrollview = view.findViewById(R.id.scrollview);
+        scrollview.setNestedScrollingEnabled(true);
 
 
-      swipeRefreshLayout.setOnRefreshListener(this);
-      swipeRefreshLayout.setRefreshing(true);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setRefreshing(true);
 //  ((NestedScrollView)view.findViewById(R.id.scrollview)).setNestedScrollingEnabled(true);
 
-      videosRv.setLayoutManager(new LinearLayoutManager(getContext(),
-              RecyclerView.HORIZONTAL, false) {
-          @Override
-          public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
-              lp.width = (int) (getHeight() * 0.55);
-              return true;
-          }
-      });
+        videosRv.setLayoutManager(new LinearLayoutManager(getContext(),
+                RecyclerView.HORIZONTAL, false) {
+            @Override
+            public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+                lp.width = (int) (getHeight() * 0.55);
+                return true;
+            }
+        });
 
-      final GridLayoutManager glm = new GridLayoutManager(getContext(), 2) {
-          @Override
-          public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
-              lp.height = (int) (getWidth() * 0.55);
-              return true;
-          }
-      };
+        final GridLayoutManager glm = new GridLayoutManager(getContext(), 2) {
+            @Override
+            public boolean checkLayoutParams(RecyclerView.LayoutParams lp) {
+                lp.height = (int) (getWidth() * 0.55);
+                return true;
+            }
+        };
 
-      glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-          @Override
-          public int getSpanSize(int position) {
-              if (newestPromosRv.getAdapter().getItemViewType(position) == 2) {
-                  return 2;
-              }
-              return 1;
-          }
-      });
+        glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (newestPromosRv.getAdapter().getItemViewType(position) == 2) {
+                    return 2;
+                }
+                return 1;
+            }
+        });
 
-      newestPromosRv.setLayoutManager(glm);
-
-
-      return view;
-  }
+        newestPromosRv.setLayoutManager(glm);
 
 
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-      super.onViewCreated(view, savedInstanceState);
+        return view;
+    }
 
 
-      videosRv.setAdapter(videosAdapter);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final AdView adView = view.findViewById(R.id.adView);
+        adView.loadAd(new AdRequest.Builder().build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                adView.setVisibility(View.VISIBLE);
+            }
+        });
 
 
-      newestPromosRv.setAdapter(adapter);
+        videosRv.setAdapter(videosAdapter);
 
 
-      getUpdatedPromotions();
+        newestPromosRv.setAdapter(adapter);
+
+
+        getUpdatedPromotions();
 
 
 //    newestPromosRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -185,24 +197,24 @@ public class CategoryPromotionsFragment extends Fragment
 //      }
 //    });
 
-      getAllVideos();
+        getAllVideos();
 
-  }
+    }
 
-  @Override
-  public void onRefresh() {
-      if (WifiUtil.checkWifiConnection(getContext())) {
-          videoPromotionsAllVideo.clear();
-          promotions.clear();
-          videosAdapter.notifyDataSetChanged();
-          adapter.notifyDataSetChanged();
-          lastResult = null;
-          getAllVideos();
-          getUpdatedPromotions();
-      } else {
-          swipeRefreshLayout.setRefreshing(false);
-      }
-  }
+    @Override
+    public void onRefresh() {
+        if (WifiUtil.checkWifiConnection(getContext())) {
+            videoPromotionsAllVideo.clear();
+            promotions.clear();
+            videosAdapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
+            lastResult = null;
+            getAllVideos();
+            getUpdatedPromotions();
+        } else {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
 
     void addScrollListener() {
         scrollview.getViewTreeObserver()
@@ -376,7 +388,7 @@ public class CategoryPromotionsFragment extends Fragment
 
     void getAllVideos() {
 
-        Query query = carsQuery.whereEqualTo("promoType", "video").limit(videoQueryLimit);
+        Query query = carsQuery.whereEqualTo("promoType", Promotion.VIDEO_TYPE).limit(videoQueryLimit);
 
         if (GlobalVariables.getInstance().getCountryCode() != null) {
             query = query.whereEqualTo("country",

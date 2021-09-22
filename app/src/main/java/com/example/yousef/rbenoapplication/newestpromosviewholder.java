@@ -16,7 +16,7 @@ public class newestpromosviewholder extends RecyclerView.ViewHolder {
     private final ImageView promoimage;
     private final TextView titleTv, priceTv, categoryTv, viewsTv, dateTv, myPromoDescTv;
     private final Picasso picasso = Picasso.get();
-    private final Locale locale = Locale.getDefault();
+//    private final Locale locale = Locale.getDefault();
     ImageView myPromoHeartIv;
     TextView favTv;
 
@@ -53,21 +53,24 @@ public class newestpromosviewholder extends RecyclerView.ViewHolder {
 
         switch (promo.getPromoType()) {
 
-            case "image":
+            case Promotion.IMAGE_TYPE:
                 picasso.load(promo.getPromoimages().get(0))
                         .centerCrop().fit().into(promoimage);
                 itemView.findViewById(R.id.myPromoArrow).setVisibility(View.GONE);
                 break;
 
-            case "video":
+            case Promotion.VIDEO_TYPE:
                 picasso.load(promo.getVideoThumbnail())
                         .centerCrop().fit().into(promoimage);
 
                 itemView.findViewById(R.id.myPromoArrow).setVisibility(View.VISIBLE);
                 break;
 
-            case "text":
+            case Promotion.TEXT_TYPE:
                 itemView.findViewById(R.id.myPromoArrow).setVisibility(View.GONE);
+                if (myPromoDescTv != null) {
+                    myPromoDescTv.setText(promo.getDescription());
+                }
                 promoimage.setBackgroundResource(R.color.red);
 
         }
@@ -84,8 +87,16 @@ public class newestpromosviewholder extends RecyclerView.ViewHolder {
 //      promoimage.setBackgroundResource(R.color.red);
 //    }
         dateTv.setText(TimeConvertor.getTimeAgo(promo.getPublishtime()));
-        priceTv.setText(String.format(locale, "%,d", (long) promo.getPrice()) + " " + promo.getCurrency());
+
+        final String priceFormatted = String.format(Locale.getDefault(), "%,d", (long) promo.getPrice());
+
+        priceTv.setText(priceFormatted + " " + CurrencyUtil.getArabicSymbol(promo.getCurrency()));
+
+
+//        priceTv.setText(String.format(locale, "%,d", (long) promo.getPrice()) + " " + promo.getCurrency());
         titleTv.setText(promo.getTitle());
+
+
         categoryTv.setText(promo.getType());
         favTv.setText(promo.getFavcount() + "");
         viewsTv.setText(promo.getViewcount() + "");
@@ -102,7 +113,12 @@ public class newestpromosviewholder extends RecyclerView.ViewHolder {
         myPromoDescTv.setText(promo.getDescription());
         dateTv.setText(TimeConvertor.getTimeAgo(promo.getPublishtime()));
 
-        priceTv.setText(String.format(locale, "%,d", (long) promo.getPrice()) + " " + promo.getCurrency());
+
+        final String priceFormatted = String.format(Locale.getDefault(), "%,d", (long) promo.getPrice());
+
+        priceTv.setText(priceFormatted + " " + CurrencyUtil.getArabicSymbol(promo.getCurrency()));
+
+//        priceTv.setText(String.format(locale, "%,d", (long) promo.getPrice()) + " " + promo.getCurrency());
         titleTv.setText(promo.getTitle());
         categoryTv.setText(promo.getType());
         favTv.setText(promo.getFavcount() + "");
